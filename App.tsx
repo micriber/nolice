@@ -1,9 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
-import { Text, View, TouchableOpacity } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import MenuScreen from "./src/screens/Menu";
-import GameScreen from "./src/screens/Game";
+import MenuScreen from "./src/screens/menu";
+import GameScreen from "./src/screens/game";
 
 
 const Stack = createNativeStackNavigator();

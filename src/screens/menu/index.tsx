@@ -1,6 +1,7 @@
 import {StyleSheet, View} from "react-native";
-import Logo from "../../assets/svg/logo.svg";
-import PrimaryButton from "../components/PrimaryButton";
+// @ts-ignore
+import Logo from "../../../assets/svg/logo.svg";
+import PrimaryButton from "../../components/PrimaryButton";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 
 type Props = {

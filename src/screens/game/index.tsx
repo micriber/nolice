@@ -1,9 +1,9 @@
 import {StyleSheet, Text, View} from "react-native";
-import PrimaryButton from "../components/PrimaryButton";
+import PrimaryButton from "../../components/PrimaryButton";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import React from "react";
-import Duck from "../../assets/svg/duck.svg";
-import ChoiceButton from "../components/ChoiceButton";
+import ChoiceButton from "../../components/ChoiceButton";
+import {AnimalImage} from "./animal-picture";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -19,48 +19,16 @@ function GameScreen({ navigation } : Props) {
           alignItems: 'center',
           flexDirection: 'row',
         }]}>
-        <View style={[
-          {
-            flex: 1,
-          }
-        ]}>
-          <Duck/>
-        </View>
-        <View style={[
-          {
-            flex: 1,
-          }
-        ]}>
-          <Duck/>
-        </View>
-        <View style={[
-          {
-            flex: 1,
-          }
-        ]}>
-          <Duck/>
-        </View>
-        <View style={[
-          {
-            flex: 1,
-          }
-        ]}>
-          <Duck/>
-        </View>
-        <View style={[
-          {
-            flex: 1,
-          }
-        ]}>
-          <Duck/>
-        </View>
-        <View style={[
-          {
-            flex: 1,
-          }
-        ]}>
-          <Duck/>
-        </View>
+        <AnimalImage />
+        <AnimalImage />
+        <AnimalImage />
+        <AnimalImage />
+        <AnimalImage />
+        <AnimalImage />
+        <AnimalImage />
+        <AnimalImage />
+        <AnimalImage />
+        <AnimalImage />
       </View>
       <View style={styles.body}>
         <View style={[
