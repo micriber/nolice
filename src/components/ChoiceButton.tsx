@@ -1,6 +1,6 @@
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 
-export default function ChoiceButton(props: { answer: string, onPress: () => void }) {
+export default function ChoiceButton(props: { value: string, onPress: () => void }) {
   return <View style={[
     {
       flex: 1,
@@ -17,7 +17,7 @@ export default function ChoiceButton(props: { answer: string, onPress: () => voi
       }}
       onPress={props.onPress}
     >
-      <Text style={styles.playButtonText}>6</Text>
+      <Text style={styles.playButtonText}>{props.value}</Text>
     </TouchableOpacity>
   </View>;
 }

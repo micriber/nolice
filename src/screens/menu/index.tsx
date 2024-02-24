@@ -3,21 +3,26 @@ import {StyleSheet, View} from "react-native";
 import Logo from "../../../assets/svg/logo.svg";
 import PrimaryButton from "../../components/PrimaryButton";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
+import {useGameScoreStore} from "../../store/game";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
 };
 
 export default function MenuScreen({ navigation } : Props) {
+  const store = useGameScoreStore()
+  const handleClick = () => {
+    store.initQuestions()
+    navigation.navigate('Game')
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Logo/>
       </View>
       <View style={styles.body}>
-        <PrimaryButton name="JOUER" onPress={() => {
-          navigation.navigate('Game')
-        }}/>
+        <PrimaryButton name="JOUER" onPress={handleClick}/>
       </View>
     </View>
   );

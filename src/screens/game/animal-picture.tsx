@@ -8,7 +8,8 @@ export function AnimalImage() {
   return (
     <View style={[
       {
-        flex: 1,
+        width: "20%",
+        height: "40%",
       }
     ]}>
       <Duck/>
