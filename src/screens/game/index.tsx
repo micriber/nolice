@@ -1,10 +1,12 @@
 import {StyleSheet, Text, View} from "react-native";
 import PrimaryButton from "../../components/PrimaryButton";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import ChoiceButton from "../../components/ChoiceButton";
 import {AnimalImage} from "./animal-picture";
-import {useGameScoreStore} from "../../store/game";
+import {MAX_QUESTION, useGameScoreStore} from "../../store/game";
+import {ResultModal} from "./result-modal";
+import {Audio} from "expo-av";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -12,19 +14,39 @@ type Props = {
 
 export default
 function GameScreen({ navigation } : Props) {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [success, setSuccess] = useState(false);
   const store = useGameScoreStore()
   const ducks = []
+
   const answer = store.questions[store.currentIndex]?.possibilities.find((value) => value.isGood)
   if (answer) {
-    for (let i = 0; i < answer!.value; i++) {
+    for (let i = 0; i < answer.value; i++) {
       ducks.push(<AnimalImage key={i} />)
     }
   }
 
-  console.log({ current: store.currentIndex, possibilities: store.questions[store.currentIndex] })
+  useEffect(() => {
+    const playAudio = async () => {
+      const { sound } = await Audio.Sound.createAsync( require("../../../assets/audio/count-duck.wav"));
+      await sound.playAsync();
+    }
+
+    if (store.currentIndex < MAX_QUESTION) {
+      playAudio()
+    }
+  }, [store.currentIndex])
 
   return (
     <View style={styles.container}>
+      <ResultModal answer={answer?.value} onNext={() => {
+        setModalVisible(false)
+        store.nextQuestion(success)
+        setSuccess(false)
+        if (!store.hasNextQuestion()) {
+          return navigation.navigate('Score')
+        }
+      }} success={success} visible={modalVisible}/>
       <View style={[styles.header]}>
         <View style={[
           {
@@ -56,10 +78,8 @@ function GameScreen({ navigation } : Props) {
         }}>
           {store.questions[store.currentIndex]?.possibilities?.map((possibility) => (
             <ChoiceButton key={possibility.value} value={possibility.value.toString()} onPress={() => {
-              store.nextQuestion(possibility.isGood)
-              if (!store.hasNextQuestion()) {
-                navigation.navigate('Score')
-              }
+              setModalVisible(true)
+              setSuccess(possibility.isGood)
             }}/>
           ))}
         </View>
@@ -92,6 +112,8 @@ const styles = StyleSheet.create({
   },
   footer: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   playButton: {
     alignItems: 'center',

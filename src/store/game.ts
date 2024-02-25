@@ -56,14 +56,14 @@ export function newQuestion(): Question {
 
   return {
     success: false,
-    possibilities: possibilities.sort((a, b) => a.value - b.value)
+    possibilities: possibilities.sort((a, b) => 0.5 - Math.random())
   }
 }
 
 interface GameScoreState {
   currentIndex: number
   questions: Question[]
-  initQuestions: () => void
+  init: () => void
   nextQuestion: (success: boolean) => void
   hasNextQuestion: () => boolean
   getResults: () => number
@@ -72,12 +72,12 @@ interface GameScoreState {
 export const useGameScoreStore = create<GameScoreState>((set, get) => ({
   currentIndex: 0,
   questions: [],
-  initQuestions: () => {
+  init: () => {
     const questions: Question[] = []
     for (let i = 0; i < 10; i++) {
       questions.push(newQuestion())
     }
-    set(() => ({ questions }))
+    set(() => ({ questions, currentIndex: 0 }))
   },
   nextQuestion: (success: boolean) => {
     set((state) => {
@@ -88,7 +88,6 @@ export const useGameScoreStore = create<GameScoreState>((set, get) => ({
     set((state) => ({ currentIndex: state.currentIndex + 1 }))
   },
   hasNextQuestion: (): boolean => {
-    console.log(get().questions[get().currentIndex - 1])
     return get().currentIndex < MAX_QUESTION
   },
   getResults: (): number => {

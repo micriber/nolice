@@ -12,7 +12,7 @@ type Props = {
 export default function MenuScreen({ navigation } : Props) {
   const store = useGameScoreStore()
   const handleClick = () => {
-    store.initQuestions()
+    store.init()
     navigation.navigate('Game')
   }
 
@@ -43,5 +43,6 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
   },
 });
