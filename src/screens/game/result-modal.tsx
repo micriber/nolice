@@ -1,19 +1,17 @@
 import {Modal, StyleSheet, Text, View} from "react-native";
 import PrimaryButton from "../../components/PrimaryButton";
-import {useEffect, useState} from "react";
 import { Audio } from 'expo-av';
 
 type Props = {
   onClose?: () => void
   onNext: () => void
   visible: boolean
-  success: boolean
+  success: boolean,
+  answer: number,
 }
 
 const BRAVO_SOUND_PATH = '../../../assets/audio/bravo.wav'
 const DOMMAGE_SOUND_PATH = '../../../assets/audio/dommage.wav'
-// const bravoSound = Audio.Sound.createAsync( require(BRAVO_SOUND_PATH));
-// const dommageSound = Audio.Sound.createAsync( require(DOMMAGE_SOUND_PATH));
 
 export function ResultModal(props: Props) {
   async function playSound() {
@@ -36,15 +34,13 @@ export function ResultModal(props: Props) {
       }}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <Text style={styles.modalText}>{props.success ? "Bravo !" : "Dommage..."}</Text>
+          <Text style={[
+            styles.modalText,
+            {color: props.success ? 'green' : 'red'}
+          ]}>{props.success ? "Bravo !" : "Faux la bonne réponse est " + props.answer}</Text>
           <PrimaryButton name="SUIVANT" onPress={() => {
             props.onNext()
           }} />
-          {/*<Pressable*/}
-          {/*  style={[styles.button, styles.buttonClose]}*/}
-          {/*  onPress={() => setModalVisible(!modalVisible)}>*/}
-          {/*  <Text style={styles.textStyle}>Hide Modal</Text>*/}
-          {/*</Pressable>*/}
         </View>
       </View>
     </Modal>
@@ -61,10 +57,13 @@ const styles = StyleSheet.create({
   },
   modalView: {
     margin: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#f3f1f1',
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#9b9b9b',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -74,24 +73,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-  },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
-  buttonClose: {
-    backgroundColor: '#2196F3',
-  },
-  textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
   modalText: {
-    marginBottom: 15,
+    fontSize: 27,
+    marginBottom: 30,
+    fontWeight: 'bold',
     textAlign: 'center',
   },
 });

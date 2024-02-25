@@ -18,11 +18,14 @@ function GameScreen({ navigation } : Props) {
   const [success, setSuccess] = useState(false);
   const store = useGameScoreStore()
   const ducks = []
+
   const answer = store.questions[store.currentIndex]?.possibilities.find((value) => value.isGood)
-  if (answer) {
-    for (let i = 0; i < answer!.value; i++) {
-      ducks.push(<AnimalImage key={i} />)
-    }
+  if (answer === undefined) {
+    console.error('No answer found');
+    return navigation.navigate('Score');
+  }
+  for (let i = 0; i < answer.value; i++) {
+    ducks.push(<AnimalImage key={i} />)
   }
 
   useEffect(() => {
@@ -36,11 +39,9 @@ function GameScreen({ navigation } : Props) {
     }
   }, [store.currentIndex])
 
-  console.log({ current: store.currentIndex, possibilities: store.questions[store.currentIndex] })
-
   return (
     <View style={styles.container}>
-      <ResultModal onNext={() => {
+      <ResultModal answer={answer.value} onNext={() => {
         setModalVisible(false)
         store.nextQuestion(success)
         setSuccess(false)
@@ -113,6 +114,8 @@ const styles = StyleSheet.create({
   },
   footer: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   playButton: {
     alignItems: 'center',

@@ -88,7 +88,6 @@ export const useGameScoreStore = create<GameScoreState>((set, get) => ({
     set((state) => ({ currentIndex: state.currentIndex + 1 }))
   },
   hasNextQuestion: (): boolean => {
-    console.log(get().questions[get().currentIndex - 1])
     return get().currentIndex < MAX_QUESTION
   },
   getResults: (): number => {
