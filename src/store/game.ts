@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 
+export const MAX_QUESTION = 10
+
 export type Possibility = {
   value: number,
   isGood: boolean
@@ -64,6 +66,7 @@ interface GameScoreState {
   initQuestions: () => void
   nextQuestion: (success: boolean) => void
   hasNextQuestion: () => boolean
+  getResults: () => number
 }
 
 export const useGameScoreStore = create<GameScoreState>((set, get) => ({
@@ -86,6 +89,9 @@ export const useGameScoreStore = create<GameScoreState>((set, get) => ({
   },
   hasNextQuestion: (): boolean => {
     console.log(get().questions[get().currentIndex - 1])
-    return get().currentIndex < 10
+    return get().currentIndex < MAX_QUESTION
+  },
+  getResults: (): number => {
+    return get().questions.reduce((acc, question) => (question.success ? acc + 1 : acc), 0)
   }
 }))

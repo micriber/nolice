@@ -14,9 +14,11 @@ export default
 function GameScreen({ navigation } : Props) {
   const store = useGameScoreStore()
   const ducks = []
-  const answer = store.questions[store.currentIndex].possibilities.find((value) => value.isGood)
-  for (let i = 0; i < answer!.value; i++) {
-    ducks.push(<AnimalImage key={i} />)
+  const answer = store.questions[store.currentIndex]?.possibilities.find((value) => value.isGood)
+  if (answer) {
+    for (let i = 0; i < answer!.value; i++) {
+      ducks.push(<AnimalImage key={i} />)
+    }
   }
 
   console.log({ current: store.currentIndex, possibilities: store.questions[store.currentIndex] })
@@ -54,11 +56,11 @@ function GameScreen({ navigation } : Props) {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-          {store.questions[store.currentIndex].possibilities.map((possibility) => (
+          {store.questions[store.currentIndex]?.possibilities?.map((possibility) => (
             <ChoiceButton key={possibility.value} value={possibility.value.toString()} onPress={() => {
               store.nextQuestion(possibility.isGood)
               if (!store.hasNextQuestion()) {
-                navigation.navigate('Menu')
+                navigation.navigate('Score')
               }
             }}/>
           ))}
