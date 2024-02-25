@@ -1,22 +1,25 @@
-import {StyleSheet, View} from "react-native";
-import Logo from "../../assets/svg/logo.svg";
-import PrimaryButton from "../components/PrimaryButton";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
+import {StyleSheet, View, Text} from "react-native";
+import {MAX_QUESTION, useGameScoreStore} from "../../store/game";
+import PrimaryButton from "../../components/PrimaryButton";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
 };
 
-export default function MenuScreen({ navigation } : Props) {
+export default function ScoreScreen({ navigation }: Props) {
+  const store = useGameScoreStore()
+  const handleClick = () => {
+    navigation.navigate('Menu')
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Logo/>
+        <Text style={styles.score}>{store.getResults()} / {MAX_QUESTION}</Text>
       </View>
       <View style={styles.body}>
-        <PrimaryButton name="JOUER" onPress={() => {
-          navigation.navigate('Game')
-        }}/>
+        <PrimaryButton name="Retour" onPress={handleClick}/>
       </View>
     </View>
   );
@@ -38,20 +41,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  footer: {
-    flex: 1,
-  },
-  playButton: {
+  score: {
     alignItems: 'center',
-    backgroundColor: '#f6da72',
     height: 50,
     justifyContent: 'center',
-    borderRadius: 20,
     marginHorizontal: 80,
-  },
-  playButtonText: {
-    fontSize: 30,
-    color: "#ffffff",
-    fontWeight: "bold",
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 24,
+    marginTop: 0,
+    width: 200,
   }
 });

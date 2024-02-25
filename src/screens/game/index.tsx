@@ -1,9 +1,10 @@
 import {StyleSheet, Text, View} from "react-native";
-import PrimaryButton from "../components/PrimaryButton";
+import PrimaryButton from "../../components/PrimaryButton";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import React from "react";
-import Duck from "../../assets/svg/duck.svg";
-import ChoiceButton from "../components/ChoiceButton";
+import ChoiceButton from "../../components/ChoiceButton";
+import {AnimalImage} from "./animal-picture";
+import {useGameScoreStore} from "../../store/game";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -11,55 +12,29 @@ type Props = {
 
 export default
 function GameScreen({ navigation } : Props) {
+  const store = useGameScoreStore()
+  const ducks = []
+  const answer = store.questions[store.currentIndex]?.possibilities.find((value) => value.isGood)
+  if (answer) {
+    for (let i = 0; i < answer!.value; i++) {
+      ducks.push(<AnimalImage key={i} />)
+    }
+  }
+
+  console.log({ current: store.currentIndex, possibilities: store.questions[store.currentIndex] })
+
   return (
     <View style={styles.container}>
-      <View style={[
-        styles.header,
-        {
-          alignItems: 'center',
-          flexDirection: 'row',
-        }]}>
+      <View style={[styles.header]}>
         <View style={[
           {
-            flex: 1,
-          }
-        ]}>
-          <Duck/>
-        </View>
-        <View style={[
-          {
-            flex: 1,
-          }
-        ]}>
-          <Duck/>
-        </View>
-        <View style={[
-          {
-            flex: 1,
-          }
-        ]}>
-          <Duck/>
-        </View>
-        <View style={[
-          {
-            flex: 1,
-          }
-        ]}>
-          <Duck/>
-        </View>
-        <View style={[
-          {
-            flex: 1,
-          }
-        ]}>
-          <Duck/>
-        </View>
-        <View style={[
-          {
-            flex: 1,
-          }
-        ]}>
-          <Duck/>
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            marginTop: '15%'
+          }]}>
+          {ducks}
         </View>
       </View>
       <View style={styles.body}>
@@ -79,18 +54,19 @@ function GameScreen({ navigation } : Props) {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-          <ChoiceButton answer="2" onPress={() => {
-            navigation.navigate('Menu')
-          }}/>
-          <ChoiceButton answer="4" onPress={() => {
-            navigation.navigate('Menu')
-          }}/>
-          <ChoiceButton answer="6" onPress={() => {
-            navigation.navigate('Menu')
-          }}/>
+          {store.questions[store.currentIndex]?.possibilities?.map((possibility) => (
+            <ChoiceButton key={possibility.value} value={possibility.value.toString()} onPress={() => {
+              store.nextQuestion(possibility.isGood)
+              if (!store.hasNextQuestion()) {
+                navigation.navigate('Score')
+              }
+            }}/>
+          ))}
         </View>
       </View>
-      <View style={styles.footer}>
+      <View style={[styles.footer, {
+        marginTop: '15%'
+      }]}>
         <PrimaryButton name="RETOUR" onPress={() => {
           navigation.navigate('Menu')
         }}/>
