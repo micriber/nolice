@@ -6,7 +6,7 @@ import ChoiceButton from "../../components/ChoiceButton";
 import {AnimalImage} from "./animal-picture";
 import {MAX_QUESTION, useGameScoreStore} from "../../store/game";
 import {ResultModal} from "./result-modal";
-import {Audio} from "expo-av";
+import {SOUNDS, useSoundStore} from "../../store/audio";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -17,6 +17,7 @@ function GameScreen({ navigation } : Props) {
   const [modalVisible, setModalVisible] = useState(false);
   const [success, setSuccess] = useState(false);
   const store = useGameScoreStore()
+  const soundStore = useSoundStore()
   const ducks = []
 
   const answer = store.questions[store.currentIndex]?.possibilities.find((value) => value.isGood)
@@ -28,8 +29,7 @@ function GameScreen({ navigation } : Props) {
 
   useEffect(() => {
     const playAudio = async () => {
-      const { sound } = await Audio.Sound.createAsync( require("../../../assets/audio/count-duck.wav"));
-      await sound.playAsync();
+      return await soundStore.play(SOUNDS.COUNT.DUCK)
     }
 
     if (store.currentIndex < MAX_QUESTION) {

@@ -1,6 +1,6 @@
 import {Modal, StyleSheet, Text, View} from "react-native";
 import PrimaryButton from "../../components/PrimaryButton";
-import { Audio } from 'expo-av';
+import {SOUNDS, useSoundStore} from "../../store/audio";
 
 type Props = {
   onClose?: () => void
@@ -10,17 +10,14 @@ type Props = {
   answer?: number,
 }
 
-const BRAVO_SOUND_PATH = '../../../assets/audio/bravo.wav'
-const DOMMAGE_SOUND_PATH = '../../../assets/audio/dommage.wav'
-
 export function ResultModal(props: Props) {
+  const soundStore = useSoundStore()
   async function playSound() {
-    const bravoSound = Audio.Sound.createAsync( require(BRAVO_SOUND_PATH));
-    const dommageSound = Audio.Sound.createAsync( require(DOMMAGE_SOUND_PATH));
-
-    const { sound } = props.success ? await bravoSound : await dommageSound;
-
-    await sound.playAsync();
+    if (props.success) {
+      await soundStore.play(SOUNDS.BRAVO)
+    } else {
+      await soundStore.play(SOUNDS.DOMMAGE)
+    }
   }
 
   return (
