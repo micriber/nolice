@@ -44,20 +44,4 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  footer: {
-    flex: 1,
-  },
-  playButton: {
-    alignItems: 'center',
-    backgroundColor: '#f6da72',
-    height: 50,
-    justifyContent: 'center',
-    borderRadius: 20,
-    marginHorizontal: 80,
-  },
-  playButtonText: {
-    fontSize: 30,
-    color: "#ffffff",
-    fontWeight: "bold",
-  }
 });

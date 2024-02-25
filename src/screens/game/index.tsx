@@ -1,7 +1,7 @@
 import {StyleSheet, Text, View} from "react-native";
 import PrimaryButton from "../../components/PrimaryButton";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
-import React, {useEffect} from "react";
+import React from "react";
 import ChoiceButton from "../../components/ChoiceButton";
 import {AnimalImage} from "./animal-picture";
 import {useGameScoreStore} from "../../store/game";
@@ -29,14 +29,12 @@ function GameScreen({ navigation } : Props) {
         <View style={[
           {
             alignItems: 'center',
+            justifyContent: 'center',
             flexDirection: 'row',
             flexWrap: 'wrap',
             marginTop: '15%'
           }]}>
           {ducks}
-          {/*{store.questions.map((question) =>{*/}
-          {/*  return */}
-          {/*})}*/}
         </View>
       </View>
       <View style={styles.body}>
@@ -64,15 +62,6 @@ function GameScreen({ navigation } : Props) {
               }
             }}/>
           ))}
-          {/*<ChoiceButton answer="2" onPress={() => {*/}
-          {/*  navigation.navigate('Menu')*/}
-          {/*}}/>*/}
-          {/*<ChoiceButton answer="4" onPress={() => {*/}
-          {/*  navigation.navigate('Menu')*/}
-          {/*}}/>*/}
-          {/*<ChoiceButton answer="6" onPress={() => {*/}
-          {/*  navigation.navigate('Menu')*/}
-          {/*}}/>*/}
         </View>
       </View>
       <View style={[styles.footer, {
