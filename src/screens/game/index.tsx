@@ -20,12 +20,10 @@ function GameScreen({ navigation } : Props) {
   const ducks = []
 
   const answer = store.questions[store.currentIndex]?.possibilities.find((value) => value.isGood)
-  if (answer === undefined) {
-    console.error('No answer found');
-    navigation.navigate('Menu');
-  }
-  for (let i = 0; i < answer.value; i++) {
-    ducks.push(<AnimalImage key={i} />)
+  if (answer) {
+    for (let i = 0; i < answer.value; i++) {
+      ducks.push(<AnimalImage key={i} />)
+    }
   }
 
   useEffect(() => {
@@ -41,12 +39,12 @@ function GameScreen({ navigation } : Props) {
 
   return (
     <View style={styles.container}>
-      <ResultModal answer={answer.value} onNext={() => {
+      <ResultModal answer={answer?.value} onNext={() => {
         setModalVisible(false)
         store.nextQuestion(success)
         setSuccess(false)
         if (!store.hasNextQuestion()) {
-          navigation.navigate('Score')
+          return navigation.navigate('Score')
         }
       }} success={success} visible={modalVisible}/>
       <View style={[styles.header]}>

@@ -7,7 +7,7 @@ type Props = {
   onNext: () => void
   visible: boolean
   success: boolean,
-  answer: number,
+  answer?: number,
 }
 
 const BRAVO_SOUND_PATH = '../../../assets/audio/bravo.wav'
@@ -37,7 +37,7 @@ export function ResultModal(props: Props) {
           <Text style={[
             styles.modalText,
             {color: props.success ? 'green' : 'red'}
-          ]}>{props.success ? "Bravo !" : "Faux la bonne réponse est " + props.answer}</Text>
+          ]}>{props.success ? "Bravo !" : (props.answer ? "Faux la bonne réponse est " + props.answer : "Faux")}</Text>
           <PrimaryButton name="SUIVANT" onPress={() => {
             props.onNext()
           }} />

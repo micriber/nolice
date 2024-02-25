@@ -56,7 +56,7 @@ export function newQuestion(): Question {
 
   return {
     success: false,
-    possibilities: possibilities.sort((a, b) => a.value - b.value)
+    possibilities: possibilities.sort((a, b) => 0.5 - Math.random())
   }
 }
 
