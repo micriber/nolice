@@ -1,11 +1,12 @@
-import {Modal, StyleSheet, Text, View} from "react-native";
+import {StyleSheet, Text, View} from "react-native";
 import PrimaryButton from "../../components/PrimaryButton";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import ChoiceButton from "../../components/ChoiceButton";
 import {AnimalImage} from "./animal-picture";
-import {useGameScoreStore} from "../../store/game";
+import {MAX_QUESTION, useGameScoreStore} from "../../store/game";
 import {ResultModal} from "./result-modal";
+import {Audio} from "expo-av";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -23,6 +24,17 @@ function GameScreen({ navigation } : Props) {
       ducks.push(<AnimalImage key={i} />)
     }
   }
+
+  useEffect(() => {
+    const playAudio = async () => {
+      const { sound } = await Audio.Sound.createAsync( require("../../../assets/audio/count-duck.wav"));
+      await sound.playAsync();
+    }
+
+    if (store.currentIndex < MAX_QUESTION) {
+      playAudio()
+    }
+  }, [store.currentIndex])
 
   console.log({ current: store.currentIndex, possibilities: store.questions[store.currentIndex] })
 
