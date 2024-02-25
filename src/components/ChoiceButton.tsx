@@ -34,6 +34,6 @@ const styles = StyleSheet.create({
   playButtonText: {
     fontSize: 30,
     color: "#ffffff",
-    fontWeight: "bold",
+    fontFamily: "TitilliumWeb_700Bold",
   }
 });
