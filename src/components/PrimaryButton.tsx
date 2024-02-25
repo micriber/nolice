@@ -1,4 +1,5 @@
 import {StyleSheet, Text, TouchableOpacity} from "react-native";
+import {REGULAR_FONT} from "../config/theme";
 
 export default function PrimaryButton(props: { name: string, onPress: () => void }) {
   return <TouchableOpacity
@@ -22,5 +23,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "#ffffff",
     fontWeight: "bold",
+    fontFamily: REGULAR_FONT,
   }
 });

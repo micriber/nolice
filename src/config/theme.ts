@@ -1,0 +1,1 @@
+export const REGULAR_FONT = "TitilliumWeb_400Regular"

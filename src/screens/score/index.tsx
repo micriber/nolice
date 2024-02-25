@@ -2,6 +2,7 @@ import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import {StyleSheet, View, Text} from "react-native";
 import {MAX_QUESTION, useGameScoreStore} from "../../store/game";
 import PrimaryButton from "../../components/PrimaryButton";
+import {REGULAR_FONT} from "../../config/theme";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -51,5 +52,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginTop: 0,
     width: 200,
+    fontFamily: REGULAR_FONT,
   }
 });

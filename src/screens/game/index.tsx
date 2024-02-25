@@ -5,6 +5,7 @@ import React from "react";
 import ChoiceButton from "../../components/ChoiceButton";
 import {AnimalImage} from "./animal-picture";
 import {useGameScoreStore} from "../../store/game";
+import {REGULAR_FONT} from "../../config/theme";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -47,6 +48,7 @@ function GameScreen({ navigation } : Props) {
             fontSize: 27,
             color: "#ffffff",
             fontWeight: "bold",
+            fontFamily: REGULAR_FONT,
           }}>Combien vois-tu de canards ?</Text>
         </View>
         <View style={{

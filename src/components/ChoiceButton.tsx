@@ -1,4 +1,5 @@
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {REGULAR_FONT} from "../config/theme";
 
 export default function ChoiceButton(props: { value: string, onPress: () => void }) {
   return <View style={[
@@ -27,5 +28,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "#ffffff",
     fontWeight: "bold",
+    fontFamily: REGULAR_FONT,
   }
 });
