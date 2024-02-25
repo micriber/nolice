@@ -1,10 +1,11 @@
-import {StyleSheet, Text, View} from "react-native";
+import {Modal, StyleSheet, Text, View} from "react-native";
 import PrimaryButton from "../../components/PrimaryButton";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
-import React from "react";
+import React, {useState} from "react";
 import ChoiceButton from "../../components/ChoiceButton";
 import {AnimalImage} from "./animal-picture";
 import {useGameScoreStore} from "../../store/game";
+import {ResultModal} from "./result-modal";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -12,6 +13,8 @@ type Props = {
 
 export default
 function GameScreen({ navigation } : Props) {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [success, setSuccess] = useState(false);
   const store = useGameScoreStore()
   const ducks = []
   const answer = store.questions[store.currentIndex]?.possibilities.find((value) => value.isGood)
@@ -25,6 +28,14 @@ function GameScreen({ navigation } : Props) {
 
   return (
     <View style={styles.container}>
+      <ResultModal onNext={() => {
+        setModalVisible(false)
+        store.nextQuestion(success)
+        setSuccess(false)
+        if (!store.hasNextQuestion()) {
+          navigation.navigate('Score')
+        }
+      }} success={success} visible={modalVisible}/>
       <View style={[styles.header]}>
         <View style={[
           {
@@ -56,10 +67,8 @@ function GameScreen({ navigation } : Props) {
         }}>
           {store.questions[store.currentIndex]?.possibilities?.map((possibility) => (
             <ChoiceButton key={possibility.value} value={possibility.value.toString()} onPress={() => {
-              store.nextQuestion(possibility.isGood)
-              if (!store.hasNextQuestion()) {
-                navigation.navigate('Score')
-              }
+              setModalVisible(true)
+              setSuccess(possibility.isGood)
             }}/>
           ))}
         </View>
