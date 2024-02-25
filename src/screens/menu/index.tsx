@@ -12,7 +12,7 @@ type Props = {
 export default function MenuScreen({ navigation } : Props) {
   const store = useGameScoreStore()
   const handleClick = () => {
-    store.initQuestions()
+    store.init()
     navigation.navigate('Game')
   }
 

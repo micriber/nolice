@@ -63,7 +63,7 @@ export function newQuestion(): Question {
 interface GameScoreState {
   currentIndex: number
   questions: Question[]
-  initQuestions: () => void
+  init: () => void
   nextQuestion: (success: boolean) => void
   hasNextQuestion: () => boolean
   getResults: () => number
@@ -72,12 +72,12 @@ interface GameScoreState {
 export const useGameScoreStore = create<GameScoreState>((set, get) => ({
   currentIndex: 0,
   questions: [],
-  initQuestions: () => {
+  init: () => {
     const questions: Question[] = []
     for (let i = 0; i < 10; i++) {
       questions.push(newQuestion())
     }
-    set(() => ({ questions }))
+    set(() => ({ questions, currentIndex: 0 }))
   },
   nextQuestion: (success: boolean) => {
     set((state) => {
