@@ -47,17 +47,15 @@ function GameScreen({ navigation } : Props) {
           return navigation.navigate('Score')
         }
       }} success={success} visible={modalVisible}/>
-      <View style={[styles.header]}>
-        <View style={[
-          {
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            marginTop: '15%'
-          }]}>
-          {ducks}
-        </View>
+      <View style={[[styles.header], {
+        height: "50%",
+        alignContent: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginTop: '15%',
+      }]}>
+        {ducks}
       </View>
       <View style={styles.body}>
         <View style={[
@@ -68,7 +66,7 @@ function GameScreen({ navigation } : Props) {
           <Text style={{
             fontSize: 27,
             color: "#ffffff",
-            fontWeight: "bold",
+            fontFamily: "TitilliumWeb_700Bold",
           }}>Combien vois-tu de canards ?</Text>
         </View>
         <View style={{
@@ -126,6 +124,6 @@ const styles = StyleSheet.create({
   playButtonText: {
     fontSize: 30,
     color: "#ffffff",
-    fontWeight: "bold",
+    fontFamily: "TitilliumWeb_700Bold",
   }
 });

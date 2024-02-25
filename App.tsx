@@ -5,36 +5,55 @@ import MenuScreen from "./src/screens/menu";
 import GameScreen from "./src/screens/game";
 import ScoreScreen from "./src/screens/score";
 
+import * as SplashScreen from 'expo-splash-screen';
+import React, {useCallback} from "react";
+import { TitilliumWeb_700Bold, useFonts } from '@expo-google-fonts/titillium-web';
 
 const Stack = createNativeStackNavigator();
 
+SplashScreen.preventAutoHideAsync();
+
 export default function App() {
+  const [fontsLoaded, fontError] = useFonts({
+    TitilliumWeb_700Bold
+  });
+
+  const onReady = useCallback(async () => {
+    if (fontsLoaded || fontError) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <>
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="Menu"
-        screenOptions={{
-          headerShown: false,
-        }}>
-        <Stack.Screen
-          name="Menu"
-          component={MenuScreen}
-          options={{ animation: 'fade' }}
-        />
-        <Stack.Screen
-          name="Game"
-          component={GameScreen}
-          options={{ animation: 'fade' }}
-        />
-        <Stack.Screen
-          name="Score"
-          component={ScoreScreen}
-          options={{ animation: 'fade' }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
-	<StatusBar style="auto" />
-	</>
+      <NavigationContainer onReady={onReady}>
+        <Stack.Navigator
+          initialRouteName="Menu"
+          screenOptions={{
+            headerShown: false,
+          }}>
+          <Stack.Screen
+            name="Menu"
+            component={MenuScreen}
+            options={{ animation: 'fade' }}
+          />
+          <Stack.Screen
+            name="Game"
+            component={GameScreen}
+            options={{ animation: 'fade' }}
+          />
+          <Stack.Screen
+            name="Score"
+            component={ScoreScreen}
+            options={{ animation: 'fade' }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+      <StatusBar style="auto" />
+    </>
   );
 };
