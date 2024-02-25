@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   score: {
     alignItems: 'center',

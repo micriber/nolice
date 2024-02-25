@@ -22,7 +22,7 @@ function GameScreen({ navigation } : Props) {
   const answer = store.questions[store.currentIndex]?.possibilities.find((value) => value.isGood)
   if (answer === undefined) {
     console.error('No answer found');
-    return navigation.navigate('Score');
+    navigation.navigate('Menu');
   }
   for (let i = 0; i < answer.value; i++) {
     ducks.push(<AnimalImage key={i} />)
