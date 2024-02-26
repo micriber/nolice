@@ -19,7 +19,8 @@ const styles = StyleSheet.create({
   playButton: {
     alignItems: "center",
     backgroundColor: "#8ff672",
-    width: "30%",
+    width: 50,
+    height: 50,
     justifyContent: "center",
     borderRadius: 25,
     shadowColor: '#000',
@@ -35,5 +36,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "#ffffff",
     fontFamily: "TitilliumWeb_700Bold",
+    marginBottom: 5,
   }
 });
