@@ -64,10 +64,11 @@ function GameScreen({ navigation } : Props) {
           }
         ]}>
           <Text style={{
-            fontSize: 27,
+            fontSize: 25,
             color: "#ffffff",
             fontFamily: "TitilliumWeb_700Bold",
-          }}>Combien vois-tu de canards ?</Text>
+            textAlign: 'center',
+          }}>Combien comptes-tu de canards ?</Text>
         </View>
         <View style={{
           flexDirection: 'row',

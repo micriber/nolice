@@ -7,13 +7,17 @@ interface AudioStoreState {
   play: (src: AVPlaybackSource) => Promise<AVPlaybackStatus | void>
 }
 
-const DOMMAGE_SOUND_PATH = '../../assets/audio/dommage.wav'
-const BRAVO_SOUND_PATH = '../../assets/audio/bravo.wav'
-const COUNT_DUCK_SOUND_PATH = '../../assets/audio/count-duck.wav'
+const DOMMAGE_SOUND_PATH = '../../assets/audio/dommage.mp3'
+const BRAVO_SOUND_PATH = '../../assets/audio/bravo.mp3'
+const COUNT_DUCK_SOUND_PATH = '../../assets/audio/duck.mp3'
+const CONGRATULATION_SOUND_PATH = '../../assets/audio/congratulation.mp3'
+const RETRY_SOUND_PATH = '../../assets/audio/retry.mp3'
 
 export const SOUNDS = {
   DOMMAGE: require(DOMMAGE_SOUND_PATH),
+  RETRY: require(RETRY_SOUND_PATH),
   BRAVO: require(BRAVO_SOUND_PATH),
+  CONGRATULATION: require(CONGRATULATION_SOUND_PATH),
   COUNT: {
     DUCK: require(COUNT_DUCK_SOUND_PATH)
   }

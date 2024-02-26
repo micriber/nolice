@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export const MAX_QUESTION = 10
+export const MAX_QUESTION = 3
 
 export type Possibility = {
   value: number,
