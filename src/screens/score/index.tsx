@@ -18,7 +18,7 @@ export default function ScoreScreen({ navigation }: Props) {
 
   let results = store.getResults();
   let isGood = results >= MAX_QUESTION / 2;
-  let isPerfect = results = MAX_QUESTION;
+  let isPerfect = results === MAX_QUESTION;
   const congratulationSource = require('../../../assets/congratulation.jpeg');
   const retrySource = require('../../../assets/retry.jpeg');
 
