@@ -87,17 +87,31 @@ function GameScreen({ navigation } : Props) {
         }
       }} success={success} visible={modalVisible}/>
       <View style={[[styles.header], {
-        alignContent: 'center',
-        justifyContent: 'center',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
       }]}>
-        {animals}
+        <View style={[{
+          flex: 1,
+          flexDirection: 'row',
+        }]}>
+          <Text style={{
+            fontSize: 25,
+            color: "#ffffff",
+            fontFamily: "TitilliumWeb_700Bold",
+          }}>Question {store.currentIndex + 1} sur {MAX_QUESTION}</Text>
+        </View>
+        <View style={[ {
+          alignContent: 'center',
+          justifyContent: 'center',
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          flex: 8,
+        }]}>
+          {animals}
+        </View>
       </View>
       <View style={styles.body}>
         <View style={[
           {
-            flex: 3,
+            flex: 1,
             marginBottom: 30,
           }
         ]}>
@@ -110,8 +124,10 @@ function GameScreen({ navigation } : Props) {
         </View>
         <View style={{
           flexDirection: 'row',
+          alignContent: 'center',
           justifyContent: 'center',
-          alignItems: 'center',
+          flexWrap: 'wrap',
+          flex: 3,
         }}>
           {question?.possibilities?.map((possibility) => (
             <ChoiceButton key={possibility.value} value={possibility.value.toString()} onPress={() => {
@@ -120,13 +136,6 @@ function GameScreen({ navigation } : Props) {
             }}/>
           ))}
         </View>
-      </View>
-      <View style={[styles.footer, {
-        marginTop: '15%'
-      }]}>
-        <PrimaryButton name="RETOUR" onPress={() => {
-          navigation.navigate('Menu')
-        }}/>
       </View>
     </View>
   );
@@ -140,16 +149,10 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   header: {
-    flex: 3.5,
-    justifyContent: 'center',
+    flex: 1,
   },
   body: {
-    flex: 1.5,
-    justifyContent: 'center',
-  },
-  footer: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
   },
   playButton: {

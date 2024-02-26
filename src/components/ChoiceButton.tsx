@@ -13,8 +13,9 @@ export default function ChoiceButton(props: { value: string, onPress: () => void
 
 const styles = StyleSheet.create({
   containerView: {
-    flex: 1,
-    alignItems: 'center',
+    width: "35%",
+    height: "50%",
+    alignItems: "center",
   },
   playButton: {
     alignItems: "center",
