@@ -97,11 +97,12 @@ function GameScreen({ navigation } : Props) {
       <View style={styles.body}>
         <View style={[
           {
-            flex: 2,
+            flex: 3,
+            marginBottom: 30,
           }
         ]}>
           <Text style={{
-            fontSize: 25,
+            fontSize: 30,
             color: "#ffffff",
             fontFamily: "TitilliumWeb_700Bold",
             textAlign: 'center',
@@ -143,7 +144,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   body: {
-    flex: 1.15,
+    flex: 1.5,
     justifyContent: 'center',
   },
   footer: {
