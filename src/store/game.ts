@@ -6,8 +6,21 @@ export type Possibility = {
   value: number,
   isGood: boolean
 }
+enum Animal {
+  duck,
+  rabbit,
+  dog,
+  pig,
+  cow,
+  cat,
+  bird,
+  sheep,
+}
+
+type AnimalType = keyof typeof Animal;
 
 export type Question = {
+  animal: AnimalType,
   success: boolean,
   possibilities: Possibility[],
 }
@@ -20,9 +33,15 @@ function getRandomInt(max: number) {
 }
 
 // Made with hate by @bersiroth
-export function newQuestion(): Question {
+export function newQuestion(previousAnimal: AnimalType|undefined): Question {
   let max = 9;
   let answer = getRandomInt(max);
+  let animal = Animal[getRandomInt(8) - 1];
+  if (previousAnimal !== undefined) {
+    while (animal === previousAnimal) {
+      animal = Animal[getRandomInt(8) - 1];
+    }
+  }
   let delta = getRandomInt(2);
   let possibilities: Possibility[] = [
     {
@@ -54,7 +73,8 @@ export function newQuestion(): Question {
     });
   }
 
-  return {
+  return <Question>{
+    animal: animal,
     success: false,
     possibilities: possibilities.sort((a, b) => 0.5 - Math.random())
   }
@@ -74,8 +94,11 @@ export const useGameScoreStore = create<GameScoreState>((set, get) => ({
   questions: [],
   init: () => {
     const questions: Question[] = []
+    let previousAnimal;
     for (let i = 0; i < 10; i++) {
-      questions.push(newQuestion())
+      const question = newQuestion(previousAnimal);
+      previousAnimal = question.animal;
+      questions.push(question)
     }
     set(() => ({ questions, currentIndex: 0 }))
   },

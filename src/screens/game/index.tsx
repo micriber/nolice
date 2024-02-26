@@ -18,24 +18,63 @@ function GameScreen({ navigation } : Props) {
   const [success, setSuccess] = useState(false);
   const store = useGameScoreStore()
   const soundStore = useSoundStore()
-  const ducks = []
+  const animals = []
 
-  const answer = store.questions[store.currentIndex]?.possibilities.find((value) => value.isGood)
+  const question = store.questions[store.currentIndex];
+  const answer = question?.possibilities.find((value) => value.isGood)
   if (answer) {
     for (let i = 0; i < answer.value; i++) {
-      ducks.push(<AnimalImage key={i} />)
+      animals.push(<AnimalImage key={i} type={question.animal} />)
     }
   }
 
+  let animalLabel;
+  let sound;
+  switch (question?.animal) {
+    case "duck":
+      animalLabel = "canards";
+      sound = SOUNDS.COUNT.DUCK;
+      break;
+    case "rabbit":
+      animalLabel = "lapins";
+      sound = SOUNDS.COUNT.RABBIT;
+      break;
+    case "dog":
+      animalLabel = "chiens";
+      sound = SOUNDS.COUNT.DOG;
+      break;
+    case "pig":
+      animalLabel = "cochons";
+      sound = SOUNDS.COUNT.PIG;
+      break;
+    case "cow":
+      animalLabel = "vaches";
+      sound = SOUNDS.COUNT.COW;
+      break;
+    case "cat":
+      animalLabel = "chats";
+      sound = SOUNDS.COUNT.CAT;
+      break;
+    case "bird":
+      animalLabel = "oiseaux";
+      sound = SOUNDS.COUNT.BIRD;
+      break;
+    case "sheep":
+      animalLabel = "moutons";
+      sound = SOUNDS.COUNT.SHEEP;
+      break;
+  }
+  const questionLabel = `Combien comptes-tu de ${animalLabel} ?`;
+
   useEffect(() => {
     const playAudio = async () => {
-      return await soundStore.play(SOUNDS.COUNT.DUCK)
+      return await soundStore.play(sound)
     }
 
     if (store.currentIndex < MAX_QUESTION) {
       playAudio()
     }
-  }, [store.currentIndex])
+  }, [store.currentIndex, sound])
 
   return (
     <View style={styles.container}>
@@ -48,19 +87,18 @@ function GameScreen({ navigation } : Props) {
         }
       }} success={success} visible={modalVisible}/>
       <View style={[[styles.header], {
-        height: "50%",
         alignContent: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
         flexWrap: 'wrap',
-        marginTop: '15%',
       }]}>
-        {ducks}
+        {animals}
       </View>
       <View style={styles.body}>
         <View style={[
           {
             flex: 0.5,
+            marginBottom: 30,
           }
         ]}>
           <Text style={{
@@ -68,14 +106,14 @@ function GameScreen({ navigation } : Props) {
             color: "#ffffff",
             fontFamily: "TitilliumWeb_700Bold",
             textAlign: 'center',
-          }}>Combien comptes-tu de canards ?</Text>
+          }}>{questionLabel}</Text>
         </View>
         <View style={{
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-          {store.questions[store.currentIndex]?.possibilities?.map((possibility) => (
+          {question?.possibilities?.map((possibility) => (
             <ChoiceButton key={possibility.value} value={possibility.value.toString()} onPress={() => {
               setModalVisible(true)
               setSuccess(possibility.isGood)
@@ -102,7 +140,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   header: {
-    flex: 2,
+    flex: 3.5,
     justifyContent: 'center',
   },
   body: {
