@@ -50,7 +50,7 @@ export function AnimalImage({type = "duck"}) {
     <View style={[
       {
         width: "25%",
-        height: "25%",
+        height: "33%",
         flexGrow: 1,
       }
     ]}>

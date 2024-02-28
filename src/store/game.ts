@@ -32,6 +32,21 @@ function getRandomInt(max: number) {
   return Math.floor(Math.random() * max) + 1;
 }
 
+function getRandomRangeIntUnique(min: number, max: number, quantity: number, exclude: number) {
+  if (quantity > (max - min + 1) || (max < min)) {
+    return null;
+  }
+  const randomIntList = [];
+  while (randomIntList.length < quantity) {
+    const randomInt = Math.floor(Math.random() * (max - min + 1)) + min;
+    if (!randomIntList.includes(randomInt) && randomInt !== exclude) {
+      randomIntList.push(randomInt);
+    }
+  }
+
+  return randomIntList;
+}
+
 // Made with hate by @bersiroth
 export function newQuestion(previousAnimal: AnimalType|undefined): Question {
   let max = 9;
@@ -42,37 +57,22 @@ export function newQuestion(previousAnimal: AnimalType|undefined): Question {
       animal = Animal[getRandomInt(8) - 1];
     }
   }
-  let delta = getRandomInt(2);
   let possibilities: Possibility[] = [
     {
       value: answer,
       isGood: true
     }
   ];
-  let secondLabel;
-  if (answer - delta > 0) {
+  const randomRange = getRandomRangeIntUnique(
+    Math.max(answer - 3, 1),
+    Math.min(answer + 3, 9),
+    3, answer);
+  randomRange?.forEach((value) => {
     possibilities.push({
-      value: (secondLabel = answer - delta),
+      value: value,
       isGood: false
     });
-  } else {
-    possibilities.push({
-      value: (secondLabel = answer + delta + delta),
-      isGood: false
-    });
-  }
-  if (answer + delta <= max) {
-    possibilities.push({
-      value: (answer + delta),
-      isGood: false
-    });
-  } else {
-    possibilities.push({
-      value: (secondLabel - delta),
-      isGood: false
-    });
-  }
-
+  });
   return <Question>{
     animal: animal,
     success: false,
