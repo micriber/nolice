@@ -1,5 +1,4 @@
 import {StyleSheet, Text, View} from "react-native";
-import PrimaryButton from "../../components/PrimaryButton";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import React, {useEffect, useState} from "react";
 import ChoiceButton from "../../components/ChoiceButton";
@@ -7,6 +6,7 @@ import {AnimalImage} from "./animal-picture";
 import {MAX_QUESTION, useGameScoreStore} from "../../store/game";
 import {ResultModal} from "./result-modal";
 import {SOUNDS, useSoundStore} from "../../store/audio";
+import {AVPlaybackSource} from "expo-av";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -29,7 +29,7 @@ function GameScreen({ navigation } : Props) {
   }
 
   let animalLabel;
-  let sound;
+  let sound: AVPlaybackSource;
   switch (question?.animal) {
     case "duck":
       animalLabel = "canards";
