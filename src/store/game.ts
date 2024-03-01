@@ -1,6 +1,8 @@
 import { create } from 'zustand'
+import {shuffle} from "../utils/array";
 
 export const MAX_QUESTION = 10
+const MAX_ANSWER = 9
 
 export type Possibility = {
   value: number,
@@ -36,7 +38,7 @@ function getRandomRangeIntUnique(min: number, max: number, quantity: number, exc
   if (quantity > (max - min + 1) || (max < min)) {
     return null;
   }
-  const randomIntList = [];
+  const randomIntList: number[] = [];
   while (randomIntList.length < quantity) {
     const randomInt = Math.floor(Math.random() * (max - min + 1)) + min;
     if (!randomIntList.includes(randomInt) && randomInt !== exclude) {
@@ -48,9 +50,7 @@ function getRandomRangeIntUnique(min: number, max: number, quantity: number, exc
 }
 
 // Made with hate by @bersiroth
-export function newQuestion(previousAnimal: AnimalType|undefined): Question {
-  let max = 9;
-  let answer = getRandomInt(max);
+export function newQuestion(answer: number, previousAnimal: AnimalType|null): Question {
   let animal = Animal[getRandomInt(8) - 1];
   if (previousAnimal !== undefined) {
     while (animal === previousAnimal) {
@@ -73,10 +73,10 @@ export function newQuestion(previousAnimal: AnimalType|undefined): Question {
       isGood: false
     });
   });
-  return <Question>{
-    animal: animal,
+  return {
+    animal: <AnimalType>animal,
     success: false,
-    possibilities: possibilities.sort((a, b) => 0.5 - Math.random())
+    possibilities: shuffle(possibilities)
   }
 }
 
@@ -93,13 +93,15 @@ export const useGameScoreStore = create<GameScoreState>((set, get) => ({
   currentIndex: 0,
   questions: [],
   init: () => {
-    const questions: Question[] = []
-    let previousAnimal;
-    for (let i = 0; i < 10; i++) {
-      const question = newQuestion(previousAnimal);
+    let questions: Question[] = []
+    let previousAnimal: AnimalType | null = null;
+    for (let i = 0; i < MAX_ANSWER; i++) {
+      const question = newQuestion(i+1, previousAnimal);
       previousAnimal = question.animal;
       questions.push(question)
     }
+    questions = shuffle(questions)
+    questions.push(questions[4])
     set(() => ({ questions, currentIndex: 0 }))
   },
   nextQuestion: (success: boolean) => {

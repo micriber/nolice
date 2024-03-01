@@ -20,7 +20,17 @@ const COUNT_SHEEP_SOUND_PATH = '../../assets/audio/sheep.mp3'
 const CONGRATULATION_SOUND_PATH = '../../assets/audio/congratulation.mp3'
 const RETRY_SOUND_PATH = '../../assets/audio/retry.mp3'
 
-export const SOUNDS = {
+type SoundsType = {
+  DOMMAGE: AVPlaybackSource,
+  RETRY: AVPlaybackSource,
+  BRAVO: AVPlaybackSource,
+  CONGRATULATION: AVPlaybackSource
+  COUNT: {
+    [k: string]: AVPlaybackSource
+  },
+}
+
+export const SOUNDS: SoundsType = {
   DOMMAGE: require(DOMMAGE_SOUND_PATH),
   RETRY: require(RETRY_SOUND_PATH),
   BRAVO: require(BRAVO_SOUND_PATH),
