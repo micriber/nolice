@@ -1,9 +1,11 @@
-import {StyleSheet, View} from "react-native";
+import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 // @ts-ignore
 import Logo from "../../../assets/svg/logo.svg";
 import PrimaryButton from "../../components/PrimaryButton";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import {useGameScoreStore} from "../../store/game";
+import SoundButton from "../../components/SoundButton";
+import COLORS from "../../utils/color";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -22,7 +24,12 @@ export default function MenuScreen({ navigation } : Props) {
         <Logo/>
       </View>
       <View style={styles.body}>
-        <PrimaryButton name="JOUER" onPress={handleClick}/>
+        <View style={styles.body}>
+          <PrimaryButton name="JOUER" onPress={handleClick}/>
+        </View>
+        <View style={styles.body}>
+          <SoundButton/>
+        </View>
       </View>
     </View>
   );
@@ -31,7 +38,7 @@ export default function MenuScreen({ navigation } : Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#53afd5',
+    backgroundColor: COLORS.BACKGROUND,
     padding: 20,
     justifyContent: 'center',
     flexDirection: 'column',
@@ -42,7 +49,6 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
   },
 });

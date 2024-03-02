@@ -6,8 +6,9 @@ import GameScreen from "./src/screens/game";
 import ScoreScreen from "./src/screens/score";
 
 import * as SplashScreen from 'expo-splash-screen';
-import React, {useCallback} from "react";
+import React, {useCallback, useEffect} from "react";
 import { TitilliumWeb_700Bold, useFonts } from '@expo-google-fonts/titillium-web';
+import {SOUNDS, useSoundStore} from "./src/store/audio";
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +18,11 @@ export default function App() {
   const [fontsLoaded, fontError] = useFonts({
     TitilliumWeb_700Bold
   });
+
+  const soundStore = useSoundStore()
+  useEffect(() => {
+    soundStore.playBackground(SOUNDS.MUSIC)
+  }, [])
 
   const onReady = useCallback(async () => {
     if (fontsLoaded || fontError) {
@@ -53,7 +59,7 @@ export default function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
-      <StatusBar hidden={true}/>
+      <StatusBar/>
     </>
   );
 };
