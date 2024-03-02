@@ -1,4 +1,6 @@
 import {StyleSheet, Text, TouchableOpacity} from "react-native";
+import COLORS from "../utils/color";
+import FONT from "../utils/font";
 
 export default function PrimaryButton(props: { name: string, onPress: () => void }) {
   return <TouchableOpacity
@@ -12,7 +14,7 @@ export default function PrimaryButton(props: { name: string, onPress: () => void
 const styles = StyleSheet.create({
   playButton: {
     alignItems: 'center',
-    backgroundColor: '#f6da72',
+    backgroundColor: COLORS.BUTTON.PRIMARY,
     height: 50,
     justifyContent: 'center',
     borderRadius: 20,
@@ -27,8 +29,8 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   playButtonText: {
-    fontSize: 30,
-    color: '#f3f1f1',
-    fontFamily: "TitilliumWeb_700Bold",
+    fontSize: FONT.SIZE.BASE,
+    fontFamily: FONT.FAMILY,
+    color: COLORS.FONT.BASE,
   }
 });

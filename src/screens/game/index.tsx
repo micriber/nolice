@@ -7,6 +7,9 @@ import {MAX_QUESTION, useGameScoreStore} from "../../store/game";
 import {ResultModal} from "./result-modal";
 import {SOUNDS, useSoundStore} from "../../store/audio";
 import {AVPlaybackSource} from "expo-av";
+import SoundButton from "../../components/SoundButton";
+import COLORS from "../../utils/color";
+import FONT from "../../utils/font";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -93,10 +96,12 @@ function GameScreen({ navigation } : Props) {
           flexDirection: 'row',
         }]}>
           <Text style={{
-            fontSize: 25,
-            color: "#ffffff",
-            fontFamily: "TitilliumWeb_700Bold",
+            fontSize: FONT.SIZE.BASE,
+            fontFamily: FONT.FAMILY,
+            color: COLORS.FONT.BASE,
+            flex: 3,
           }}>Question {store.currentIndex + 1} sur {MAX_QUESTION}</Text>
+          <SoundButton/>
         </View>
         <View style={[ {
           alignContent: 'center',
@@ -116,9 +121,9 @@ function GameScreen({ navigation } : Props) {
           }
         ]}>
           <Text style={{
-            fontSize: 30,
-            color: "#ffffff",
-            fontFamily: "TitilliumWeb_700Bold",
+            fontSize: FONT.SIZE.BASE,
+            fontFamily: FONT.FAMILY,
+            color: COLORS.FONT.BASE,
             textAlign: 'center',
           }}>{questionLabel}</Text>
         </View>
@@ -143,8 +148,9 @@ function GameScreen({ navigation } : Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#53afd5',
-    padding: 20,
+    backgroundColor: COLORS.BACKGROUND,
+    paddingHorizontal: 20,
+    paddingVertical: 40,
     justifyContent: 'center',
     flexDirection: 'column',
   },
@@ -154,18 +160,5 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     justifyContent: 'center',
-  },
-  playButton: {
-    alignItems: 'center',
-    backgroundColor: '#f6da72',
-    height: 50,
-    justifyContent: 'center',
-    borderRadius: 20,
-    marginHorizontal: 80,
-  },
-  playButtonText: {
-    fontSize: 30,
-    color: "#ffffff",
-    fontFamily: "TitilliumWeb_700Bold",
   }
 });

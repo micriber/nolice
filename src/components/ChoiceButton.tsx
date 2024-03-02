@@ -1,4 +1,6 @@
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import COLORS from "../utils/color";
+import FONT from "../utils/font";
 
 export default function ChoiceButton(props: { value: string, onPress: () => void }) {
   return <View style={styles.containerView}>
@@ -19,7 +21,7 @@ const styles = StyleSheet.create({
   },
   playButton: {
     alignItems: "center",
-    backgroundColor: "#8ff672",
+    backgroundColor: COLORS.BUTTON.SECONDARY,
     width: 75,
     height: 75,
     justifyContent: "center",
@@ -34,9 +36,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   playButtonText: {
-    fontSize: 30,
-    color: "#ffffff",
-    fontFamily: "TitilliumWeb_700Bold",
+    fontSize: FONT.SIZE.BIG,
+    fontFamily: FONT.FAMILY,
+    color: COLORS.FONT.BASE,
     marginBottom: 5,
   }
 });

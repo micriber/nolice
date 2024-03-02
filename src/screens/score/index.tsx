@@ -3,6 +3,8 @@ import {StyleSheet, View, Text, Image} from "react-native";
 import {MAX_QUESTION, useGameScoreStore} from "../../store/game";
 import PrimaryButton from "../../components/PrimaryButton";
 import {SOUNDS, useSoundStore} from "../../store/audio";
+import COLORS from "../../utils/color";
+import FONT from "../../utils/font";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -52,7 +54,7 @@ export default function ScoreScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#53afd5',
+    backgroundColor: COLORS.BACKGROUND,
     padding: 20,
     justifyContent: 'center',
     flexDirection: 'column',
@@ -76,9 +78,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     textAlign: 'center',
-    fontSize: 30,
-    fontFamily: "TitilliumWeb_700Bold",
-    color: '#f3f1f1',
+    fontSize: FONT.SIZE.BASE,
+    fontFamily: FONT.FAMILY,
+    color: COLORS.FONT.BASE,
   },
   message: {
     marginBottom: "10%",

@@ -1,6 +1,8 @@
 import {Modal, StyleSheet, Text, View} from "react-native";
 import PrimaryButton from "../../components/PrimaryButton";
 import {SOUNDS, useSoundStore} from "../../store/audio";
+import COLORS from "../../utils/color";
+import FONT from "../../utils/font";
 
 type Props = {
   onClose?: () => void
@@ -22,7 +24,7 @@ export function ResultModal(props: Props) {
 
   return (
     <Modal
-      animationType="slide"
+      animationType="fade"
       transparent={true}
       visible={props.visible}
       onShow={playSound}
@@ -33,8 +35,18 @@ export function ResultModal(props: Props) {
         <View style={styles.modalView}>
           <Text style={[
             styles.modalText,
-            {color: props.success ? 'green' : 'red'}
-          ]}>{props.success ? "Bravo !" : (props.answer ? "Faux la bonne réponse est " + props.answer : "Faux")}</Text>
+            {
+              color: props.success ? COLORS.FONT.SUCCESS : COLORS.FONT.ERROR,
+              fontSize: FONT.SIZE.BIG
+            }
+          ]}>{props.success ? "BRAVO !" : "FAUX !"}</Text>
+          <Text style={styles.modalText}>La bonne réponse est</Text>
+          <Text style={[
+            styles.modalText,
+            {
+              fontSize: FONT.SIZE.BIG + 110
+            }
+          ]}>{props.answer}</Text>
           <PrimaryButton name="SUIVANT" onPress={() => {
             props.onNext()
           }} />
@@ -50,11 +62,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 22,
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalView: {
     margin: 20,
-    backgroundColor: '#f3f1f1',
+    backgroundColor: COLORS.BACKGROUND,
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',
@@ -71,9 +83,9 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   modalText: {
-    fontSize: 27,
-    marginBottom: 30,
-    fontWeight: 'bold',
+    fontSize: FONT.SIZE.BASE,
+    color: COLORS.FONT.BASE,
+    fontFamily: FONT.FAMILY,
     textAlign: 'center',
   },
 });
