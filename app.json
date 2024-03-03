@@ -15,13 +15,15 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.micriber.nolice"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
+      "googleServicesFile": "./google-services.json",
       "package": "com.micriber.nolice"
     },
     "extra": {
@@ -29,6 +31,16 @@
         "projectId": "7e0e307e-207a-48e9-a656-af7bb9e95315"
       }
     },
-    "owner": "micriber"
+    "owner": "micriber",
+    "plugins": [
+      "@react-native-firebase/app",
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "sentry org slug, or use the `SENTRY_ORG` environment variable",
+          "project": "sentry project name, or use the `SENTRY_PROJECT` environment variable"
+        }
+      ]
+    ]
   }
 }

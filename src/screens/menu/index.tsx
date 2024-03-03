@@ -6,6 +6,7 @@ import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import {useGameScoreStore} from "../../store/game";
 import SoundButton from "../../components/SoundButton";
 import COLORS from "../../utils/color";
+import analytics from '@react-native-firebase/analytics';
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -13,8 +14,9 @@ type Props = {
 
 export default function MenuScreen({ navigation } : Props) {
   const store = useGameScoreStore()
-  const handleClick = () => {
+  const handleClick = async () => {
     store.init()
+    await analytics().logEvent('play')
     navigation.navigate('Game')
   }
 

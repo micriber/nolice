@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "504221006674",
+    "project_id": "nolice",
+    "storage_bucket": "nolice.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:504221006674:android:24ac12e0d40508013b588b",
+        "android_client_info": {
+          "package_name": "com.micriber.nolice"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmRPnvqYu30QEnW5vpdcOZQ2Jk3gPzN_8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

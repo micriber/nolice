@@ -9,7 +9,6 @@ export const COLORS =
     FONT: {
         BASE: '#f3f1f1',
         ERROR: '#E12343',
-        // SUCCESS: '#38891A',
         SUCCESS: '#5DD232',
     },
   }

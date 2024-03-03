@@ -5,6 +5,7 @@ import PrimaryButton from "../../components/PrimaryButton";
 import {SOUNDS, useSoundStore} from "../../store/audio";
 import COLORS from "../../utils/color";
 import FONT from "../../utils/font";
+import analytics from "@react-native-firebase/analytics";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -35,6 +36,11 @@ export default function ScoreScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container} onLayout={async () => {
+      await analytics().logEvent('score', {
+        results: results,
+        isGood: isGood,
+        isPerfect: isPerfect,
+      })
       await soundStore.play((isGood) ? SOUNDS.CONGRATULATION : SOUNDS.RETRY);
     }}>
       <View style={styles.header}>

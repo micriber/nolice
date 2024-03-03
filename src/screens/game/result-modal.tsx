@@ -3,6 +3,7 @@ import PrimaryButton from "../../components/PrimaryButton";
 import {SOUNDS, useSoundStore} from "../../store/audio";
 import COLORS from "../../utils/color";
 import FONT from "../../utils/font";
+import analytics from "@react-native-firebase/analytics";
 
 type Props = {
   onClose?: () => void
@@ -14,7 +15,12 @@ type Props = {
 
 export function ResultModal(props: Props) {
   const soundStore = useSoundStore()
-  async function playSound() {
+  async function onShow() {
+    await analytics().logEvent('result', {
+      success: props.success,
+      answer: props.answer,
+    })
+
     if (props.success) {
       await soundStore.play(SOUNDS.BRAVO)
     } else {
@@ -27,7 +33,7 @@ export function ResultModal(props: Props) {
       animationType="fade"
       transparent={true}
       visible={props.visible}
-      onShow={playSound}
+      onShow={onShow}
       onRequestClose={() => {
         props.onClose && props.onClose()
       }}>

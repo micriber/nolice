@@ -10,6 +10,7 @@ import {AVPlaybackSource} from "expo-av";
 import SoundButton from "../../components/SoundButton";
 import COLORS from "../../utils/color";
 import FONT from "../../utils/font";
+import analytics from "@react-native-firebase/analytics";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -76,8 +77,17 @@ function GameScreen({ navigation } : Props) {
 
     if (store.currentIndex < MAX_QUESTION) {
       playAudio()
+      analytics().logEvent('question', {
+        event_name: 'question',
+        animal: question.animal,
+        answer: question?.possibilities.find((value) => value.isGood).value,
+        possibility1: question.possibilities[0].value,
+        possibility2: question.possibilities[1].value,
+        possibility3: question.possibilities[2].value,
+        possibility4: question.possibilities[3].value,
+      })
     }
-  }, [store.currentIndex, sound])
+  }, [store.currentIndex, sound, question])
 
   return (
     <View style={styles.container}>
