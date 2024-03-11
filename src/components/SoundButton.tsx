@@ -12,9 +12,9 @@ export default function SoundButton() {
         await analytics().logEvent('sound', {
           pause: soundStore.backgroundPlaying ? 'pause' : 'unpause',
         })
-        soundStore.backgroundPlaying ? soundStore.pauseBackground() : soundStore.unPauseBackground();
+        soundStore.backgroundPlaying ? await soundStore.pauseBackground() : await soundStore.unPauseBackground();
       }}
     >
-      <MaterialCommunityIcons name={soundStore.backgroundPlaying ? 'music-off' : 'music'} size={40} color={COLORS.ICON} />
+      <MaterialCommunityIcons name={soundStore.backgroundPlaying ? 'music-off' : 'music'} size={60} color={COLORS.ICON} />
     </TouchableOpacity>;
 }

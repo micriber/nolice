@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import {Audio, AVPlaybackSource, AVPlaybackStatus} from "expo-av";
+import {Audio, AVPlaybackSource, InterruptionModeAndroid} from "expo-av";
+import * as Sentry from '@sentry/react-native';
 
 interface AudioStoreState {
   stop: () => Promise<void>
@@ -8,8 +9,8 @@ interface AudioStoreState {
   backgroundPlaying: boolean
   current: Audio.Sound | null
   currentBackground: Audio.Sound | null
-  play: (src: AVPlaybackSource) => Promise<AVPlaybackStatus | void>
-  playBackground: (src: AVPlaybackSource) => Promise<AVPlaybackStatus | void>
+  play: (src: AVPlaybackSource) => Promise<void>
+  playBackground: (src: AVPlaybackSource) => Promise<void>
 }
 
 const DOMMAGE_SOUND_PATH = '../../assets/audio/dommage.mp3'
@@ -60,28 +61,52 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
   currentBackground: null,
   backgroundPlaying: false,
   play: async (src: AVPlaybackSource) => {
-    const { sound } = await Audio.Sound.createAsync(src);
-    await get().stop()
-    set(() => ({current: sound}));
-    return get().current?.playAsync()
+    try {
+      await Audio.setAudioModeAsync({
+        interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+      });
+      const { sound } = await Audio.Sound.createAsync(src);
+      await get().stop()
+      set(() => ({current: sound}));
+      await get().current?.playAsync();
+    } catch (error: any) {
+      console.log(error);
+      if (error.name !== "AudioFocusNotAcquiredException") {
+        Sentry.withScope(function(scope) {
+          Sentry.captureException(error);
+        });
+      }
+    }
   },
   playBackground: async (src: AVPlaybackSource) => {
-    const { sound } = await Audio.Sound.createAsync(src);
-    await get().currentBackground?.stopAsync()
-    await get().currentBackground?.unloadAsync();
-    set(() => ({currentBackground: sound}));
-    await get().currentBackground?.setIsLoopingAsync(true);
-    await get().currentBackground?.setVolumeAsync(0.2);
-    set(() => ({backgroundPlaying: true}));
-    return get().currentBackground?.playFromPositionAsync(2000);
+    try {
+      await Audio.setAudioModeAsync({
+        interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+      });
+      const {sound} = await Audio.Sound.createAsync(src);
+      await get().currentBackground?.stopAsync()
+      await get().currentBackground?.unloadAsync();
+      set(() => ({currentBackground: sound}));
+      await get().currentBackground?.setIsLoopingAsync(true);
+      await get().currentBackground?.setVolumeAsync(0.2);
+      await get().currentBackground?.playFromPositionAsync(2000);
+      set(() => ({backgroundPlaying: true}));
+    } catch (error: any) {
+      console.log(error);
+      if (error.name !== "AudioFocusNotAcquiredException") {
+        Sentry.withScope(function(scope) {
+          Sentry.captureException(error);
+        });
+      }
+    }
   },
   pauseBackground: async () => {
-    set(() => ({backgroundPlaying: false}));
-    return get().currentBackground?.pauseAsync();
+    await get().currentBackground?.pauseAsync();
+    set({backgroundPlaying: false});
   },
   unPauseBackground: async () => {
-    set(() => ({backgroundPlaying: true}));
-    return get().currentBackground?.playAsync();
+    await get().currentBackground?.playAsync();
+    set({backgroundPlaying: true});
   },
   stop: async () => {
     await get().current?.stopAsync()

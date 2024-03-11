@@ -2,7 +2,7 @@
   "expo": {
     "name": "nolice",
     "slug": "nolice",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,17 +14,14 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.micriber.nolice"
-    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
       "googleServicesFile": "./google-services.json",
-      "package": "com.micriber.nolice"
+      "package": "com.micriber.nolice",
+      "versionCode": 3
     },
     "extra": {
       "eas": {
@@ -37,8 +34,9 @@
       [
         "@sentry/react-native/expo",
         {
-          "organization": "sentry org slug, or use the `SENTRY_ORG` environment variable",
-          "project": "sentry project name, or use the `SENTRY_PROJECT` environment variable"
+          "url": "https://sentry.io/",
+          "project": "nolice",
+          "organization": "micriber"
         }
       ]
     ]

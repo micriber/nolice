@@ -99,8 +99,7 @@ function GameScreen({ navigation } : Props) {
           return navigation.navigate('Score')
         }
       }} success={success} visible={modalVisible}/>
-      <View style={[[styles.header], {
-      }]}>
+      <View style={[styles.header]}>
         <View style={[{
           flex: 1,
           flexDirection: 'row',
@@ -111,7 +110,6 @@ function GameScreen({ navigation } : Props) {
             color: COLORS.FONT.BASE,
             flex: 3,
           }}>Question {store.currentIndex + 1} sur {MAX_QUESTION}</Text>
-          <SoundButton/>
         </View>
         <View style={[ {
           alignContent: 'center',
@@ -152,6 +150,9 @@ function GameScreen({ navigation } : Props) {
           ))}
         </View>
       </View>
+      <View style={[styles.footer]}>
+        <SoundButton/>
+      </View>
     </View>
   );
 }
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.BACKGROUND,
     paddingHorizontal: 20,
-    paddingVertical: 40,
+    paddingTop: 40,
     justifyContent: 'center',
     flexDirection: 'column',
   },
@@ -170,5 +171,10 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     justifyContent: 'center',
+  },
+  footer: {
+    alignItems: 'flex-end',
+    flex: 0.2,
+    marginTop: -20,
   }
 });

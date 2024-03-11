@@ -20,13 +20,14 @@ Sentry.init({
   // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
   // We recommend adjusting this value in production.
   tracesSampleRate: 1.0,
+  environment: 'production',
 });
 
-export default function App() {
+function App() {
   const routeNameRef = React.useRef();
   const navigationRef = React.useRef();
 
-  const [fontsLoaded, fontError] = useFonts({
+  const [fontsLoaded] = useFonts({
     TitilliumWeb_700Bold
   });
 
@@ -36,12 +37,12 @@ export default function App() {
   }, [])
 
   const onReady = useCallback(async () => {
-    if (fontsLoaded || fontError) {
+    if (fontsLoaded && soundStore.currentBackground) {
       await SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, fontError]);
+  }, [soundStore.currentBackground, fontsLoaded]);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || !soundStore.currentBackground) {
     return null;
   }
 
@@ -92,3 +93,5 @@ export default function App() {
     </>
   );
 };
+
+export default Sentry.wrap(App);
