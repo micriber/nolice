@@ -1,9 +1,13 @@
+import {RFPercentage} from "react-native-responsive-fontsize";
+
 export const FONT =
   {
     FAMILY: 'TitilliumWeb_700Bold',
     SIZE: {
-        BASE: 30,
-        BIG: 40,
+        SMALL: RFPercentage(3),
+        BASE: RFPercentage(5),
+        MEDIUM: RFPercentage(8),
+        BIG: RFPercentage(10),
     },
   }
 

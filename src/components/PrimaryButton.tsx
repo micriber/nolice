@@ -15,10 +15,9 @@ const styles = StyleSheet.create({
   playButton: {
     alignItems: 'center',
     backgroundColor: COLORS.BUTTON.PRIMARY,
-    height: 50,
     justifyContent: 'center',
     borderRadius: 20,
-    width: 190,
+    minWidth: "65%",
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

@@ -15,15 +15,15 @@ export default function ChoiceButton(props: { value: string, onPress: () => void
 
 const styles = StyleSheet.create({
   containerView: {
-    width: "35%",
+    width: "50%",
     height: "50%",
     alignItems: "center",
   },
   playButton: {
     alignItems: "center",
     backgroundColor: COLORS.BUTTON.SECONDARY,
-    width: 75,
-    height: 75,
+    width: "70%",
+    height: "70%",
     justifyContent: "center",
     borderRadius: 50,
     shadowColor: '#000',
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   playButtonText: {
-    fontSize: FONT.SIZE.BIG,
+    fontSize: FONT.SIZE.BASE,
     fontFamily: FONT.FAMILY,
     color: COLORS.FONT.BASE,
     marginBottom: 5,

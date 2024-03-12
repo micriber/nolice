@@ -33,16 +33,17 @@ function App() {
 
   const soundStore = useSoundStore()
   useEffect(() => {
-    soundStore.playBackground(SOUNDS.MUSIC)
+    console.log('play background');
+    soundStore.playBackground(SOUNDS.MUSIC).catch(console.error);
   }, [])
 
   const onReady = useCallback(async () => {
-    if (fontsLoaded && soundStore.currentBackground) {
+    if (fontsLoaded && soundStore.backgroundLoaded) {
       await SplashScreen.hideAsync();
     }
-  }, [soundStore.currentBackground, fontsLoaded]);
+  }, [soundStore.backgroundLoaded, fontsLoaded]);
 
-  if (!fontsLoaded || !soundStore.currentBackground) {
+  if (!fontsLoaded || !soundStore.backgroundLoaded) {
     return null;
   }
 
