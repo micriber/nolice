@@ -11,6 +11,7 @@ import SoundButton from "../../components/SoundButton";
 import COLORS from "../../utils/color";
 import FONT from "../../utils/font";
 import analytics from "@react-native-firebase/analytics";
+import {RFPercentage} from "react-native-responsive-fontsize";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -36,39 +37,39 @@ function GameScreen({ navigation } : Props) {
   let sound: AVPlaybackSource;
   switch (question?.animal) {
     case "duck":
-      animalLabel = "canards";
+      animalLabel = "de canards";
       sound = SOUNDS.COUNT.DUCK;
       break;
     case "rabbit":
-      animalLabel = "lapins";
+      animalLabel = "de lapins";
       sound = SOUNDS.COUNT.RABBIT;
       break;
     case "dog":
-      animalLabel = "chiens";
+      animalLabel = "de chiens";
       sound = SOUNDS.COUNT.DOG;
       break;
     case "pig":
-      animalLabel = "cochons";
+      animalLabel = "de cochons";
       sound = SOUNDS.COUNT.PIG;
       break;
     case "cow":
-      animalLabel = "vaches";
+      animalLabel = "de vaches";
       sound = SOUNDS.COUNT.COW;
       break;
     case "cat":
-      animalLabel = "chats";
+      animalLabel = "de chats";
       sound = SOUNDS.COUNT.CAT;
       break;
     case "bird":
-      animalLabel = "oiseaux";
+      animalLabel = "d'oiseaux";
       sound = SOUNDS.COUNT.BIRD;
       break;
     case "sheep":
-      animalLabel = "moutons";
+      animalLabel = "de moutons";
       sound = SOUNDS.COUNT.SHEEP;
       break;
   }
-  const questionLabel = `Combien comptes-tu de ${animalLabel} ?`;
+  const questionLabel = `Combien comptes-tu ${animalLabel} ?`;
 
   useEffect(() => {
     const playAudio = async () => {
@@ -105,7 +106,7 @@ function GameScreen({ navigation } : Props) {
           flexDirection: 'row',
         }]}>
           <Text style={{
-            fontSize: FONT.SIZE.BASE,
+            fontSize: RFPercentage(4),
             fontFamily: FONT.FAMILY,
             color: COLORS.FONT.BASE,
             flex: 3,
@@ -125,11 +126,11 @@ function GameScreen({ navigation } : Props) {
         <View style={[
           {
             flex: 1,
-            marginBottom: 30,
+            marginBottom: '5%',
           }
         ]}>
           <Text style={{
-            fontSize: FONT.SIZE.BASE,
+            fontSize: RFPercentage(4),
             fontFamily: FONT.FAMILY,
             color: COLORS.FONT.BASE,
             textAlign: 'center',

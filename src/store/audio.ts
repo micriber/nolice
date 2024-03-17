@@ -1,16 +1,15 @@
-import { create } from 'zustand'
+import {create, GetState, SetState, StoreApi} from 'zustand'
 import {Audio, AVPlaybackSource, InterruptionModeAndroid} from "expo-av";
 import * as Sentry from '@sentry/react-native';
+import {get} from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 interface AudioStoreState {
-  stop: () => Promise<void>
+  backgroundPlaying: boolean
+  backgroundLoaded: boolean
   pauseBackground: () => Promise<void>
   unPauseBackground: () => Promise<void>
-  backgroundPlaying: boolean
-  current: Audio.Sound | null
-  currentBackground: Audio.Sound | null
-  play: (src: AVPlaybackSource) => Promise<void>
   playBackground: (src: AVPlaybackSource) => Promise<void>
+  play: (src: AVPlaybackSource) => Promise<void>
 }
 
 const DOMMAGE_SOUND_PATH = '../../assets/audio/dommage.mp3'
@@ -56,60 +55,60 @@ export const SOUNDS: SoundsType = {
   }
 }
 
+function errorSafe(callback: () => void , message: string = "Audio error:"){
+  try {
+    callback();
+  } catch (error: any) {
+    console.error(message, error);
+    if (error.name !== "AudioFocusNotAcquiredException") {
+      Sentry.withScope(function(scope) {
+        Sentry.captureException(error);
+      });
+    }
+  }
+}
+
+const soundObject = new Audio.Sound();
+const soundObjectBackground = new Audio.Sound();
+
 export const useSoundStore = create<AudioStoreState>((set, get) => ({
-  current: null,
-  currentBackground: null,
   backgroundPlaying: false,
+  backgroundLoaded: false,
   play: async (src: AVPlaybackSource) => {
-    try {
+    errorSafe(async () => {
+      await soundObject.unloadAsync();
       await Audio.setAudioModeAsync({
         interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
       });
-      const { sound } = await Audio.Sound.createAsync(src);
-      await get().stop()
-      set(() => ({current: sound}));
-      await get().current?.playAsync();
-    } catch (error: any) {
-      console.log(error);
-      if (error.name !== "AudioFocusNotAcquiredException") {
-        Sentry.withScope(function(scope) {
-          Sentry.captureException(error);
-        });
-      }
-    }
+      await soundObject.loadAsync(src, { shouldPlay: true })
+    }, 'Audio error: play');
   },
   playBackground: async (src: AVPlaybackSource) => {
-    try {
-      await Audio.setAudioModeAsync({
-        interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
-      });
-      const {sound} = await Audio.Sound.createAsync(src);
-      await get().currentBackground?.stopAsync()
-      await get().currentBackground?.unloadAsync();
-      set(() => ({currentBackground: sound}));
-      await get().currentBackground?.setIsLoopingAsync(true);
-      await get().currentBackground?.setVolumeAsync(0.2);
-      await get().currentBackground?.playFromPositionAsync(2000);
-      set(() => ({backgroundPlaying: true}));
-    } catch (error: any) {
-      console.log(error);
-      if (error.name !== "AudioFocusNotAcquiredException") {
-        Sentry.withScope(function(scope) {
-          Sentry.captureException(error);
+    errorSafe(async () => {
+      if (!get().backgroundPlaying) {
+        await Audio.setAudioModeAsync({
+          interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
         });
+        await soundObjectBackground.unloadAsync();
+        set(() => ({backgroundLoaded: true}));
+        set({backgroundPlaying: true});
+        await soundObjectBackground.loadAsync(src);
+        await soundObjectBackground.setIsLoopingAsync(true);
+        await soundObjectBackground.setVolumeAsync(0.2);
+        await soundObjectBackground.playFromPositionAsync(2000);
       }
-    }
+    }, 'Audio error: playBackground');
   },
   pauseBackground: async () => {
-    await get().currentBackground?.pauseAsync();
-    set({backgroundPlaying: false});
+    errorSafe(async () => {
+      await soundObjectBackground.pauseAsync();
+      set({backgroundPlaying: false});
+    }, 'Audio error: pauseBackground');
   },
   unPauseBackground: async () => {
-    await get().currentBackground?.playAsync();
-    set({backgroundPlaying: true});
-  },
-  stop: async () => {
-    await get().current?.stopAsync()
-    await get().current?.unloadAsync();
+    errorSafe(async () => {
+      await soundObjectBackground.playAsync();
+      set({backgroundPlaying: true});
+    }, 'Audio error: unPauseBackground');
   }
 }));

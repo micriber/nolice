@@ -71,9 +71,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    width: '80%',
-    height: '80%',
-    resizeMode: 'stretch',
+    height: "90%",
+    resizeMode: 'center',
   },
   body: {
     flex: 1,
@@ -90,6 +89,7 @@ const styles = StyleSheet.create({
   },
   message: {
     marginBottom: "10%",
+    fontSize: FONT.SIZE.SMALL,
   },
   footer: {
     flex: 1,

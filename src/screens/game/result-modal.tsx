@@ -43,19 +43,25 @@ export function ResultModal(props: Props) {
             styles.modalText,
             {
               color: props.success ? COLORS.FONT.SUCCESS : COLORS.FONT.ERROR,
-              fontSize: FONT.SIZE.BIG
+              fontSize: FONT.SIZE.BASE
             }
           ]}>{props.success ? "BRAVO !" : "FAUX !"}</Text>
-          <Text style={styles.modalText}>La bonne réponse est</Text>
+          <Text style={styles.modalText}>La bonne réponse</Text>
           <Text style={[
             styles.modalText,
             {
-              fontSize: FONT.SIZE.BIG + 110
+              fontSize: FONT.SIZE.BIG,
+              flex: 2,
             }
           ]}>{props.answer}</Text>
-          <PrimaryButton name="SUIVANT" onPress={() => {
-            props.onNext()
-          }} />
+          <View style={[{
+            flex: 2,
+            justifyContent: 'center',
+          }]}>
+            <PrimaryButton name="SUIVANT" onPress={() => {
+              props.onNext()
+            }} />
+          </View>
         </View>
       </View>
     </Modal>
@@ -71,10 +77,11 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalView: {
+    flexDirection: 'column',
     margin: 20,
     backgroundColor: COLORS.BACKGROUND,
     borderRadius: 20,
-    padding: 35,
+    padding: '5%',
     alignItems: 'center',
     borderStyle: 'solid',
     borderWidth: 1,
@@ -87,8 +94,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+    height: "50%",
   },
   modalText: {
+    flex: 1,
     fontSize: FONT.SIZE.BASE,
     color: COLORS.FONT.BASE,
     fontFamily: FONT.FAMILY,
