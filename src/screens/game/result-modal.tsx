@@ -50,7 +50,7 @@ export function ResultModal(props: Props) {
           <Text style={[
             styles.modalText,
             {
-              fontSize: FONT.SIZE.BIG,
+              fontSize: FONT.SIZE.GIANT,
               flex: 2,
             }
           ]}>{props.answer}</Text>

@@ -1,7 +1,7 @@
 import {StyleSheet, Text, View} from "react-native";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import React, {useEffect, useState} from "react";
-import ChoiceButton from "../../components/ChoiceButton";
+import ChoiceButton from "./ChoiceButton";
 import {AnimalImage} from "./animal-picture";
 import {MAX_QUESTION, useGameScoreStore} from "../../store/game";
 import {ResultModal} from "./result-modal";
@@ -81,6 +81,7 @@ function GameScreen({ navigation } : Props) {
       analytics().logEvent('question', {
         event_name: 'question',
         animal: question.animal,
+        // @ts-ignore
         answer: question?.possibilities.find((value) => value.isGood).value,
         possibility1: question.possibilities[0].value,
         possibility2: question.possibilities[1].value,

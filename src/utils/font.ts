@@ -6,8 +6,9 @@ export const FONT =
     SIZE: {
         SMALL: RFPercentage(3),
         BASE: RFPercentage(5),
-        MEDIUM: RFPercentage(8),
-        BIG: RFPercentage(10),
+        MEDIUM: RFPercentage(6),
+        BIG: RFPercentage(8),
+        GIANT: RFPercentage(10),
     },
   }
 

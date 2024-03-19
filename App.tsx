@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import MenuScreen from "./src/screens/menu";
+import {MainMenuScreen, GameSelectionMenu} from "./src/screens/menu";
 import GameScreen from "./src/screens/game";
 import ScoreScreen from "./src/screens/score";
 import analytics from '@react-native-firebase/analytics';
@@ -33,7 +33,6 @@ function App() {
 
   const soundStore = useSoundStore()
   useEffect(() => {
-    console.log('play background');
     soundStore.playBackground(SOUNDS.MUSIC).catch(console.error);
   }, [])
 
@@ -51,11 +50,13 @@ function App() {
     <>
       <NavigationContainer
         onReady={() => {
+          // @ts-ignore
           routeNameRef.current = navigationRef.current.getCurrentRoute().name;
           return onReady();
         }}
         onStateChange={async () => {
           const previousRouteName = routeNameRef.current;
+          // @ts-ignore
           const currentRouteName = navigationRef.current.getCurrentRoute().name;
 
           if (previousRouteName !== currentRouteName) {
@@ -66,16 +67,22 @@ function App() {
           }
           routeNameRef.current = currentRouteName;
         }}
+        // @ts-ignore
         ref={navigationRef}
       >
         <Stack.Navigator
-          initialRouteName="Menu"
+          initialRouteName="MainMenu"
           screenOptions={{
             headerShown: false,
           }}>
           <Stack.Screen
-            name="Menu"
-            component={MenuScreen}
+            name="MainMenu"
+            component={MainMenuScreen}
+            options={{ animation: 'fade' }}
+          />
+          <Stack.Screen
+            name="GameSelectionMenu"
+            component={GameSelectionMenu}
             options={{ animation: 'fade' }}
           />
           <Stack.Screen

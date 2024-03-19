@@ -1,6 +1,6 @@
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import COLORS from "../utils/color";
-import FONT from "../utils/font";
+import COLORS from "../../utils/color";
+import FONT from "../../utils/font";
 
 export default function ChoiceButton(props: { value: string, onPress: () => void }) {
   return <View style={styles.containerView}>
