@@ -16,7 +16,7 @@ export default function ScoreScreen({ navigation }: Props) {
   const soundStore = useSoundStore()
 
   const handleClick = () => {
-    navigation.navigate('Menu')
+    navigation.navigate('GameSelectionMenu')
   }
 
   let results = store.getResults();
@@ -48,10 +48,10 @@ export default function ScoreScreen({ navigation }: Props) {
       </View>
       <View style={styles.body}>
         <Text style={[styles.score, styles.message]}>{message}</Text>
-        <Text style={styles.score}>Résultat : <Text style={[{color: (isGood) ? 'green' : 'red'}]}>{results}</Text> / {MAX_QUESTION}</Text>
+        <Text style={styles.score}>Résultat : <Text style={[{color: (isGood) ? COLORS.FONT.SUCCESS : COLORS.FONT.ERROR}]}>{results}</Text> / {MAX_QUESTION}</Text>
       </View>
       <View style={styles.footer}>
-        <PrimaryButton name="Retour" onPress={handleClick}/>
+        <PrimaryButton name="REJOUER" onPress={handleClick}/>
       </View>
     </View>
   );

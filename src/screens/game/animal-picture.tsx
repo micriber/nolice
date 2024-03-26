@@ -17,6 +17,7 @@ import Cat from "../../../assets/svg/cat.svg";
 import Bird from "../../../assets/svg/bird.svg";
 // @ts-ignore
 import Sheep from "../../../assets/svg/sheep.svg";
+import {RFPercentage} from "react-native-responsive-fontsize";
 
 export function AnimalImage({type = "duck"}) {
   let animal;
@@ -49,8 +50,8 @@ export function AnimalImage({type = "duck"}) {
   return (
     <View style={[
       {
-        width: "25%",
-        height: "33%",
+        height: RFPercentage(13),
+        width:  RFPercentage(10),
         flexGrow: 1,
       }
     ]}>

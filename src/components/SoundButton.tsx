@@ -19,7 +19,7 @@ export default function SoundButton() {
     >
       <MaterialCommunityIcons name={soundStore.backgroundPlaying ? 'music-off' : 'music'} style={
         {
-          fontSize: FONT.SIZE.MEDIUM,
+          fontSize: FONT.SIZE.BIG,
         }
       } color={COLORS.ICON} />
     </TouchableOpacity>;
