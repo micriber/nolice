@@ -1,2 +1,2 @@
-export { default as MainMenuScreen } from './MainMenu';
-export { default as GameSelectionMenu } from './GameSelectionMenu';
+export { MainMenu } from './MainMenu';
+export { GameSelectionMenu } from './GameSelectionMenu';

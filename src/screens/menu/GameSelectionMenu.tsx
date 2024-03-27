@@ -1,6 +1,4 @@
 import {StyleSheet, Text, View} from "react-native";
-// @ts-ignore
-import Logo from "../../../assets/svg/logo.svg";
 import PrimaryButton from "../../components/PrimaryButton";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import {useGameScoreStore} from "../../store/game";
@@ -13,24 +11,30 @@ type Props = {
   navigation: NativeStackNavigationProp<any>;
 };
 
-export default function GameSelectionMenu({ navigation } : Props) {
+export function GameSelectionMenu({ navigation } : Props) {
   const store = useGameScoreStore()
 
   const handleNumberButton = async () => {
-    store.init()
+    // store.init(10, 9)
     await analytics().logEvent('NumberGame')
-    navigation.navigate('Game')
+    navigation.navigate('NumberGame')
   }
 
   const handleColorButton = async () => {
-    store.init()
+    store.init(10, 9)
     await analytics().logEvent('ColorGame')
-    navigation.navigate('MainMenu')
+    navigation.navigate('ColorGame');
   }
 
   const handleAnimalButton = async () => {
-    store.init()
+    store.init(10, 9)
     await analytics().logEvent('AnimalGame')
+    navigation.navigate('MainMenu')
+  }
+
+  const handleShapeButton = async () => {
+    store.init(10, 9)
+    await analytics().logEvent('ShapeGame')
     navigation.navigate('MainMenu')
   }
 
@@ -49,6 +53,9 @@ export default function GameSelectionMenu({ navigation } : Props) {
         <View style={styles.body}>
           <PrimaryButton name="ANIMAUX" onPress={handleAnimalButton} animal={'duck'}/>
         </View>
+        <View style={styles.body}>
+          <PrimaryButton name="FORME" onPress={handleShapeButton} animal={'bird'}/>
+        </View>
       </View>
       <View style={styles.footer}>
         <SoundButton/>
@@ -66,7 +73,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   header: {
-    flex: 3,
+    flex: 2,
     justifyContent: 'center',
     fontSize: FONT.SIZE.SMALL,
   },
@@ -82,7 +89,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   footer: {
-    flex: 1.5,
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     width: "100%",

@@ -11,9 +11,9 @@ type Props = {
   navigation: NativeStackNavigationProp<any>;
 };
 
-export default function MainMenuScreen({ navigation } : Props) {
+export function MainMenu({ navigation } : Props) {
   const handleClick = async () => {
-    // await analytics().logEvent('play')
+    await analytics().logEvent('play')
     navigation.navigate('GameSelectionMenu')
   }
 

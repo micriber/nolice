@@ -22,14 +22,8 @@ export default function PrimaryButton(props: { name: string, onPress: () => void
     }]}
     onPress={props.onPress}
   >
-    <View style={[{
-      flex: 1,
-      flexDirection: 'row',
-      maxWidth: "80%",
-      marginHorizontal: "3%",
-    }]}>
-      <View style={[{flex:2.5, alignItems: 'center',
-        justifyContent: 'center',}]}>
+    <View style={[styles.buttonContainer]}>
+      <View style={[styles.textContainer]}>
         <Text style={styles.playButtonText}>{props.name}</Text>
       </View>
       {logo}
@@ -53,6 +47,17 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
     height: RFPercentage(14),
+  },
+  buttonContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    maxWidth: "80%",
+    marginHorizontal: "3%",
+  },
+  textContainer: {
+    flex: 2.5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   playButtonText: {
     fontSize: FONT.SIZE.BASE,

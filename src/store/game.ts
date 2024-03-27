@@ -1,80 +1,36 @@
 import { create } from 'zustand'
 import {shuffle} from "../utils/array";
+import {getRandomInt, getRandomRangeIntUnique} from "../utils/random";
 
-export const MAX_QUESTION = 10
-const MAX_ANSWER = 9
 
 export type Possibility = {
   value: number,
   isGood: boolean
 }
-enum Animal {
-  duck,
-  rabbit,
-  dog,
-  pig,
-  cow,
-  cat,
-  bird,
-  sheep,
-}
 
-type AnimalType = keyof typeof Animal;
 
 export type Question = {
-  animal: AnimalType,
+  answer: number,
   success: boolean,
   possibilities: Possibility[],
 }
 
-function getRandomInt(max: number) {
-  // On ajoute +1 parce que le max, n'est pas le max
-  // maintenant le max est le vrai.
-  // toi meme tu sais
-  return Math.floor(Math.random() * max) + 1;
-}
-
-function getRandomRangeIntUnique(min: number, max: number, quantity: number, exclude: number) {
-  if (quantity > (max - min + 1) || (max < min)) {
-    return null;
-  }
-  const randomIntList: number[] = [];
-  while (randomIntList.length < quantity) {
-    const randomInt = Math.floor(Math.random() * (max - min + 1)) + min;
-    if (!randomIntList.includes(randomInt) && randomInt !== exclude) {
-      randomIntList.push(randomInt);
-    }
-  }
-
-  return randomIntList;
-}
 
 // Made with hate by @bersiroth
-export function newQuestion(answer: number, previousAnimal: AnimalType|null): Question {
-  let animal = Animal[getRandomInt(8) - 1];
-  if (previousAnimal !== undefined) {
-    while (animal === previousAnimal) {
-      animal = Animal[getRandomInt(8) - 1];
-    }
-  }
-  let possibilities: Possibility[] = [
-    {
-      value: answer,
-      isGood: true
-    }
-  ];
+export function newQuestion(answer: number, maxAnswer: number): Question {
+  const range = Math.floor(maxAnswer / 3);
   const randomRange = getRandomRangeIntUnique(
-    Math.max(answer - 3, 1),
-    Math.min(answer + 3, 9),
+    Math.max(answer - range, 1),
+    Math.min(answer + range, maxAnswer),
     3, answer);
-  randomRange?.forEach((value) => {
-    possibilities.push({
-      value: value,
-      isGood: false
-    });
-  });
+
+  const possibilities: Possibility[] = [
+    { value: answer, isGood: true },
+    ...(randomRange?.map(value => ({ value, isGood: false })) || [])
+  ];
+
   return {
-    animal: <AnimalType>animal,
+    answer,
     success: false,
     possibilities: shuffle(possibilities)
   }
@@ -83,37 +39,36 @@ export function newQuestion(answer: number, previousAnimal: AnimalType|null): Qu
 interface GameScoreState {
   currentIndex: number
   questions: Question[]
-  init: () => void
+  init: (maxQuestion :number, maxAnswer :number) => void
   nextQuestion: (success: boolean) => void
-  hasNextQuestion: () => boolean
   getResults: () => number
 }
 
 export const useGameScoreStore = create<GameScoreState>((set, get) => ({
   currentIndex: 0,
   questions: [],
-  init: () => {
+  init: (maxQuestion :number = 10, maxAnswer :number = 9) => {
+    console.log('init');
     let questions: Question[] = []
-    let previousAnimal: AnimalType | null = null;
-    for (let i = 0; i < MAX_ANSWER; i++) {
-      const question = newQuestion(i+1, previousAnimal);
-      previousAnimal = question.animal;
-      questions.push(question)
+    for (let i = 0; questions.length < maxQuestion; i++) {
+      if (i == maxAnswer) {
+        i = getRandomInt(maxAnswer - 1)
+      }
+      questions.push(newQuestion(i+1, maxAnswer))
     }
-    questions = shuffle(questions)
-    questions.push(questions[4])
+
+    do {
+      questions = shuffle(questions);
+    } while (questions.some((v, i, a) => v.answer === a[i + 1]?.answer));
+
     set(() => ({ questions, currentIndex: 0 }))
   },
   nextQuestion: (success: boolean) => {
     set((state) => {
-      const newQuestions = [...state.questions]
-      newQuestions[state.currentIndex].success = success
-      return { questions: newQuestions }
-    })
-    set((state) => ({ currentIndex: state.currentIndex + 1 }))
-  },
-  hasNextQuestion: (): boolean => {
-    return get().currentIndex < MAX_QUESTION
+      const newQuestions = [...state.questions];
+      newQuestions[state.currentIndex].success = success;
+      return { questions: newQuestions, currentIndex: state.currentIndex + 1 };
+    });
   },
   getResults: (): number => {
     return get().questions.reduce((acc, question) => (question.success ? acc + 1 : acc), 0)
