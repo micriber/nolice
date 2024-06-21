@@ -10,7 +10,7 @@ type Props = {
   onNext: () => void
   visible: boolean
   success: boolean,
-  answer?: number,
+  answer?: string,
 }
 
 export function ResultModal(props: Props) {

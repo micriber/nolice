@@ -15,13 +15,11 @@ export function GameSelectionMenu({ navigation } : Props) {
   const store = useGameScoreStore()
 
   const handleNumberButton = async () => {
-    // store.init(10, 9)
     await analytics().logEvent('NumberGame')
     navigation.navigate('NumberGame')
   }
 
   const handleColorButton = async () => {
-    store.init(10, 9)
     await analytics().logEvent('ColorGame')
     navigation.navigate('ColorGame');
   }

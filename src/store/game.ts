@@ -2,12 +2,10 @@ import { create } from 'zustand'
 import {shuffle} from "../utils/array";
 import {getRandomInt, getRandomRangeIntUnique} from "../utils/random";
 
-
 export type Possibility = {
   value: number,
   isGood: boolean
 }
-
 
 export type Question = {
   answer: number,
@@ -15,9 +13,8 @@ export type Question = {
   possibilities: Possibility[],
 }
 
-
 // Made with hate by @bersiroth
-export function newQuestion(answer: number, maxAnswer: number): Question {
+function newQuestion(answer: number, maxAnswer: number): Question {
   const range = Math.floor(maxAnswer / 3);
   const randomRange = getRandomRangeIntUnique(
     Math.max(answer - range, 1),
@@ -40,7 +37,7 @@ interface GameScoreState {
   currentIndex: number
   questions: Question[]
   init: (maxQuestion :number, maxAnswer :number) => void
-  nextQuestion: (success: boolean) => void
+  nextQuestion: () => void
   getResults: () => number
 }
 
@@ -48,7 +45,6 @@ export const useGameScoreStore = create<GameScoreState>((set, get) => ({
   currentIndex: 0,
   questions: [],
   init: (maxQuestion :number = 10, maxAnswer :number = 9) => {
-    console.log('init');
     let questions: Question[] = []
     for (let i = 0; questions.length < maxQuestion; i++) {
       if (i == maxAnswer) {
@@ -63,11 +59,9 @@ export const useGameScoreStore = create<GameScoreState>((set, get) => ({
 
     set(() => ({ questions, currentIndex: 0 }))
   },
-  nextQuestion: (success: boolean) => {
+  nextQuestion: () => {
     set((state) => {
-      const newQuestions = [...state.questions];
-      newQuestions[state.currentIndex].success = success;
-      return { questions: newQuestions, currentIndex: state.currentIndex + 1 };
+      return { currentIndex: state.currentIndex + 1 };
     });
   },
   getResults: (): number => {

@@ -3,7 +3,7 @@ import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import React, {useEffect, useState} from "react";
 import ChoiceButton from "./ChoiceButton";
 import {AnimalImage} from "./animal-picture";
-import {newQuestion, useGameScoreStore} from "../../store/game";
+import {useGameScoreStore} from "../../store/game";
 import {ResultModal} from "./result-modal";
 import {SOUNDS, useSoundStore} from "../../store/audio";
 import {AVPlaybackSource} from "expo-av";
@@ -50,9 +50,8 @@ const animalSoundMap: AnimalSoundMap = {
 
 export function NumberGame({ navigation } : Props) {
   const [modalVisible, setModalVisible] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [animals, setAnimals] = useState([Animal[1]]);
+  const [animals, setAnimals] = useState([Animal[0]]);
   const store = useGameScoreStore()
   const soundStore = useSoundStore()
 
@@ -80,14 +79,6 @@ export function NumberGame({ navigation } : Props) {
     setIsLoaded(true)
   }, []);
 
-  const question = store.questions[store.currentIndex];
-  const answer = question?.answer
-  const animal = animals[store.currentIndex];
-  const animalsElements = answer ? Array.from({ length: answer }, (_, i) => <AnimalImage key={i} type={animal} />) : [];
-
-  const { label, sound } = animalSoundMap[animal];
-  const questionLabel = `Combien comptes-tu ${label} ?`;
-
   useEffect(() => {
     const playAudio = async () => {
       return await soundStore.play(sound)
@@ -97,28 +88,36 @@ export function NumberGame({ navigation } : Props) {
       playAudio()
       analytics().logEvent('question', {
         event_name: 'question',
-        // animal: question.animal,
-        // @ts-ignore
-        answer: question?.possibilities.find((value) => value.isGood).value,
+        animal: animal,
+        answer: question.answer,
         possibility1: question?.possibilities[0].value,
         possibility2: question?.possibilities[1].value,
         possibility3: question?.possibilities[2].value,
         possibility4: question?.possibilities[3].value,
       })
     }
-  }, [isLoaded, store.currentIndex, sound, question])
+  }, [isLoaded, store.currentIndex])
 
   if (!isLoaded) return <></>;
+
+  const question = store.questions[store.currentIndex];
+  const answer = question?.answer
+  const animal = animals[store.currentIndex];
+  const animalsElements = answer ? Array.from({ length: answer }, (_, i) => <AnimalImage key={i} type={animal} />) : [];
+  const { label, sound } = animalSoundMap[animal];
+  const questionLabel = `Combien comptes-tu ${label} ?`;
+
   return (
     <View style={styles.container}>
-      <ResultModal answer={answer} onNext={() => {
+      <ResultModal answer={answer.toString()} onNext={() => {
         setModalVisible(false)
-        store.nextQuestion(success)
-        setSuccess(false)
-        if (store.currentIndex === maxQuestion) {
-          return navigation.navigate('Score')
+        if (store.currentIndex + 1 === maxQuestion) {
+          return navigation.navigate('Score', {
+            maxQuestion: maxQuestion,
+          })
         }
-      }} success={success} visible={modalVisible}/>
+        store.nextQuestion()
+      }} success={question.success} visible={modalVisible}/>
       <View style={[styles.header]}>
         <View style={[{
           flex: 1,
@@ -163,9 +162,9 @@ export function NumberGame({ navigation } : Props) {
           flex: 3,
         }}>
           {question?.possibilities?.map((possibility) => (
-            <ChoiceButton key={possibility.value} value={possibility.value.toString()} onPress={() => {
+            <ChoiceButton type={'number'} key={possibility.value} value={possibility.value.toString()} onPress={() => {
+              question.success = possibility.isGood
               setModalVisible(true)
-              setSuccess(possibility.isGood)
             }}/>
           ))}
         </View>
