@@ -69,15 +69,15 @@ export function ColorGame({ navigation } : Props) {
 
   return (
     <View style={styles.container}>
-      <ResultModal answer={colorLabel} onNext={() => {
-        setModalVisible(false)
-        if (store.currentIndex + 1 === maxQuestion) {
-          return navigation.navigate('Score', {
-            maxQuestion: maxQuestion,
-          })
+      <ResultModal answer={'1'} onNext={() => {
+        if (!store.hasMoreQuestion()) {
+          return navigation.navigate('Score')
         }
         store.nextQuestion()
-      }} success={question.success} visible={modalVisible}/>
+        setModalVisible(false)
+      }} success={question.success} visible={modalVisible}>
+        <ChoiceButton key={question.answer} type={'color'} value={Color[question.answer]} onPress={() => {}}/>
+      </ResultModal>
       <View style={[styles.header]}>
         <View style={[{
           flex: 1,
@@ -96,14 +96,14 @@ export function ColorGame({ navigation } : Props) {
           alignItems: 'center',
           flexDirection: 'row',
           flexWrap: 'wrap',
-          flex: 8
+          flex: 3,
         }]}>
           <Text style={{
             fontSize: RFPercentage(4),
             fontFamily: FONT.FAMILY,
             color: COLORS.FONT.BASE,
             textAlign: 'center'
-          }}>Quelle couleur est {colorSoundMap[Color[question.answer]].label} ?</Text>
+          }}>Quelle couleur est {colorLabel} ?</Text>
         </View>
       </View>
       <View style={styles.body}>
@@ -113,6 +113,7 @@ export function ColorGame({ navigation } : Props) {
           justifyContent: 'center',
           flexWrap: 'wrap',
           flex: 3,
+          gap: 20,
         }}>
           {question?.possibilities?.map((possibility) => (
             <ChoiceButton key={possibility.value} type={'color'} value={Color[possibility.value]} onPress={() => {
@@ -141,12 +142,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   body: {
-    flex: 1,
+    flex: 2,
     justifyContent: 'center',
   },
   footer: {
     alignItems: 'flex-end',
-    flex: 0.2,
+    flex: 0.3,
     marginTop: -20,
+    marginBottom: 30,
   }
 });

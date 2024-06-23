@@ -39,3 +39,4 @@ yarn-error.*
 /*.apk
 /*.aab
 google-services-prod.json
+todo.md

@@ -32,17 +32,18 @@ export default function ChoiceButton(props: { value: string, type: string, onPre
 
 const styles = StyleSheet.create({
   containerView: {
-    width: "50%",
-    height: "50%",
+    minHeight: "35%",
+    minWidth: "35%",
     alignItems: "center",
   },
   playButton: {
     alignItems: "center",
     backgroundColor: COLORS.BUTTON.SECONDARY,
-    width: "70%",
-    height: "70%",
+    minHeight: 75,
+    minWidth: 75,
     justifyContent: "center",
-    borderRadius: 50,
+    padding: 10,
+    borderRadius: 500,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

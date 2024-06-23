@@ -38,6 +38,7 @@ interface GameScoreState {
   questions: Question[]
   init: (maxQuestion :number, maxAnswer :number) => void
   nextQuestion: () => void
+  hasMoreQuestion: () => boolean
   getResults: () => number
 }
 
@@ -63,6 +64,9 @@ export const useGameScoreStore = create<GameScoreState>((set, get) => ({
     set((state) => {
       return { currentIndex: state.currentIndex + 1 };
     });
+  },
+  hasMoreQuestion: () : boolean => {
+    return get().currentIndex < get().questions.length - 1;
   },
   getResults: (): number => {
     return get().questions.reduce((acc, question) => (question.success ? acc + 1 : acc), 0)

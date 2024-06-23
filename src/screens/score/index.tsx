@@ -6,25 +6,23 @@ import {SOUNDS, useSoundStore} from "../../store/audio";
 import COLORS from "../../utils/color";
 import FONT from "../../utils/font";
 import analytics from "@react-native-firebase/analytics";
-import {RouteProp} from "@react-navigation/native";
 
 type Props = {
-  route: {params: {maxQuestion: number}};
   navigation: NativeStackNavigationProp<any>;
 };
 
-export default function ScoreScreen({ route, navigation }: Props) {
+export default function ScoreScreen({navigation }: Props) {
   const store = useGameScoreStore()
   const soundStore = useSoundStore()
-  const maxQuestion = route.params.maxQuestion;
+  const maxQuestion = store.questions.length;
 
   const handleClick = () => {
     navigation.navigate('GameSelectionMenu')
   }
 
-  let results = store.getResults();
-  let isGood = results >= maxQuestion / 2;
-  let isPerfect = results === maxQuestion;
+  const results = store.getResults();
+  const isGood = results >= maxQuestion / 2;
+  const isPerfect = results === maxQuestion;
   const congratulationSource = require('../../../assets/congratulation.jpeg');
   const retrySource = require('../../../assets/retry.jpeg');
 

@@ -51,7 +51,7 @@ const animalSoundMap: AnimalSoundMap = {
 export function NumberGame({ navigation } : Props) {
   const [modalVisible, setModalVisible] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [animals, setAnimals] = useState([Animal[0]]);
+  const [animals, setAnimals] = useState(['duck']);
   const store = useGameScoreStore()
   const soundStore = useSoundStore()
 
@@ -110,17 +110,15 @@ export function NumberGame({ navigation } : Props) {
   return (
     <View style={styles.container}>
       <ResultModal answer={answer.toString()} onNext={() => {
-        setModalVisible(false)
-        if (store.currentIndex + 1 === maxQuestion) {
-          return navigation.navigate('Score', {
-            maxQuestion: maxQuestion,
-          })
+        if (!store.hasMoreQuestion()) {
+          return navigation.navigate('Score')
         }
         store.nextQuestion()
+        setModalVisible(false)
       }} success={question.success} visible={modalVisible}/>
       <View style={[styles.header]}>
         <View style={[{
-          flex: 1,
+          flex: 1.5,
           flexDirection: 'row',
         }]}>
           <Text style={{
@@ -159,7 +157,9 @@ export function NumberGame({ navigation } : Props) {
           alignContent: 'center',
           justifyContent: 'center',
           flexWrap: 'wrap',
-          flex: 3,
+          flex: 3.5,
+          gap: 20,
+          marginTop: -20
         }}>
           {question?.possibilities?.map((possibility) => (
             <ChoiceButton type={'number'} key={possibility.value} value={possibility.value.toString()} onPress={() => {
@@ -180,15 +180,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.BACKGROUND,
     paddingHorizontal: 20,
-    paddingTop: 40,
+    paddingTop: 20,
     justifyContent: 'center',
     flexDirection: 'column',
   },
   header: {
-    flex: 1,
+    flex: 1
   },
   body: {
-    flex: 1,
+    flex: 1.1,
     justifyContent: 'center',
   },
   footer: {
