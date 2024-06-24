@@ -15,7 +15,7 @@ export type Question = {
 
 // Made with hate by @bersiroth
 function newQuestion(answer: number, maxAnswer: number): Question {
-  const range = Math.floor(maxAnswer / 3);
+  const range = Math.max(Math.floor(maxAnswer / 3), 3);
   const randomRange = getRandomRangeIntUnique(
     Math.max(answer - range, 1),
     Math.min(answer + range, maxAnswer),
@@ -48,10 +48,9 @@ export const useGameScoreStore = create<GameScoreState>((set, get) => ({
   init: (maxQuestion :number = 10, maxAnswer :number = 9) => {
     let questions: Question[] = []
     for (let i = 0; questions.length < maxQuestion; i++) {
-      if (i == maxAnswer) {
-        i = getRandomInt(maxAnswer - 1)
-      }
-      questions.push(newQuestion(i+1, maxAnswer))
+      let answer = 0;
+      answer = (i >= maxAnswer) ? getRandomInt(maxAnswer - 1) : i + 1;
+      questions.push(newQuestion(answer, maxAnswer))
     }
 
     do {

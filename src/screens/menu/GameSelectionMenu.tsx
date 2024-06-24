@@ -25,13 +25,11 @@ export function GameSelectionMenu({ navigation } : Props) {
   }
 
   const handleAnimalButton = async () => {
-    store.init(10, 9)
     await analytics().logEvent('AnimalGame')
-    navigation.navigate('MainMenu')
+    navigation.navigate('AnimalGame');
   }
 
   const handleShapeButton = async () => {
-    store.init(10, 9)
     await analytics().logEvent('ShapeGame')
     navigation.navigate('MainMenu')
   }

@@ -9,7 +9,7 @@ import React, {useCallback, useEffect} from "react";
 import { TitilliumWeb_700Bold, useFonts } from '@expo-google-fonts/titillium-web';
 import {SOUNDS, useSoundStore} from "./src/store/audio";
 import {MainMenu, GameSelectionMenu} from "./src/screens/menu";
-import {NumberGame, ColorGame} from "./src/screens/game";
+import {NumberGame, ColorGame, AnimalGame} from "./src/screens/game";
 
 const Stack = createNativeStackNavigator();
 
@@ -93,6 +93,11 @@ function App() {
           <Stack.Screen
             name="ColorGame"
             component={ColorGame}
+            options={{ animation: 'fade' }}
+          />
+          <Stack.Screen
+            name="AnimalGame"
+            component={AnimalGame}
             options={{ animation: 'fade' }}
           />
           <Stack.Screen

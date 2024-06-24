@@ -16,17 +16,15 @@ type Props = {
   navigation: NativeStackNavigationProp<any>;
 };
 
-enum Color {
-  yellow,
-  red,
-  brown,
-  blue,
-  pink,
-  green,
-  black,
-  purple,
-  orange,
-  gray,
+enum Animal {
+  bird,
+  cat,
+  cow,
+  dog,
+  duck,
+  pig,
+  rabbit,
+  sheep,
 }
 
 type ColorSoundMap = {
@@ -36,27 +34,26 @@ type ColorSoundMap = {
   };
 };
 
-const colorSoundMap: ColorSoundMap = {
-  "yellow": { label: "le jaune", sound: SOUNDS.COLOR.YELLOW },
-  "red": { label: "le rouge", sound: SOUNDS.COLOR.RED },
-  "brown": { label: "le marron", sound: SOUNDS.COLOR.BROWN },
-  "blue": { label: "le bleu", sound: SOUNDS.COLOR.BLUE },
-  "pink": { label: "le rose", sound: SOUNDS.COLOR.PINK },
-  "green": { label: "le vert", sound: SOUNDS.COLOR.GREEN },
-  "black": { label: "le noir", sound: SOUNDS.COLOR.BLACK },
-  "purple": { label: "le voilet", sound: SOUNDS.COLOR.PURPLE },
-  "orange": { label: "l'orange", sound: SOUNDS.COLOR.ORANGE },
-  "gray": { label: "le gris", sound: SOUNDS.COLOR.GREY },
+const animalSoundMap: ColorSoundMap = {
+  "bird": { label: "l'oiseau", sound: SOUNDS.ANIMAL.BIRD },
+  "cat": { label: "le chat", sound: SOUNDS.ANIMAL.CAT },
+  "cow": { label: "la vache", sound: SOUNDS.ANIMAL.COW },
+  "dog": { label: "le chien", sound: SOUNDS.ANIMAL.DOG },
+  "duck": { label: "le canard", sound: SOUNDS.ANIMAL.DUCK },
+  "pig": { label: "le cochon", sound: SOUNDS.ANIMAL.PIG },
+  "rabbit": { label: "le lapin", sound: SOUNDS.ANIMAL.RABBIT },
+  "sheep": { label: "le mouton", sound: SOUNDS.ANIMAL.MOUTON },
 };
 
-export function ColorGame({ navigation } : Props) {
+export function AnimalGame({ navigation } : Props) {
   const store = useGameScoreStore()
   const soundStore = useSoundStore()
   const [isLoaded, setIsLoaded] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
   const maxQuestion = 10;
-  const maxAnswer = 9;
+  const maxAnswer = 7;
+
   useEffect(() => {
     store.init(maxQuestion, maxAnswer)
     setIsLoaded(true)
@@ -75,7 +72,7 @@ export function ColorGame({ navigation } : Props) {
   if (!isLoaded) return <></>;
 
   const question = store.questions[store.currentIndex];
-  const { label, sound } = colorSoundMap[Color[question.answer]];
+  const { label, sound } = animalSoundMap[Animal[question.answer]];
 
   return (
     <View style={styles.container}>
@@ -86,7 +83,7 @@ export function ColorGame({ navigation } : Props) {
         store.nextQuestion()
         setModalVisible(false)
       }} success={question.success} visible={modalVisible}>
-        <ChoiceButton key={question.answer} type={'color'} value={Color[question.answer]} onPress={() => {}}/>
+        <ChoiceButton key={question.answer} type={'animal'} value={Animal[question.answer]} onPress={() => {}}/>
       </ResultModal>
       <View style={[styles.header]}>
         <View style={[{
@@ -113,7 +110,7 @@ export function ColorGame({ navigation } : Props) {
             fontFamily: FONT.FAMILY,
             color: COLORS.FONT.BASE,
             textAlign: 'center'
-          }}>Quelle couleur est {label} ?</Text>
+          }}>Trouve {label}</Text>
         </View>
       </View>
       <View style={styles.body}>
@@ -126,7 +123,7 @@ export function ColorGame({ navigation } : Props) {
           gap: 20,
         }}>
           {question?.possibilities?.map((possibility) => (
-            <ChoiceButton key={possibility.value} type={'color'} value={Color[possibility.value]} onPress={() => {
+            <ChoiceButton key={possibility.value} type={'animal'} value={Animal[possibility.value]} onPress={() => {
               question.success = possibility.isGood
               setModalVisible(true)
             }}/>

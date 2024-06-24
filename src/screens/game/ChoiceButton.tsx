@@ -2,6 +2,8 @@ import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import COLORS from "../../utils/color";
 import FONT from "../../utils/font";
 import {ColorImage} from "./color-picture";
+import {AnimalImage} from "./animal-picture";
+import {RFPercentage} from "react-native-responsive-fontsize";
 
 export default function ChoiceButton(props: { value: string, type: string, onPress: () => void }) {
   let element;
@@ -15,6 +17,10 @@ export default function ChoiceButton(props: { value: string, type: string, onPre
     case 'color':
       element = <ColorImage type={props.value}/>;
       playButtonStyle = {...playButtonStyle, backgroundColor: COLORS.FONT.BASE};
+      break;
+    case 'animal':
+      element = <AnimalImage type={props.value}/>;
+      playButtonStyle = {...playButtonStyle, backgroundColor: '#1e779c'};
       break;
     default:
       element = null;
@@ -41,6 +47,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.BUTTON.SECONDARY,
     minHeight: 75,
     minWidth: 75,
+    maxHeight: 100,
+    maxWidth: 100,
     justifyContent: "center",
     padding: 10,
     borderRadius: 500,
