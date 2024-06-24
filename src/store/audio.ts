@@ -50,15 +50,9 @@ type SoundsType = {
   BRAVO: AVPlaybackSource,
   MUSIC: AVPlaybackSource,
   CONGRATULATION: AVPlaybackSource
-  COUNT: {
-    [k: string]: AVPlaybackSource
-  },
-  COLOR: {
-    [k: string]: AVPlaybackSource
-  },
-  ANIMAL: {
-    [k: string]: AVPlaybackSource
-  },
+  COUNT: { [k: string]: AVPlaybackSource },
+  COLOR: { [k: string]: AVPlaybackSource },
+  ANIMAL: { [k: string]: AVPlaybackSource },
 }
 
 export const SOUNDS: SoundsType = {

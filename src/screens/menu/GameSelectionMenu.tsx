@@ -2,7 +2,7 @@ import {StyleSheet, Text, View} from "react-native";
 import PrimaryButton from "../../components/PrimaryButton";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import {useGameScoreStore} from "../../store/game";
-import SoundButton from "../../components/SoundButton";
+import MusicButton from "../../components/MusicButton";
 import COLORS from "../../utils/color";
 import analytics from '@react-native-firebase/analytics';
 import FONT from "../../utils/font";
@@ -54,7 +54,7 @@ export function GameSelectionMenu({ navigation } : Props) {
         </View>
       </View>
       <View style={styles.footer}>
-        <SoundButton/>
+        <MusicButton/>
       </View>
     </View>
   );

@@ -7,7 +7,7 @@ import {useGameScoreStore} from "../../store/game";
 import {ResultModal} from "./result-modal";
 import {SOUNDS, useSoundStore} from "../../store/audio";
 import {AVPlaybackSource} from "expo-av";
-import SoundButton from "../../components/SoundButton";
+import MusicButton from "../../components/MusicButton";
 import COLORS from "../../utils/color";
 import FONT from "../../utils/font";
 import analytics from "@react-native-firebase/analytics";
@@ -170,7 +170,7 @@ export function NumberGame({ navigation } : Props) {
         </View>
       </View>
       <View style={[styles.footer]}>
-        <SoundButton/>
+        <MusicButton/>
       </View>
     </View>
   );

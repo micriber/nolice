@@ -6,11 +6,12 @@ import {useGameScoreStore} from "../../store/game";
 import {ResultModal} from "./result-modal";
 import {SOUNDS, useSoundStore} from "../../store/audio";
 import {AVPlaybackSource} from "expo-av";
-import SoundButton from "../../components/SoundButton";
+import MusicButton from "../../components/MusicButton";
 import COLORS from "../../utils/color";
 import FONT from "../../utils/font";
 import analytics from "@react-native-firebase/analytics";
 import {RFPercentage} from "react-native-responsive-fontsize";
+import InstructionButton from "../../components/InstructionButton";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -134,7 +135,8 @@ export function ColorGame({ navigation } : Props) {
         </View>
       </View>
       <View style={[styles.footer]}>
-        <SoundButton/>
+        {sound !== undefined ? <InstructionButton sound={sound}/> : null }
+        <MusicButton/>
       </View>
     </View>
   );
@@ -156,7 +158,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   footer: {
-    alignItems: 'flex-end',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 100,
     flex: 0.3,
     marginTop: -20,
     marginBottom: 30,

@@ -3,7 +3,7 @@ import {StyleSheet, View} from "react-native";
 import Logo from "../../../assets/svg/logo.svg";
 import PrimaryButton from "../../components/PrimaryButton";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
-import SoundButton from "../../components/SoundButton";
+import MusicButton from "../../components/MusicButton";
 import COLORS from "../../utils/color";
 import analytics from '@react-native-firebase/analytics';
 
@@ -27,7 +27,7 @@ export function MainMenu({ navigation } : Props) {
           <PrimaryButton name="JOUER" onPress={handleClick}/>
         </View>
         <View style={styles.body}>
-          <SoundButton/>
+          <MusicButton/>
         </View>
       </View>
     </View>
