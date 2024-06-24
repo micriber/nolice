@@ -1,3 +1,2 @@
-export { ColorGame } from './ColorGame';
-export { AnimalGame } from './AnimalGame';
+export { FindGame } from './FindGame';
 export { NumberGame } from './NumberGame';

@@ -4,56 +4,35 @@ import React, {useEffect, useState} from "react";
 import ChoiceButton from "./ChoiceButton";
 import {useGameScoreStore} from "../../store/game";
 import {ResultModal} from "./result-modal";
-import {SOUNDS, useSoundStore} from "../../store/audio";
-import {AVPlaybackSource} from "expo-av";
+import {useSoundStore} from "../../store/audio";
 import MusicButton from "../../components/MusicButton";
 import COLORS from "../../utils/color";
 import FONT from "../../utils/font";
 import analytics from "@react-native-firebase/analytics";
 import {RFPercentage} from "react-native-responsive-fontsize";
 import InstructionButton from "../../components/InstructionButton";
+import {AVPlaybackSource} from "expo-av";
+
+type QuestionConfig = {
+  key: string;
+  label: string;
+  sound: AVPlaybackSource;
+};
 
 type Props = {
+  route: {params: {questionConfig: QuestionConfig[], gameType: string}};
   navigation: NativeStackNavigationProp<any>;
 };
 
-enum Animal {
-  bird,
-  cat,
-  cow,
-  dog,
-  duck,
-  pig,
-  rabbit,
-  sheep,
-}
-
-type ColorSoundMap = {
-  [color: string]: {
-    label: string;
-    sound: AVPlaybackSource;
-  };
-};
-
-const animalSoundMap: ColorSoundMap = {
-  "bird": { label: "l'oiseau", sound: SOUNDS.ANIMAL.BIRD },
-  "cat": { label: "le chat", sound: SOUNDS.ANIMAL.CAT },
-  "cow": { label: "la vache", sound: SOUNDS.ANIMAL.COW },
-  "dog": { label: "le chien", sound: SOUNDS.ANIMAL.DOG },
-  "duck": { label: "le canard", sound: SOUNDS.ANIMAL.DUCK },
-  "pig": { label: "le cochon", sound: SOUNDS.ANIMAL.PIG },
-  "rabbit": { label: "le lapin", sound: SOUNDS.ANIMAL.RABBIT },
-  "sheep": { label: "le mouton", sound: SOUNDS.ANIMAL.MOUTON },
-};
-
-export function AnimalGame({ navigation } : Props) {
+export function FindGame({ route, navigation } : Props) {
+  const { questionConfig,gameType} = route.params;
   const store = useGameScoreStore()
   const soundStore = useSoundStore()
   const [isLoaded, setIsLoaded] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
   const maxQuestion = 10;
-  const maxAnswer = 7;
+  const maxAnswer = questionConfig.length - 1;
 
   useEffect(() => {
     store.init(maxQuestion, maxAnswer)
@@ -73,7 +52,7 @@ export function AnimalGame({ navigation } : Props) {
   if (!isLoaded) return <></>;
 
   const question = store.questions[store.currentIndex];
-  const { label, sound } = animalSoundMap[Animal[question.answer]];
+  const { label, sound, key} = questionConfig[question.answer];
 
   return (
     <View style={styles.container}>
@@ -84,7 +63,7 @@ export function AnimalGame({ navigation } : Props) {
         store.nextQuestion()
         setModalVisible(false)
       }} success={question.success} visible={modalVisible}>
-        <ChoiceButton key={question.answer} type={'animal'} value={Animal[question.answer]} onPress={() => {}}/>
+        <ChoiceButton key={question.answer} type={gameType} value={key} onPress={() => {}}/>
       </ResultModal>
       <View style={[styles.header]}>
         <View style={[{
@@ -124,7 +103,7 @@ export function AnimalGame({ navigation } : Props) {
           gap: 20,
         }}>
           {question?.possibilities?.map((possibility) => (
-            <ChoiceButton key={possibility.value} type={'animal'} value={Animal[possibility.value]} onPress={() => {
+            <ChoiceButton key={possibility.value} type={gameType} value={questionConfig[possibility.value].key} onPress={() => {
               question.success = possibility.isGood
               setModalVisible(true)
             }}/>

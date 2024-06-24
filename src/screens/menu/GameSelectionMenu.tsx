@@ -6,6 +6,7 @@ import MusicButton from "../../components/MusicButton";
 import COLORS from "../../utils/color";
 import analytics from '@react-native-firebase/analytics';
 import FONT from "../../utils/font";
+import {SOUNDS} from "../../store/audio";
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -21,12 +22,34 @@ export function GameSelectionMenu({ navigation } : Props) {
 
   const handleColorButton = async () => {
     await analytics().logEvent('ColorGame')
-    navigation.navigate('ColorGame');
+    const questionConfig= [
+      {key: "yellow",  label: "le jaune", sound: SOUNDS.COLOR.YELLOW },
+      {key: "red",  label: "le rouge", sound: SOUNDS.COLOR.RED },
+      {key: "brown",  label: "le marron", sound: SOUNDS.COLOR.BROWN },
+      {key: "blue",  label: "le bleu", sound: SOUNDS.COLOR.BLUE },
+      {key: "pink",  label: "le rose", sound: SOUNDS.COLOR.PINK },
+      {key: "green",  label: "le vert", sound: SOUNDS.COLOR.GREEN },
+      {key: "black",  label: "le noir", sound: SOUNDS.COLOR.BLACK },
+      {key: "purple",  label: "le voilet", sound: SOUNDS.COLOR.PURPLE },
+      {key: "orange",  label: "l'orange", sound: SOUNDS.COLOR.ORANGE },
+      {key: "gray",  label: "le gris", sound: SOUNDS.COLOR.GREY },
+    ];
+    navigation.navigate('FindGame', {questionConfig: questionConfig, gameType: 'color'});
   }
 
   const handleAnimalButton = async () => {
     await analytics().logEvent('AnimalGame')
-    navigation.navigate('AnimalGame');
+    const questionConfig= [
+      {key: "bird", label: "l'oiseau", sound: SOUNDS.ANIMAL.BIRD },
+      {key: "cat", label: "le chat", sound: SOUNDS.ANIMAL.CAT },
+      {key: "cow", label: "la vache", sound: SOUNDS.ANIMAL.COW },
+      {key: "dog", label: "le chien", sound: SOUNDS.ANIMAL.DOG },
+      {key: "duck", label: "le canard", sound: SOUNDS.ANIMAL.DUCK },
+      {key: "pig", label: "le cochon", sound: SOUNDS.ANIMAL.PIG },
+      {key: "rabbit", label: "le lapin", sound: SOUNDS.ANIMAL.RABBIT },
+      {key: "sheep", label: "le mouton", sound: SOUNDS.ANIMAL.MOUTON },
+    ];
+    navigation.navigate('FindGame', {questionConfig: questionConfig, gameType: 'animal'});
   }
 
   const handleShapeButton = async () => {
