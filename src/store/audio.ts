@@ -30,6 +30,15 @@ const COW_SOUND_PATH = '../../assets/audio/cow.mp3'
 const RABBIT_SOUND_PATH = '../../assets/audio/rabbit.mp3'
 const BIRD_SOUND_PATH = '../../assets/audio/bird.mp3'
 const SHEEP_SOUND_PATH = '../../assets/audio/sheep.mp3'
+const CIRCLE_SOUND_PATH = '../../assets/audio/shape-circle.mp3'
+const CROSS_SOUND_PATH = '../../assets/audio/shape-cross.mp3'
+const HEART_SOUND_PATH = '../../assets/audio/shape-heart.mp3'
+const LOSANGE_SOUND_PATH = '../../assets/audio/shape-losange.mp3'
+const OVAL_SOUND_PATH = '../../assets/audio/shape-oval.mp3'
+const RECTANGLE_SOUND_PATH = '../../assets/audio/shape-rectangle.mp3'
+const SQUARE_SOUND_PATH = '../../assets/audio/shape-square.mp3'
+const STAR_SOUND_PATH = '../../assets/audio/shape-star.mp3'
+const TRIANGLE_SOUND_PATH = '../../assets/audio/shape-triangle.mp3'
 const BLACK_SOUND_PATH = '../../assets/audio/black.mp3'
 const BLUE_SOUND_PATH = '../../assets/audio/blue.mp3'
 const BROWN_SOUND_PATH = '../../assets/audio/brown.mp3'
@@ -53,6 +62,7 @@ type SoundsType = {
   COUNT: { [k: string]: AVPlaybackSource },
   COLOR: { [k: string]: AVPlaybackSource },
   ANIMAL: { [k: string]: AVPlaybackSource },
+  SHAPE: { [k: string]: AVPlaybackSource },
 }
 
 export const SOUNDS: SoundsType = {
@@ -92,6 +102,17 @@ export const SOUNDS: SoundsType = {
     PIG: require(PIG_SOUND_PATH),
     RABBIT: require(RABBIT_SOUND_PATH),
     SHEEP: require(SHEEP_SOUND_PATH),
+  },
+  SHAPE: {
+    CIRCLE: require(CIRCLE_SOUND_PATH),
+    CROSS: require(CROSS_SOUND_PATH),
+    HEART: require(HEART_SOUND_PATH),
+    LOSANGE: require(LOSANGE_SOUND_PATH),
+    OVAL: require(OVAL_SOUND_PATH),
+    RECTANGLE: require(RECTANGLE_SOUND_PATH),
+    SQUARE: require(SQUARE_SOUND_PATH),
+    STAR: require(STAR_SOUND_PATH),
+    TRIANGLE: require(TRIANGLE_SOUND_PATH),
   }
 }
 

@@ -8,17 +8,19 @@ import {RFPercentage} from "react-native-responsive-fontsize";
 import NumberLogo from "../../assets/svg/logo-number-game.svg";
 // @ts-ignore
 import ColorLogo from "../../assets/svg/logo-color-game.svg";
+import {ShapeImage} from "../screens/game/shape-picture";
 
-export default function PrimaryButton(props: { name: string, onPress: () => void, animal?: string, game?: string}) {
-  const logo = props.animal || props.game ?
+export default function PrimaryButton(props: { name: string, onPress: () => void, game?: string}) {
+  const logo = props.game ?
     <View style={[{flex:1}]}>
-      {props.animal ? <AnimalImage type={props.animal} /> : null}
       {props.game == 'number' ? <NumberLogo/> : null}
       {props.game == 'color' ? <ColorLogo/> : null}
+      {props.game == 'shape' ? <ShapeImage/> : null}
+      {props.game == 'animal' ? <AnimalImage type={'duck'} /> : null}
     </View> : null;
   return <TouchableOpacity
     style={[styles.playButton, {
-      height: RFPercentage(props.animal || props.game ? 14 : 10),
+      height: RFPercentage(props.game ? 14 : 10),
     }]}
     onPress={props.onPress}
   >

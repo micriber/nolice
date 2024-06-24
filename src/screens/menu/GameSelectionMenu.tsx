@@ -54,7 +54,18 @@ export function GameSelectionMenu({ navigation } : Props) {
 
   const handleShapeButton = async () => {
     await analytics().logEvent('ShapeGame')
-    navigation.navigate('MainMenu')
+    const questionConfig= [
+      {key: "circle", label: "le cercle", sound: SOUNDS.SHAPE.CIRCLE },
+      {key: "cross", label: "la croix", sound: SOUNDS.SHAPE.CROSS },
+      {key: "heart", label: "le coeur", sound: SOUNDS.SHAPE.HEART },
+      {key: "losange", label: "le losange", sound: SOUNDS.SHAPE.LOSANGE },
+      {key: "oval", label: "l'ovale", sound: SOUNDS.SHAPE.OVAL },
+      {key: "rectangle", label: "le rectangle", sound: SOUNDS.SHAPE.RECTANGLE },
+      {key: "square", label: "le caré", sound: SOUNDS.SHAPE.SQUARE },
+      {key: "star", label: "l'étoile", sound: SOUNDS.SHAPE.STAR },
+      {key: "triangle", label: "le triangle", sound: SOUNDS.SHAPE.TRIANGLE },
+    ];
+    navigation.navigate('FindGame', {questionConfig: questionConfig, gameType: 'shape'});
   }
 
   return (
@@ -70,10 +81,10 @@ export function GameSelectionMenu({ navigation } : Props) {
           <PrimaryButton name="COULEUR" onPress={handleColorButton} game={'color'}/>
         </View>
         <View style={styles.body}>
-          <PrimaryButton name="ANIMAUX" onPress={handleAnimalButton} animal={'duck'}/>
+          <PrimaryButton name="ANIMAUX" onPress={handleAnimalButton} game={'animal'}/>
         </View>
         <View style={styles.body}>
-          <PrimaryButton name="FORME" onPress={handleShapeButton} animal={'bird'}/>
+          <PrimaryButton name="FORME" onPress={handleShapeButton} game={'shape'}/>
         </View>
       </View>
       <View style={styles.footer}>

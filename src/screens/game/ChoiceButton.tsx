@@ -3,7 +3,7 @@ import COLORS from "../../utils/color";
 import FONT from "../../utils/font";
 import {ColorImage} from "./color-picture";
 import {AnimalImage} from "./animal-picture";
-import {RFPercentage} from "react-native-responsive-fontsize";
+import {ShapeImage} from "./shape-picture";
 
 export default function ChoiceButton(props: { value: string, type: string, onPress: () => void }) {
   let element;
@@ -21,6 +21,10 @@ export default function ChoiceButton(props: { value: string, type: string, onPre
     case 'animal':
       element = <AnimalImage type={props.value}/>;
       playButtonStyle = {...playButtonStyle, backgroundColor: '#1e779c'};
+      break;
+    case 'shape':
+      element = <ShapeImage type={props.value}/>;
+      playButtonStyle = {...playButtonStyle, backgroundColor: COLORS.FONT.BASE};
       break;
     default:
       element = null;
