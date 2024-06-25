@@ -4,13 +4,15 @@ import {SOUNDS, useSoundStore} from "../../store/audio";
 import COLORS from "../../utils/color";
 import FONT from "../../utils/font";
 import analytics from "@react-native-firebase/analytics";
+import React from "react";
 
 type Props = {
   onClose?: () => void
   onNext: () => void
   visible: boolean
   success: boolean,
-  answer?: number,
+  answer?: string,
+  children?: React.ReactNode;
 }
 
 export function ResultModal(props: Props) {
@@ -26,6 +28,28 @@ export function ResultModal(props: Props) {
     } else {
       await soundStore.play(SOUNDS.DOMMAGE)
     }
+  }
+
+  let content;
+  if (props.children) {
+    content = <View style={[{
+      flex: 3,
+      marginTop: 30,
+      flexDirection: 'row',
+      alignContent: 'center',
+      justifyContent: 'center',
+    }]}>
+      {props.children}
+    </View>;
+  } else if (props.answer) {
+    content = <Text style={[
+      styles.modalText,
+      {
+        fontSize: FONT.SIZE.GIANT,
+        flex: 3,
+        marginTop: 30,
+      }
+    ]}>{props.answer}</Text>
   }
 
   return (
@@ -47,13 +71,7 @@ export function ResultModal(props: Props) {
             }
           ]}>{props.success ? "BRAVO !" : "FAUX !"}</Text>
           <Text style={styles.modalText}>La bonne réponse</Text>
-          <Text style={[
-            styles.modalText,
-            {
-              fontSize: FONT.SIZE.GIANT,
-              flex: 2,
-            }
-          ]}>{props.answer}</Text>
+          {content ?? <></>}
           <View style={[{
             flex: 2,
             justifyContent: 'center',
@@ -83,9 +101,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: '5%',
     alignItems: 'center',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#9b9b9b',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -94,7 +109,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    height: "50%",
+    height: "60%",
   },
   modalText: {
     flex: 1,

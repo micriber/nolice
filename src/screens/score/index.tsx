@@ -1,6 +1,6 @@
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import {StyleSheet, View, Text, Image} from "react-native";
-import {MAX_QUESTION, useGameScoreStore} from "../../store/game";
+import {useGameScoreStore} from "../../store/game";
 import PrimaryButton from "../../components/PrimaryButton";
 import {SOUNDS, useSoundStore} from "../../store/audio";
 import COLORS from "../../utils/color";
@@ -11,17 +11,18 @@ type Props = {
   navigation: NativeStackNavigationProp<any>;
 };
 
-export default function ScoreScreen({ navigation }: Props) {
+export default function ScoreScreen({navigation }: Props) {
   const store = useGameScoreStore()
   const soundStore = useSoundStore()
+  const maxQuestion = store.questions.length;
 
   const handleClick = () => {
     navigation.navigate('GameSelectionMenu')
   }
 
-  let results = store.getResults();
-  let isGood = results >= MAX_QUESTION / 2;
-  let isPerfect = results === MAX_QUESTION;
+  const results = store.getResults();
+  const isGood = results >= maxQuestion / 2;
+  const isPerfect = results === maxQuestion;
   const congratulationSource = require('../../../assets/congratulation.jpeg');
   const retrySource = require('../../../assets/retry.jpeg');
 
@@ -48,7 +49,7 @@ export default function ScoreScreen({ navigation }: Props) {
       </View>
       <View style={styles.body}>
         <Text style={[styles.score, styles.message]}>{message}</Text>
-        <Text style={styles.score}>Résultat : <Text style={[{color: (isGood) ? COLORS.FONT.SUCCESS : COLORS.FONT.ERROR}]}>{results}</Text> / {MAX_QUESTION}</Text>
+        <Text style={styles.score}>Résultat : <Text style={[{color: (isGood) ? COLORS.FONT.SUCCESS : COLORS.FONT.ERROR}]}>{results}</Text> / {maxQuestion}</Text>
       </View>
       <View style={styles.footer}>
         <PrimaryButton name="REJOUER" onPress={handleClick}/>

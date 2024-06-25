@@ -3,7 +3,7 @@ import {StyleSheet, View} from "react-native";
 import Logo from "../../../assets/svg/logo.svg";
 import PrimaryButton from "../../components/PrimaryButton";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
-import SoundButton from "../../components/SoundButton";
+import MusicButton from "../../components/MusicButton";
 import COLORS from "../../utils/color";
 import analytics from '@react-native-firebase/analytics';
 
@@ -11,9 +11,9 @@ type Props = {
   navigation: NativeStackNavigationProp<any>;
 };
 
-export default function MainMenuScreen({ navigation } : Props) {
+export function MainMenu({ navigation } : Props) {
   const handleClick = async () => {
-    // await analytics().logEvent('play')
+    await analytics().logEvent('play')
     navigation.navigate('GameSelectionMenu')
   }
 
@@ -27,7 +27,7 @@ export default function MainMenuScreen({ navigation } : Props) {
           <PrimaryButton name="JOUER" onPress={handleClick}/>
         </View>
         <View style={styles.body}>
-          <SoundButton/>
+          <MusicButton/>
         </View>
       </View>
     </View>

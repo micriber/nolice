@@ -1,8 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {MainMenuScreen, GameSelectionMenu} from "./src/screens/menu";
-import GameScreen from "./src/screens/game";
 import ScoreScreen from "./src/screens/score";
 import analytics from '@react-native-firebase/analytics';
 import * as Sentry from '@sentry/react-native';
@@ -10,6 +8,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import React, {useCallback, useEffect} from "react";
 import { TitilliumWeb_700Bold, useFonts } from '@expo-google-fonts/titillium-web';
 import {SOUNDS, useSoundStore} from "./src/store/audio";
+import {MainMenu, GameSelectionMenu} from "./src/screens/menu";
+import {NumberGame, FindGame} from "./src/screens/game";
 
 const Stack = createNativeStackNavigator();
 
@@ -77,7 +77,7 @@ function App() {
           }}>
           <Stack.Screen
             name="MainMenu"
-            component={MainMenuScreen}
+            component={MainMenu}
             options={{ animation: 'fade' }}
           />
           <Stack.Screen
@@ -86,8 +86,13 @@ function App() {
             options={{ animation: 'fade' }}
           />
           <Stack.Screen
-            name="Game"
-            component={GameScreen}
+            name="NumberGame"
+            component={NumberGame}
+            options={{ animation: 'fade' }}
+          />
+          <Stack.Screen
+            name="FindGame"
+            component={FindGame}
             options={{ animation: 'fade' }}
           />
           <Stack.Screen
