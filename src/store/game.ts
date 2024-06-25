@@ -45,7 +45,7 @@ interface GameScoreState {
 export const useGameScoreStore = create<GameScoreState>((set, get) => ({
   currentIndex: 0,
   questions: [],
-  init: (maxQuestion :number = 10, maxAnswer :number = 9) => {
+  init: (maxQuestion: number = 10, maxAnswer: number = 9) => {
     let questions: Question[] = []
     for (let i = 0; questions.length < maxQuestion; i++) {
       let answer = 0;
