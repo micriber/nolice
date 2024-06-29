@@ -3,5 +3,5 @@
   "compilerOptions": {
     "strict": true
   },
-  "include": ["assets/svg/*.svg"]
+  "include": ["assets/svg/*.svg", "."]
 }
