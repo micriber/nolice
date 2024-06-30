@@ -14,6 +14,7 @@ import analytics from "@react-native-firebase/analytics";
 import {RFPercentage} from "react-native-responsive-fontsize";
 import {getRandomInt} from "../../utils/random";
 import {shuffle} from "../../utils/array";
+import uuid from 'react-native-uuid';
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -54,6 +55,9 @@ export function NumberGame({ navigation } : Props) {
   const [animals, setAnimals] = useState(['duck']);
   const store = useGameScoreStore()
   const soundStore = useSoundStore()
+  const [choice, setChoice] = useState('choice');
+  const [questionId, setQuestionId] = useState(uuid.v4());
+  const [gameId, setGameId] = useState(uuid.v4());
 
   const maxQuestion = 10;
   const maxAnswer = 9;
@@ -88,6 +92,9 @@ export function NumberGame({ navigation } : Props) {
       playAudio()
       analytics().logEvent('question', {
         event_name: 'question',
+        question_id: questionId,
+        game_id: gameId,
+        gameType: 'number',
         animal: animal,
         answer: question.answer,
         possibility1: question?.possibilities[0].value,
@@ -111,11 +118,13 @@ export function NumberGame({ navigation } : Props) {
     <View style={styles.container}>
       <ResultModal answer={answer.toString()} onNext={() => {
         if (!store.hasMoreQuestion()) {
-          return navigation.navigate('Score')
+          setModalVisible(false)
+          return navigation.navigate('Score', {gameId})
         }
+        setQuestionId(uuid.v4());
         store.nextQuestion()
         setModalVisible(false)
-      }} success={question.success} visible={modalVisible}/>
+      }} success={question.success} visible={modalVisible} questionId={questionId} gameId={gameId} choice={choice}/>
       <View style={[styles.header]}>
         <View style={[{
           flex: 1.5,
@@ -164,6 +173,7 @@ export function NumberGame({ navigation } : Props) {
           {question?.possibilities?.map((possibility) => (
             <ChoiceButton type={'number'} key={possibility.value} value={possibility.value.toString()} onPress={() => {
               question.success = possibility.isGood
+              setChoice(possibility.value.toString())
               setModalVisible(true)
             }}/>
           ))}

@@ -1,4 +1,4 @@
-import {TouchableOpacity, View} from "react-native";
+import {TouchableOpacity} from "react-native";
 import {useSoundStore} from "../store/audio";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import COLORS from "../utils/color";
