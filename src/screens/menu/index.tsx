@@ -1,2 +1,2 @@
-export { MainMenu } from './MainMenu';
-export { GameSelectionMenu } from './GameSelectionMenu';
+export {MainMenu} from './MainMenu';
+export {GameSelectionMenu} from './GameSelectionMenu';

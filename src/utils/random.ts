@@ -5,8 +5,13 @@ export function getRandomInt(max: number) {
   return Math.floor(Math.random() * max) + 1;
 }
 
-export function getRandomRangeIntUnique(min: number, max: number, quantity: number, exclude: number) {
-  if (quantity > (max - min + 1) || (max < min)) {
+export function getRandomRangeIntUnique(
+  min: number,
+  max: number,
+  quantity: number,
+  exclude: number,
+) {
+  if (quantity > max - min + 1 || max < min) {
     return null;
   }
   const randomIntList: number[] = [];

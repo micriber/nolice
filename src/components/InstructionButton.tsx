@@ -1,28 +1,32 @@
-import {TouchableOpacity} from "react-native";
-import {useSoundStore} from "../store/audio";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import COLORS from "../utils/color";
-import analytics from "@react-native-firebase/analytics";
-import React from "react";
-import FONT from "../utils/font";
-import {AVPlaybackSource} from "expo-av";
+import {MaterialCommunityIcons} from '@expo/vector-icons';
+import analytics from '@react-native-firebase/analytics';
+import {AVPlaybackSource} from 'expo-av';
+import React from 'react';
+import {TouchableOpacity} from 'react-native';
+
+import {useSoundStore} from '../store/audio';
+import COLORS from '../utils/color';
+import FONT from '../utils/font';
 
 type Props = {
   sound: AVPlaybackSource;
 };
 export default function InstructionButton(props: Props) {
-  const soundStore = useSoundStore()
+  const soundStore = useSoundStore();
 
-  return <TouchableOpacity
+  return (
+    <TouchableOpacity
       onPress={async () => {
         await analytics().logEvent('instruction');
         await soundStore.play(props.sound);
-      }}
-    >
-      <MaterialCommunityIcons name={'account-voice'} style={
-        {
+      }}>
+      <MaterialCommunityIcons
+        name="account-voice"
+        style={{
           fontSize: FONT.SIZE.BIG,
-        }
-      } color={COLORS.ICON} />
-    </TouchableOpacity>;
+        }}
+        color={COLORS.ICON}
+      />
+    </TouchableOpacity>
+  );
 }

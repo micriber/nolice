@@ -12,7 +12,8 @@
     "build:release": "eas build -p android",
     "ios": "expo run:ios",
     "lint": "eslint --max-warnings 0 --ext .js,.jsx,.ts,.tsx .",
-    "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx --fix ."
+    "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx --fix .",
+    "ts:check": "tsc --noemit"
   },
   "dependencies": {
     "@expo-google-fonts/titillium-web": "^0.2.3",
