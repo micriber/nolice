@@ -58,6 +58,7 @@ export function FindGame({ route, navigation } : Props) {
     <View style={styles.container}>
       <ResultModal onNext={() => {
         if (!store.hasMoreQuestion()) {
+          setModalVisible(false)
           return navigation.navigate('Score')
         }
         store.nextQuestion()

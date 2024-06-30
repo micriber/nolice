@@ -111,6 +111,7 @@ export function NumberGame({ navigation } : Props) {
     <View style={styles.container}>
       <ResultModal answer={answer.toString()} onNext={() => {
         if (!store.hasMoreQuestion()) {
+          setModalVisible(false)
           return navigation.navigate('Score')
         }
         store.nextQuestion()
