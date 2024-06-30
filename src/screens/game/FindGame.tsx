@@ -12,6 +12,7 @@ import analytics from "@react-native-firebase/analytics";
 import {RFPercentage} from "react-native-responsive-fontsize";
 import InstructionButton from "../../components/InstructionButton";
 import {AVPlaybackSource} from "expo-av";
+import uuid from 'react-native-uuid';
 
 type QuestionConfig = {
   key: string;
@@ -30,6 +31,9 @@ export function FindGame({ route, navigation } : Props) {
   const soundStore = useSoundStore()
   const [isLoaded, setIsLoaded] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [choice, setChoice] = useState('choice');
+  const [questionId, setQuestionId] = useState(uuid.v4());
+  const [gameId, setGameId] = useState(uuid.v4());
 
   const maxQuestion = 10;
   const maxAnswer = questionConfig.length - 1;
@@ -46,6 +50,17 @@ export function FindGame({ route, navigation } : Props) {
 
     if (isLoaded) {
       playAudio()
+      analytics().logEvent('question', {
+        event_name: 'question',
+        question_id: questionId,
+        game_id: gameId,
+        gameType: gameType,
+        answer: questionConfig[question.answer].key,
+        possibility1: questionConfig[question?.possibilities[0].value].key,
+        possibility2: questionConfig[question?.possibilities[1].value].key,
+        possibility3: questionConfig[question?.possibilities[2].value].key,
+        possibility4: questionConfig[question?.possibilities[3].value].key,
+      })
     }
   }, [isLoaded, store.currentIndex])
 
@@ -59,11 +74,12 @@ export function FindGame({ route, navigation } : Props) {
       <ResultModal onNext={() => {
         if (!store.hasMoreQuestion()) {
           setModalVisible(false)
-          return navigation.navigate('Score')
+          return navigation.navigate('Score', {gameId})
         }
+        setQuestionId(uuid.v4());
         store.nextQuestion()
         setModalVisible(false)
-      }} success={question.success} visible={modalVisible}>
+      }} success={question.success} visible={modalVisible} questionId={questionId} gameId={gameId} choice={choice} answer={key}>
         <ChoiceButton key={question.answer} type={gameType} value={key} onPress={() => {}}/>
       </ResultModal>
       <View style={[styles.header]}>
@@ -106,6 +122,7 @@ export function FindGame({ route, navigation } : Props) {
           {question?.possibilities?.map((possibility) => (
             <ChoiceButton key={possibility.value} type={gameType} value={questionConfig[possibility.value].key} onPress={() => {
               question.success = possibility.isGood
+              setChoice(questionConfig[possibility.value].key)
               setModalVisible(true)
             }}/>
           ))}

@@ -1,4 +1,4 @@
-import {TouchableOpacity, View} from "react-native";
+import {TouchableOpacity} from "react-native";
 import {useSoundStore} from "../store/audio";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import COLORS from "../utils/color";
@@ -6,7 +6,6 @@ import analytics from "@react-native-firebase/analytics";
 import React from "react";
 import FONT from "../utils/font";
 import {AVPlaybackSource} from "expo-av";
-import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 
 type Props = {
   sound: AVPlaybackSource;
@@ -16,6 +15,7 @@ export default function InstructionButton(props: Props) {
 
   return <TouchableOpacity
       onPress={async () => {
+        await analytics().logEvent('instruction');
         await soundStore.play(props.sound);
       }}
     >

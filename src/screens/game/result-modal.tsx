@@ -12,7 +12,10 @@ type Props = {
   visible: boolean
   success: boolean,
   answer?: string,
+  choice?: string,
   children?: React.ReactNode;
+  questionId?: string;
+  gameId?: string;
 }
 
 export function ResultModal(props: Props) {
@@ -21,6 +24,9 @@ export function ResultModal(props: Props) {
     await analytics().logEvent('result', {
       success: props.success,
       answer: props.answer,
+      choice: props.choice,
+      question_id: props.questionId,
+      game_id: props.gameId,
     })
 
     if (props.success) {
