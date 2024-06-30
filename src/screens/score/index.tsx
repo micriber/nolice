@@ -8,13 +8,15 @@ import FONT from "../../utils/font";
 import analytics from "@react-native-firebase/analytics";
 
 type Props = {
+  route: {params: {gameId: string}};
   navigation: NativeStackNavigationProp<any>;
 };
 
-export default function ScoreScreen({navigation }: Props) {
+export default function ScoreScreen({route, navigation}: Props) {
   const store = useGameScoreStore()
   const soundStore = useSoundStore()
   const maxQuestion = store.questions.length;
+  const gameId = route.params.gameId
 
   const handleClick = () => {
     navigation.navigate('GameSelectionMenu')
@@ -38,6 +40,7 @@ export default function ScoreScreen({navigation }: Props) {
   return (
     <View style={styles.container} onLayout={async () => {
       await analytics().logEvent('score', {
+        game_id: gameId,
         results: results,
         isGood: isGood,
         isPerfect: isPerfect,
