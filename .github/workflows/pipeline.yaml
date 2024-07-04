@@ -49,7 +49,7 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
       - name: Build preview
-        run: eas update --android --auto --non-interactive --branch ${{ github.event.pull_request.head.ref }}
+        run: eas update -p android --auto --non-interactive --branch ${{ github.event.pull_request.head.ref }}
   check-all-green:
     if: always()
     needs:
