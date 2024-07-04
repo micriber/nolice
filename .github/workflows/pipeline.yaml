@@ -18,7 +18,7 @@ jobs:
           cache: 'npm'
       - name: Lint
         run: npm run lint
-  tyepscript:
+  typescript:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
