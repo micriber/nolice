@@ -1,6 +1,5 @@
 import analytics from '@react-native-firebase/analytics';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {AVPlaybackSource} from 'expo-av';
+import {useNavigation, useRoute} from '@react-navigation/core';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
@@ -14,27 +13,20 @@ import {useSoundStore} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
 import COLORS from '../../utils/color';
 import FONT from '../../utils/font';
+import {FindGameScreenRouteProp} from '../menu/types';
+import {NavigationProp} from '../types';
 
-type QuestionConfig = {
-  key: string;
-  label: string;
-  sound: AVPlaybackSource;
-};
-
-type Props = {
-  route: {params: {questionConfig: QuestionConfig[]; gameType: string}};
-  navigation: NativeStackNavigationProp<any>;
-};
-
-export function FindGame({route, navigation}: Props) {
+export function FindGame() {
+  const route = useRoute<FindGameScreenRouteProp>();
+  const navigation = useNavigation<NavigationProp>();
   const {questionConfig, gameType} = route.params;
   const store = useGameScoreStore();
   const soundStore = useSoundStore();
   const [isLoaded, setIsLoaded] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [choice, setChoice] = useState('choice');
-  const [questionId, setQuestionId] = useState(uuid.v4());
-  const [gameId] = useState(uuid.v4());
+  const [questionId, setQuestionId] = useState(uuid.v4() as string);
+  const [gameId] = useState(uuid.v4() as string);
 
   const maxQuestion = 10;
   const maxAnswer = questionConfig.length - 1;
@@ -78,7 +70,7 @@ export function FindGame({route, navigation}: Props) {
             setModalVisible(false);
             return navigation.navigate('Score', {gameId});
           }
-          setQuestionId(uuid.v4());
+          setQuestionId(uuid.v4() as string);
           store.nextQuestion();
           setModalVisible(false);
         }}

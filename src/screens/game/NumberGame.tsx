@@ -57,8 +57,8 @@ export function NumberGame({navigation}: Props) {
   const store = useGameScoreStore();
   const soundStore = useSoundStore();
   const [choice, setChoice] = useState('choice');
-  const [questionId, setQuestionId] = useState(uuid.v4());
-  const [gameId] = useState(uuid.v4());
+  const [questionId, setQuestionId] = useState(uuid.v4() as string);
+  const [gameId] = useState(uuid.v4() as string);
 
   const maxQuestion = 10;
   const maxAnswer = 9;
@@ -128,7 +128,7 @@ export function NumberGame({navigation}: Props) {
             setModalVisible(false);
             return navigation.navigate('Score', {gameId});
           }
-          setQuestionId(uuid.v4());
+          setQuestionId(uuid.v4() as string);
           store.nextQuestion();
           setModalVisible(false);
         }}

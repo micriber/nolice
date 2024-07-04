@@ -1,26 +1,25 @@
 import analytics from '@react-native-firebase/analytics';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {useNavigation, useRoute} from '@react-navigation/core';
 import {StyleSheet, View, Text, Image} from 'react-native';
 
+import {ScoreScreenRouteProp} from './types';
 import PrimaryButton from '../../components/PrimaryButton';
 import {SOUNDS, useSoundStore} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
 import COLORS from '../../utils/color';
 import FONT from '../../utils/font';
+import {NavigationProp} from '../types';
 
-type Props = {
-  route: {params: {gameId: string}};
-  navigation: NativeStackNavigationProp<any>;
-};
-
-export default function ScoreScreen({route, navigation}: Props) {
+export default function ScoreScreen() {
+  const route = useRoute<ScoreScreenRouteProp>();
+  const navigation = useNavigation<NavigationProp>();
   const store = useGameScoreStore();
   const soundStore = useSoundStore();
   const maxQuestion = store.questions.length;
   const gameId = route.params.gameId;
 
   const handleClick = () => {
-    navigation.navigate('GameSelectionMenu');
+    navigation.navigate('MainMenu', {});
   };
 
   const results = store.getResults();

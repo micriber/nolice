@@ -10,9 +10,10 @@ import React, {useCallback, useEffect} from 'react';
 import {NumberGame, FindGame} from './src/screens/game';
 import {MainMenu, GameSelectionMenu} from './src/screens/menu';
 import ScoreScreen from './src/screens/score';
+import {StackNavigatorParamList} from './src/screens/types';
 import {SOUNDS, useSoundStore} from './src/store/audio';
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<StackNavigatorParamList>();
 
 SplashScreen.preventAutoHideAsync();
 
