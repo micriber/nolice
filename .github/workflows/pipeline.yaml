@@ -2,6 +2,9 @@ name: Run test suite
 
 on: [ pull_request ]
 
+env:
+  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -27,6 +30,23 @@ jobs:
       - run: npm ci
       - name: Lint
         run: npm run ts:check
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - name: 🏗 Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Build preview
+        run: eas update --auto --non-interactive --branch ${{ github.event.pull_request.head.ref }}
   check-all-green:
     if: always()
     needs:
