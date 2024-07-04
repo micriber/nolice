@@ -12,6 +12,7 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
+      - run: npm ci
       - name: Lint
         run: npm run lint
   typescript:
@@ -23,6 +24,7 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
+      - run: npm ci
       - name: Lint
         run: npm run ts:check
   check-all-green:
