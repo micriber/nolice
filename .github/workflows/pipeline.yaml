@@ -68,6 +68,12 @@ jobs:
       - name: Build preview
 #        run: eas update -p android --auto --non-interactive --branch ${{ github.event.pull_request.head.ref }}
         run: npm run build:local:preview
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{env.commit-hash}}.apk
+          path: build-*.apk
+          if-no-files-found: error
   check-all-green:
     if: always()
     needs:
