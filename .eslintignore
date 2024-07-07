@@ -1,0 +1,6 @@
+jest
+node_modules
+ios
+android
+coverage
+metro.config.js

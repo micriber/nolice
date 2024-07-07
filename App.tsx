@@ -1,22 +1,24 @@
-import { StatusBar } from 'expo-status-bar';
+import {TitilliumWeb_700Bold, useFonts} from '@expo-google-fonts/titillium-web';
+import analytics from '@react-native-firebase/analytics';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import ScoreScreen from "./src/screens/score";
-import analytics from '@react-native-firebase/analytics';
 import * as Sentry from '@sentry/react-native';
 import * as SplashScreen from 'expo-splash-screen';
-import React, {useCallback, useEffect} from "react";
-import { TitilliumWeb_700Bold, useFonts } from '@expo-google-fonts/titillium-web';
-import {SOUNDS, useSoundStore} from "./src/store/audio";
-import {MainMenu, GameSelectionMenu} from "./src/screens/menu";
-import {NumberGame, FindGame} from "./src/screens/game";
+import {StatusBar} from 'expo-status-bar';
+import React, {useCallback, useEffect} from 'react';
 
-const Stack = createNativeStackNavigator();
+import {NumberGame, FindGame} from './src/screens/game';
+import {MainMenu, GameSelectionMenu} from './src/screens/menu';
+import ScoreScreen from './src/screens/score';
+import {StackNavigatorParamList} from './src/screens/types';
+import {SOUNDS, useSoundStore} from './src/store/audio';
+
+const Stack = createNativeStackNavigator<StackNavigatorParamList>();
 
 SplashScreen.preventAutoHideAsync();
 
 Sentry.init({
-  dsn: "https://570746aa3468ae86a390bdc148e51e52@o919929.ingest.sentry.io/4506847089590272",
+  dsn: 'https://570746aa3468ae86a390bdc148e51e52@o919929.ingest.sentry.io/4506847089590272',
   // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
   // We recommend adjusting this value in production.
   tracesSampleRate: 1.0,
@@ -28,13 +30,13 @@ function App() {
   const navigationRef = React.useRef();
 
   const [fontsLoaded] = useFonts({
-    TitilliumWeb_700Bold
+    TitilliumWeb_700Bold,
   });
 
-  const soundStore = useSoundStore()
+  const soundStore = useSoundStore();
   useEffect(() => {
     soundStore.playBackground(SOUNDS.MUSIC).catch(console.error);
-  }, [])
+  }, []);
 
   const onReady = useCallback(async () => {
     if (fontsLoaded && soundStore.backgroundLoaded) {
@@ -68,8 +70,7 @@ function App() {
           routeNameRef.current = currentRouteName;
         }}
         // @ts-ignore
-        ref={navigationRef}
-      >
+        ref={navigationRef}>
         <Stack.Navigator
           initialRouteName="MainMenu"
           screenOptions={{
@@ -78,33 +79,33 @@ function App() {
           <Stack.Screen
             name="MainMenu"
             component={MainMenu}
-            options={{ animation: 'fade' }}
+            options={{animation: 'fade'}}
           />
           <Stack.Screen
             name="GameSelectionMenu"
             component={GameSelectionMenu}
-            options={{ animation: 'fade' }}
+            options={{animation: 'fade'}}
           />
           <Stack.Screen
             name="NumberGame"
             component={NumberGame}
-            options={{ animation: 'fade' }}
+            options={{animation: 'fade'}}
           />
           <Stack.Screen
             name="FindGame"
             component={FindGame}
-            options={{ animation: 'fade' }}
+            options={{animation: 'fade'}}
           />
           <Stack.Screen
             name="Score"
             component={ScoreScreen}
-            options={{ animation: 'fade' }}
+            options={{animation: 'fade'}}
           />
         </Stack.Navigator>
       </NavigationContainer>
-      <StatusBar/>
+      <StatusBar />
     </>
   );
-};
+}
 
 export default Sentry.wrap(App);
