@@ -1,4 +1,4 @@
-name: Run test suite
+name: Build preview APK
 
 on: [ workflow_dispatch ]
 
