@@ -4,6 +4,7 @@ on: [ pull_request ]
 
 env:
   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+  commit-hash: ${{ github.sha }}
 
 jobs:
   lint:
@@ -42,6 +43,18 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
+      - name: Cache Gradle Wrapper
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+      - name: Cache Gradle Dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-caches-
       - run: npm ci
       - name: 🏗 Setup EAS
         uses: expo/expo-github-action@v8
@@ -49,7 +62,8 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
       - name: Build preview
-        run: eas update -p android --auto --non-interactive --branch ${{ github.event.pull_request.head.ref }}
+#        run: eas update -p android --auto --non-interactive --branch ${{ github.event.pull_request.head.ref }}
+        run: npm run build:local:preview
   check-all-green:
     if: always()
     needs:

@@ -40,3 +40,5 @@ yarn-error.*
 /*.aab
 google-services-prod.json
 todo.md
+
+.env
