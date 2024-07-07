@@ -43,6 +43,10 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
+      - name: setup jdk
+        uses: actions/setup-java@v1
+        with:
+          java-version: 20
       - name: Cache Gradle Wrapper
         uses: actions/cache@v2
         with:
