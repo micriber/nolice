@@ -31,55 +31,11 @@ jobs:
       - run: npm ci
       - name: Lint
         run: npm run ts:check
-  preview:
-    runs-on: ubuntu-latest
-    needs:
-      - typescript
-      - lint
-    steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-      - name: setup jdk
-        uses: actions/setup-java@v1
-        with:
-          java-version: 20
-      - name: Cache Gradle Wrapper
-        uses: actions/cache@v2
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Cache Gradle Dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-caches-
-      - run: npm ci
-      - name: 🏗 Setup EAS
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-      - name: Build preview
-#        run: eas update -p android --auto --non-interactive --branch ${{ github.event.pull_request.head.ref }}
-        run: npm run build:local:preview
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-${{env.commit-hash}}.apk
-          path: build-*.apk
-          if-no-files-found: error
   check-all-green:
     if: always()
     needs:
       - lint
       - typescript
-      - preview
     runs-on: ubuntu-22.04
     steps:
       - name: Decide whether the needed jobs succeeded or failed
