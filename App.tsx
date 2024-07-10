@@ -5,13 +5,14 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import * as Sentry from '@sentry/react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import {StatusBar} from 'expo-status-bar';
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import {NumberGame, FindGame} from './src/screens/game';
 import {MainMenu, GameSelectionMenu} from './src/screens/menu';
 import ScoreScreen from './src/screens/score';
 import {StackNavigatorParamList} from './src/screens/types';
-import {SOUNDS, useSoundStore} from './src/store/audio';
+// import {SOUNDS, useSoundStore} from './src/store/audio';
+import TrackPlayer, {RepeatMode} from "react-native-track-player";
 
 const Stack = createNativeStackNavigator<StackNavigatorParamList>();
 
@@ -28,23 +29,54 @@ Sentry.init({
 function App() {
   const routeNameRef = React.useRef();
   const navigationRef = React.useRef();
+  const [isPlayerReady, setIsPlayerReady] = useState(false);
 
   const [fontsLoaded] = useFonts({
     TitilliumWeb_700Bold,
   });
 
-  const soundStore = useSoundStore();
+  // const soundStore = useSoundStore();
   useEffect(() => {
-    soundStore.playBackground(SOUNDS.MUSIC).catch(console.error);
+    async function setup() {
+      let isSetup = false;
+      try {
+        const index = await TrackPlayer.getActiveTrackIndex();
+        console.log('index', index);
+        isSetup = true;
+      } catch {
+        console.log('setup');
+        await TrackPlayer.setupPlayer();
+        isSetup = true;
+      }
+
+      const queue = await TrackPlayer.getQueue();
+      if(isSetup && queue.length <= 0) {
+        console.log('add');
+        await TrackPlayer.add([
+          {
+            id: 'music',
+            url: require( './assets/audio/music.mp3'),
+          }
+        ]);
+        await TrackPlayer.setRepeatMode(RepeatMode.Queue);
+
+      }
+
+      setIsPlayerReady(isSetup);
+      TrackPlayer.play().catch((error) => console.log(error));
+    }
+
+    setup();
+    // soundStore.playBackground(SOUNDS.MUSIC).catch(console.error);
   }, []);
 
   const onReady = useCallback(async () => {
-    if (fontsLoaded && soundStore.backgroundLoaded) {
+    if (fontsLoaded && isPlayerReady) {
       await SplashScreen.hideAsync();
     }
-  }, [soundStore.backgroundLoaded, fontsLoaded]);
+  }, [isPlayerReady, fontsLoaded]);
 
-  if (!fontsLoaded || !soundStore.backgroundLoaded) {
+  if (!fontsLoaded || !isPlayerReady) {
     return null;
   }
 
@@ -86,26 +118,29 @@ function App() {
             component={GameSelectionMenu}
             options={{animation: 'fade'}}
           />
-          <Stack.Screen
-            name="NumberGame"
-            component={NumberGame}
-            options={{animation: 'fade'}}
-          />
-          <Stack.Screen
-            name="FindGame"
-            component={FindGame}
-            options={{animation: 'fade'}}
-          />
-          <Stack.Screen
-            name="Score"
-            component={ScoreScreen}
-            options={{animation: 'fade'}}
-          />
+          {/*<Stack.Screen*/}
+          {/*  name="NumberGame"*/}
+          {/*  component={NumberGame}*/}
+          {/*  options={{animation: 'fade'}}*/}
+          {/*/>*/}
+          {/*<Stack.Screen*/}
+          {/*  name="FindGame"*/}
+          {/*  component={FindGame}*/}
+          {/*  options={{animation: 'fade'}}*/}
+          {/*/>*/}
+          {/*<Stack.Screen*/}
+          {/*  name="Score"*/}
+          {/*  component={ScoreScreen}*/}
+          {/*  options={{animation: 'fade'}}*/}
+          {/*/>*/}
         </Stack.Navigator>
       </NavigationContainer>
       <StatusBar />
     </>
   );
 }
-
+async function playbackService() {
+  // TODO: Attach remote event handlers
+}
 export default Sentry.wrap(App);
+TrackPlayer.registerPlaybackService(() => playbackService);

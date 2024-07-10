@@ -3,31 +3,32 @@ import analytics from '@react-native-firebase/analytics';
 import React from 'react';
 import {TouchableOpacity} from 'react-native';
 
-import {useSoundStore} from '../store/audio';
 import COLORS from '../utils/color';
 import FONT from '../utils/font';
+import TrackPlayer, {State} from "react-native-track-player";
 
 export default function SoundButton() {
-  const soundStore = useSoundStore();
 
   const toggleBackgroundPlaying = async () => {
-    if (soundStore.backgroundPlaying) {
-      await soundStore.pauseBackground();
+    const {state} = await TrackPlayer.getPlaybackState();
+    if (state === State.Playing) {
+      await TrackPlayer.pause()
     } else {
-      await soundStore.unPauseBackground();
+      await TrackPlayer.play()
     }
   };
 
   return (
     <TouchableOpacity
       onPress={async () => {
+        const {state} = await TrackPlayer.getPlaybackState();
         await analytics().logEvent('sound', {
-          pause: soundStore.backgroundPlaying ? 'pause' : 'unpause',
+          pause: state === State.Playing ? 'pause' : 'unpause',
         });
         await toggleBackgroundPlaying();
       }}>
       <MaterialCommunityIcons
-        name={soundStore.backgroundPlaying ? 'music-off' : 'music'}
+        name={'music'}
         style={{
           fontSize: FONT.SIZE.BIG,
         }}

@@ -15,13 +15,13 @@ import COLORS from '../../utils/color';
 import FONT from '../../utils/font';
 import {FindGameScreenRouteProp} from '../menu/types';
 import {NavigationProp} from '../types';
+import TrackPlayer, {RepeatMode} from "react-native-track-player";
 
 export function FindGame() {
   const route = useRoute<FindGameScreenRouteProp>();
   const navigation = useNavigation<NavigationProp>();
   const {questionConfig, gameType} = route.params;
   const store = useGameScoreStore();
-  const soundStore = useSoundStore();
   const [isLoaded, setIsLoaded] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [choice, setChoice] = useState('choice');
@@ -38,7 +38,33 @@ export function FindGame() {
 
   useEffect(() => {
     const playAudio = async () => {
-      return await soundStore.play(sound);
+      async function setup() {
+        let isSetup = false;
+        try {
+          const index = await TrackPlayer.getActiveTrackIndex();
+          console.log('index', index);
+          isSetup = true;
+        } catch {
+          console.log('setup');
+          await TrackPlayer.setupPlayer();
+          isSetup = true;
+        }
+
+        const queue = await TrackPlayer.getQueue();
+        if(isSetup && queue.length <= 0) {
+          console.log('add');
+          await TrackPlayer.add([
+            {
+              id: 'music',
+              url: require( '../../../assets/audio/bird.mp3'),
+            }
+          ]);
+          await TrackPlayer.setRepeatMode(RepeatMode.Queue);
+          setIsLoaded(true);
+        }
+
+        TrackPlayer.play().catch((error) => console.log(error));
+      // return await soundStore.play(sound);
     };
 
     if (isLoaded) {
@@ -55,7 +81,7 @@ export function FindGame() {
         possibility4: questionConfig[question?.possibilities[3].value].key,
       });
     }
-  }, [isLoaded, store.currentIndex]);
+  }, [isLoaded]);
 
   if (!isLoaded) return <></>;
 
