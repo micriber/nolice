@@ -1,10 +1,13 @@
 import * as Sentry from '@sentry/react-native';
-import {Audio, AVPlaybackSource, InterruptionModeAndroid} from 'expo-av';
+import {Audio, AVPlaybackSource, AVPlaybackStatus, InterruptionModeAndroid} from 'expo-av';
 import {create} from 'zustand';
+import {AVPlaybackStatusSuccess} from "expo-av/src/AV.types";
 
 interface AudioStoreState {
   backgroundPlaying: boolean;
   backgroundLoaded: boolean;
+  isPlaying: boolean;
+  soundObject: Audio.SoundObject | null;
   pauseBackground: () => Promise<void>;
   unPauseBackground: () => Promise<void>;
   playBackground: (src: AVPlaybackSource) => Promise<void>;
@@ -133,17 +136,66 @@ const soundObjectBackground = new Audio.Sound();
 export const useSoundStore = create<AudioStoreState>((set, get) => ({
   backgroundPlaying: false,
   backgroundLoaded: false,
+  isPlaying: false,
+  soundObject: null,
   play: async (src: AVPlaybackSource) => {
-    errorSafe(async () => {
-      const soundObject = new Audio.Sound();
-      await soundObject.unloadAsync();
-      await Audio.setAudioModeAsync({
-        interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
-      });
-      await soundObject.loadAsync(src);
-      await soundObject.playAsync();
-    }, 'Audio error: play');
+    const { soundObject, isPlaying } = get();
+    console.log('boulou 1')
+    if (soundObject?.sound && !soundObject?.status?.isLoaded) {
+      console.log('boulou 2')
+      return Promise.reject('Audio not loaded');
+    }
+
+    try {
+      if (soundObject?.sound && isAVPlaybackStatusSuccess(soundObject.status)
+        && soundObject?.status?.isPlaying && soundObject?.status?.positionMillis > 0) {
+        await soundObject.sound.stopAsync()
+      }
+    } catch (err) {
+      console.log(soundObject?.status)
+      console.error('Audio error: stop', err);
+    }
+
+    try {
+      if (soundObject?.sound) {
+        await soundObject.sound.unloadAsync()
+      }
+    } catch (err) {
+      console.log(soundObject?.status)
+      console.error('Audio error: unload', err);
+    }
+
+    try {
+      const soundObject = await Audio.Sound.createAsync(src, { shouldPlay: true })
+      if (!isAVPlaybackStatusSuccess(soundObject.status)) {
+        return Promise.reject('Audio not not success loaded');
+      }
+      set({ soundObject: soundObject })
+      // await soundObject.sound.playAsync()
+      soundObject.sound.setOnPlaybackStatusUpdate(status => {
+        if (isAVPlaybackStatusSuccess(status)) {
+          if (status.didJustFinish) {
+            soundObject.sound.unloadAsync()
+            set({soundObject: null })
+          }
+        } else {
+          console.error('Audio error: status', status)
+        }
+      })
+    } catch (err) {
+      console.error('Audio error: play', err);
+      set({soundObject: null })
+    }
   },
+  // play: async (src: AVPlaybackSource) => {
+  //   errorSafe(async () => {
+  //     // await Audio.setAudioModeAsync({
+  //     //   interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+  //     // });
+  //     const {sound,status} = await Audio.Sound.createAsync(src);
+  //     await sound.playAsync();
+  //   }, 'Audio error: play');
+  // },
   playBackground: async (src: AVPlaybackSource) => {
     errorSafe(async () => {
       if (!get().backgroundPlaying) {
@@ -162,14 +214,22 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
   },
   pauseBackground: async () => {
     errorSafe(async () => {
-      await soundObjectBackground.pauseAsync();
-      set({backgroundPlaying: false});
+      // await soundObjectBackground.pauseAsync();
+      // set({backgroundPlaying: false});
     }, 'Audio error: pauseBackground');
   },
   unPauseBackground: async () => {
     errorSafe(async () => {
-      await soundObjectBackground.playAsync();
-      set({backgroundPlaying: true});
+      // await soundObjectBackground.playAsync();
+      // set({backgroundPlaying: true});
     }, 'Audio error: unPauseBackground');
   },
 }));
+
+function isAVPlaybackStatusSuccess(src: AVPlaybackStatus): src is AVPlaybackStatusSuccess {
+  if ('error' in src)  {
+    return false
+  }
+
+  return true
+}
