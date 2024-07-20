@@ -11,7 +11,6 @@ import {create} from 'zustand';
 interface AudioStoreState {
   backgroundPlaying: boolean;
   backgroundLoaded: boolean;
-  isPlaying: boolean;
   soundObject: Audio.SoundObject | null;
   pauseBackground: () => Promise<void>;
   unPauseBackground: () => Promise<void>;
@@ -141,21 +140,11 @@ const soundObjectBackground = new Audio.Sound();
 export const useSoundStore = create<AudioStoreState>((set, get) => ({
   backgroundPlaying: false,
   backgroundLoaded: false,
-  isPlaying: false,
   soundObject: null,
   play: async (src: AVPlaybackSource) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const {soundObject, isPlaying} = get();
-    console.log('boulou 1');
-    console.log('-----');
+    const {soundObject} = get();
     if (soundObject?.sound && !soundObject?.status?.isLoaded) {
-      console.log('boulou 2');
       return Promise.reject(new Error('Audio not loaded'));
-    }
-
-    if (soundObject?.sound) {
-      console.log('isPlaying', soundObject?.status?.isPlaying);
-      console.log('status', isAVPlaybackStatusSuccess(soundObject.status));
     }
 
     try {
@@ -163,14 +152,16 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
         soundObject?.sound &&
         isAVPlaybackStatusSuccess(soundObject.status) &&
         soundObject?.status?.isPlaying
-        // soundObject?.status?.positionMillis > 0
       ) {
-        console.log('stop');
         await soundObject.sound.stopAsync();
       }
     } catch (err) {
       console.log(soundObject?.status);
-      if (soundObject?.status?.positionMillis > 0) {
+      if (
+        soundObject?.sound &&
+        isAVPlaybackStatusSuccess(soundObject.status) &&
+        soundObject?.status?.positionMillis > 0
+      ) {
         console.error('Audio error: stop', err);
       } else {
         console.log('Audio log: stop', err);
@@ -179,7 +170,6 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
 
     try {
       if (soundObject?.sound) {
-        console.log('unload');
         await soundObject.sound.unloadAsync();
       }
     } catch (err) {
@@ -195,7 +185,6 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
         return Promise.reject(new Error('Audio not not success loaded'));
       }
       set({soundObject});
-      // await soundObject.sound.playAsync()
       soundObject.sound.setOnPlaybackStatusUpdate((status) => {
         if (isAVPlaybackStatusSuccess(status)) {
           if (status.didJustFinish) {
@@ -211,15 +200,6 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
       set({soundObject: null});
     }
   },
-  // play: async (src: AVPlaybackSource) => {
-  //   errorSafe(async () => {
-  //     // await Audio.setAudioModeAsync({
-  //     //   interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
-  //     // });
-  //     const {sound,status} = await Audio.Sound.createAsync(src);
-  //     await sound.playAsync();
-  //   }, 'Audio error: play');
-  // },
   playBackground: async (src: AVPlaybackSource) => {
     errorSafe(async () => {
       if (!get().backgroundPlaying) {
@@ -238,14 +218,14 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
   },
   pauseBackground: async () => {
     errorSafe(async () => {
-      // await soundObjectBackground.pauseAsync();
-      // set({backgroundPlaying: false});
+      await soundObjectBackground.pauseAsync();
+      set({backgroundPlaying: false});
     }, 'Audio error: pauseBackground');
   },
   unPauseBackground: async () => {
     errorSafe(async () => {
-      // await soundObjectBackground.playAsync();
-      // set({backgroundPlaying: true});
+      await soundObjectBackground.playAsync();
+      set({backgroundPlaying: true});
     }, 'Audio error: unPauseBackground');
   },
 }));
