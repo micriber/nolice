@@ -1,10 +1,17 @@
 import * as Sentry from '@sentry/react-native';
-import {Audio, AVPlaybackSource, InterruptionModeAndroid} from 'expo-av';
+import {
+  Audio,
+  AVPlaybackSource,
+  AVPlaybackStatus,
+  InterruptionModeAndroid,
+} from 'expo-av';
+import {AVPlaybackStatusSuccess} from 'expo-av/src/AV.types';
 import {create} from 'zustand';
 
 interface AudioStoreState {
   backgroundPlaying: boolean;
   backgroundLoaded: boolean;
+  soundObject: Audio.SoundObject | null;
   pauseBackground: () => Promise<void>;
   unPauseBackground: () => Promise<void>;
   playBackground: (src: AVPlaybackSource) => Promise<void>;
@@ -133,16 +140,65 @@ const soundObjectBackground = new Audio.Sound();
 export const useSoundStore = create<AudioStoreState>((set, get) => ({
   backgroundPlaying: false,
   backgroundLoaded: false,
+  soundObject: null,
   play: async (src: AVPlaybackSource) => {
-    errorSafe(async () => {
-      const soundObject = new Audio.Sound();
-      await soundObject.unloadAsync();
-      await Audio.setAudioModeAsync({
-        interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+    const {soundObject} = get();
+    if (soundObject?.sound && !soundObject?.status?.isLoaded) {
+      return Promise.reject(new Error('Audio not loaded'));
+    }
+
+    try {
+      if (
+        soundObject?.sound &&
+        isAVPlaybackStatusSuccess(soundObject.status) &&
+        soundObject?.status?.isPlaying
+      ) {
+        await soundObject.sound.stopAsync();
+      }
+    } catch (err) {
+      console.log(soundObject?.status);
+      if (
+        soundObject?.sound &&
+        isAVPlaybackStatusSuccess(soundObject.status) &&
+        soundObject?.status?.positionMillis > 0
+      ) {
+        console.error('Audio error: stop', err);
+      } else {
+        console.log('Audio log: stop', err);
+      }
+    }
+
+    try {
+      if (soundObject?.sound) {
+        await soundObject.sound.unloadAsync();
+      }
+    } catch (err) {
+      console.log(soundObject?.status);
+      console.error('Audio error: unload', err);
+    }
+
+    try {
+      const soundObject = await Audio.Sound.createAsync(src, {
+        shouldPlay: true,
       });
-      await soundObject.loadAsync(src);
-      await soundObject.playAsync();
-    }, 'Audio error: play');
+      if (!isAVPlaybackStatusSuccess(soundObject.status)) {
+        return Promise.reject(new Error('Audio not not success loaded'));
+      }
+      set({soundObject});
+      soundObject.sound.setOnPlaybackStatusUpdate((status) => {
+        if (isAVPlaybackStatusSuccess(status)) {
+          if (status.didJustFinish) {
+            soundObject.sound.unloadAsync();
+            set({soundObject: null});
+          }
+        } else {
+          console.error('Audio error: status', status);
+        }
+      });
+    } catch (err) {
+      console.error('Audio error: play', err);
+      set({soundObject: null});
+    }
   },
   playBackground: async (src: AVPlaybackSource) => {
     errorSafe(async () => {
@@ -173,3 +229,13 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
     }, 'Audio error: unPauseBackground');
   },
 }));
+
+function isAVPlaybackStatusSuccess(
+  src: AVPlaybackStatus,
+): src is AVPlaybackStatusSuccess {
+  if ('error' in src) {
+    return false;
+  }
+
+  return true;
+}

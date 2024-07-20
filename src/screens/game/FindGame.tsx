@@ -42,7 +42,7 @@ export function FindGame() {
     };
 
     if (isLoaded) {
-      playAudio();
+      playAudio().catch(console.error);
       analytics().logEvent('question', {
         event_name: 'question',
         question_id: questionId,
