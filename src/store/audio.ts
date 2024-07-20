@@ -147,27 +147,39 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {soundObject, isPlaying} = get();
     console.log('boulou 1');
+    console.log('-----');
     if (soundObject?.sound && !soundObject?.status?.isLoaded) {
       console.log('boulou 2');
       return Promise.reject(new Error('Audio not loaded'));
+    }
+
+    if (soundObject?.sound) {
+      console.log('isPlaying', soundObject?.status?.isPlaying);
+      console.log('status', isAVPlaybackStatusSuccess(soundObject.status));
     }
 
     try {
       if (
         soundObject?.sound &&
         isAVPlaybackStatusSuccess(soundObject.status) &&
-        soundObject?.status?.isPlaying &&
-        soundObject?.status?.positionMillis > 0
+        soundObject?.status?.isPlaying
+        // soundObject?.status?.positionMillis > 0
       ) {
+        console.log('stop');
         await soundObject.sound.stopAsync();
       }
     } catch (err) {
       console.log(soundObject?.status);
-      console.error('Audio error: stop', err);
+      if (soundObject?.status?.positionMillis > 0) {
+        console.error('Audio error: stop', err);
+      } else {
+        console.log('Audio log: stop', err);
+      }
     }
 
     try {
       if (soundObject?.sound) {
+        console.log('unload');
         await soundObject.sound.unloadAsync();
       }
     } catch (err) {
