@@ -1,6 +1,5 @@
 import analytics from '@react-native-firebase/analytics';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {AVPlaybackSource} from 'expo-av';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
@@ -10,7 +9,7 @@ import ChoiceButton from './ChoiceButton';
 import {AnimalImage} from './animal-picture';
 import {ResultModal} from './result-modal';
 import MusicButton from '../../components/MusicButton';
-import {SOUNDS, useSoundStore} from '../../store/audio';
+import {SoundQuestionType, SOUNDS_QUESTION, useSoundStore} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
 import {shuffle} from '../../utils/array';
 import COLORS from '../../utils/color';
@@ -35,19 +34,19 @@ enum Animal {
 type AnimalSoundMap = {
   [animal: string]: {
     label: string;
-    sound: AVPlaybackSource;
+    sound: SoundQuestionType;
   };
 };
 
 const animalSoundMap: AnimalSoundMap = {
-  duck: {label: 'de canards', sound: SOUNDS.COUNT.DUCK},
-  rabbit: {label: 'de lapins', sound: SOUNDS.COUNT.RABBIT},
-  dog: {label: 'de chiens', sound: SOUNDS.COUNT.DOG},
-  pig: {label: 'de cochons', sound: SOUNDS.COUNT.PIG},
-  cow: {label: 'de vaches', sound: SOUNDS.COUNT.COW},
-  cat: {label: 'de chats', sound: SOUNDS.COUNT.CAT},
-  bird: {label: "d'oiseaux", sound: SOUNDS.COUNT.BIRD},
-  sheep: {label: 'de moutons', sound: SOUNDS.COUNT.SHEEP},
+  duck: {label: 'de canards', sound: SOUNDS_QUESTION.COUNT.DUCK},
+  rabbit: {label: 'de lapins', sound: SOUNDS_QUESTION.COUNT.RABBIT},
+  dog: {label: 'de chiens', sound: SOUNDS_QUESTION.COUNT.DOG},
+  pig: {label: 'de cochons', sound: SOUNDS_QUESTION.COUNT.PIG},
+  cow: {label: 'de vaches', sound: SOUNDS_QUESTION.COUNT.COW},
+  cat: {label: 'de chats', sound: SOUNDS_QUESTION.COUNT.CAT},
+  bird: {label: "d'oiseaux", sound: SOUNDS_QUESTION.COUNT.BIRD},
+  sheep: {label: 'de moutons', sound: SOUNDS_QUESTION.COUNT.SHEEP},
 };
 
 export function NumberGame({navigation}: Props) {

@@ -15,7 +15,7 @@ interface AudioStoreState {
   pauseBackground: () => Promise<void>;
   unPauseBackground: () => Promise<void>;
   playBackground: (src: AVPlaybackSource) => Promise<void>;
-  play: (src: AVPlaybackSource) => Promise<void>;
+  play: (src: AVPlaybackSource, callback?: () => void) => Promise<void>;
 }
 
 const DOMMAGE_SOUND_PATH = '../../assets/audio/dommage.mp3';
@@ -45,19 +45,40 @@ const RECTANGLE_SOUND_PATH = '../../assets/audio/shape-rectangle.mp3';
 const SQUARE_SOUND_PATH = '../../assets/audio/shape-square.mp3';
 const STAR_SOUND_PATH = '../../assets/audio/shape-star.mp3';
 const TRIANGLE_SOUND_PATH = '../../assets/audio/shape-triangle.mp3';
-const BLACK_SOUND_PATH = '../../assets/audio/black.mp3';
-const BLUE_SOUND_PATH = '../../assets/audio/blue.mp3';
-const BROWN_SOUND_PATH = '../../assets/audio/brown.mp3';
-const GREEN_SOUND_PATH = '../../assets/audio/green.mp3';
-const PINK_SOUND_PATH = '../../assets/audio/pink.mp3';
-const PURPLE_SOUND_PATH = '../../assets/audio/purple.mp3';
-const RED_SOUND_PATH = '../../assets/audio/red.mp3';
-const YELLOW_SOUND_PATH = '../../assets/audio/yellow.mp3';
-const ORANGE_SOUND_PATH = '../../assets/audio/orange.mp3';
-const GREY_SOUND_PATH = '../../assets/audio/grey.mp3';
+const BLACK_QUESTION_SOUND_PATH = '../../assets/audio/black.mp3';
+const BLACK_ANSWER_SOUND_PATH = '../../assets/audio/response-black.mp3';
+const BLUE_QUESTION_SOUND_PATH = '../../assets/audio/blue.mp3';
+const BLUE_ANSWER_SOUND_PATH = '../../assets/audio/response-blue.mp3';
+const BROWN_QUESTION_SOUND_PATH = '../../assets/audio/brown.mp3';
+const BROWN_ANSWER_SOUND_PATH = '../../assets/audio/response-brown.mp3';
+const GREEN_QUESTION_SOUND_PATH = '../../assets/audio/green.mp3';
+const GREEN_ANSWER_SOUND_PATH = '../../assets/audio/response-green.mp3';
+const PINK_QUESTION_SOUND_PATH = '../../assets/audio/pink.mp3';
+const PINK_ANSWER_SOUND_PATH = '../../assets/audio/response-pink.mp3';
+const PURPLE_QUESTION_SOUND_PATH = '../../assets/audio/purple.mp3';
+const PURPLE_ANSWER_SOUND_PATH = '../../assets/audio/response-purple.mp3';
+const RED_QUESTION_SOUND_PATH = '../../assets/audio/red.mp3';
+const RED_ANSWER_SOUND_PATH = '../../assets/audio/response-red.mp3';
+const YELLOW_QUESTION_SOUND_PATH = '../../assets/audio/yellow.mp3';
+const YELLOW_ANSWER_SOUND_PATH = '../../assets/audio/response-yellow.mp3';
+const ORANGE_QUESTION_SOUND_PATH = '../../assets/audio/orange.mp3';
+const ORANGE_ANSWER_SOUND_PATH = '../../assets/audio/response-orange.mp3';
+const GREY_QUESTION_SOUND_PATH = '../../assets/audio/grey.mp3';
+const GREY_ANSWER_SOUND_PATH = '../../assets/audio/response-grey.mp3';
 const CONGRATULATION_SOUND_PATH = '../../assets/audio/congratulation.mp3';
 const RETRY_SOUND_PATH = '../../assets/audio/retry.mp3';
 const MUSIC_SOUND_PATH = '../../assets/audio/music.mp3';
+
+type SoundsTypeQuestion = {
+  [gameType: string]: SoundQuestionType;
+};
+
+export interface SoundQuestionType {
+  [key: string]: {
+    QUESTION: AVPlaybackSource;
+    ANSWER: AVPlaybackSource;
+  };
+}
 
 type SoundsType = {
   DOMMAGE: AVPlaybackSource;
@@ -65,10 +86,6 @@ type SoundsType = {
   BRAVO: AVPlaybackSource;
   MUSIC: AVPlaybackSource;
   CONGRATULATION: AVPlaybackSource;
-  COUNT: {[k: string]: AVPlaybackSource};
-  COLOR: {[k: string]: AVPlaybackSource};
-  ANIMAL: {[k: string]: AVPlaybackSource};
-  SHAPE: {[k: string]: AVPlaybackSource};
 };
 
 export const SOUNDS: SoundsType = {
@@ -77,6 +94,8 @@ export const SOUNDS: SoundsType = {
   RETRY: require(RETRY_SOUND_PATH),
   BRAVO: require(BRAVO_SOUND_PATH),
   CONGRATULATION: require(CONGRATULATION_SOUND_PATH),
+};
+export const SOUNDS_QUESTION: SoundsTypeQuestion = {
   COUNT: {
     DUCK: require(COUNT_DUCK_SOUND_PATH),
     CAT: require(COUNT_CAT_SOUND_PATH),
@@ -88,16 +107,46 @@ export const SOUNDS: SoundsType = {
     SHEEP: require(COUNT_SHEEP_SOUND_PATH),
   },
   COLOR: {
-    YELLOW: require(YELLOW_SOUND_PATH),
-    RED: require(RED_SOUND_PATH),
-    BROWN: require(BROWN_SOUND_PATH),
-    BLUE: require(BLUE_SOUND_PATH),
-    PINK: require(PINK_SOUND_PATH),
-    GREEN: require(GREEN_SOUND_PATH),
-    BLACK: require(BLACK_SOUND_PATH),
-    PURPLE: require(PURPLE_SOUND_PATH),
-    ORANGE: require(ORANGE_SOUND_PATH),
-    GREY: require(GREY_SOUND_PATH),
+    YELLOW: {
+      QUESTION: require(YELLOW_QUESTION_SOUND_PATH),
+      ANSWER: require(YELLOW_ANSWER_SOUND_PATH),
+    },
+    RED: {
+      QUESTION: require(RED_QUESTION_SOUND_PATH),
+      ANSWER: require(RED_ANSWER_SOUND_PATH),
+    },
+    BROWN: {
+      QUESTION: require(BROWN_QUESTION_SOUND_PATH),
+      ANSWER: require(BROWN_ANSWER_SOUND_PATH),
+    },
+    BLUE: {
+      QUESTION: require(BLUE_QUESTION_SOUND_PATH),
+      ANSWER: require(BLUE_ANSWER_SOUND_PATH),
+    },
+    PINK: {
+      QUESTION: require(PINK_QUESTION_SOUND_PATH),
+      ANSWER: require(PINK_ANSWER_SOUND_PATH),
+    },
+    GREEN: {
+      QUESTION: require(GREEN_QUESTION_SOUND_PATH),
+      ANSWER: require(GREEN_ANSWER_SOUND_PATH),
+    },
+    BLACK: {
+      QUESTION: require(BLACK_QUESTION_SOUND_PATH),
+      ANSWER: require(BLACK_ANSWER_SOUND_PATH),
+    },
+    PURPLE: {
+      QUESTION: require(PURPLE_QUESTION_SOUND_PATH),
+      ANSWER: require(PURPLE_ANSWER_SOUND_PATH),
+    },
+    ORANGE: {
+      QUESTION: require(ORANGE_QUESTION_SOUND_PATH),
+      ANSWER: require(ORANGE_ANSWER_SOUND_PATH),
+    },
+    GREY: {
+      QUESTION: require(GREY_QUESTION_SOUND_PATH),
+      ANSWER: require(GREY_ANSWER_SOUND_PATH),
+    },
   },
   ANIMAL: {
     BIRD: require(BIRD_SOUND_PATH),
@@ -141,7 +190,7 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
   backgroundPlaying: false,
   backgroundLoaded: false,
   soundObject: null,
-  play: async (src: AVPlaybackSource) => {
+  play: async (src: AVPlaybackSource, callback?: () => void) => {
     const {soundObject} = get();
     if (soundObject?.sound && !soundObject?.status?.isLoaded) {
       return Promise.reject(new Error('Audio not loaded'));
@@ -190,6 +239,9 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
           if (status.didJustFinish) {
             soundObject.sound.unloadAsync();
             set({soundObject: null});
+            if (callback) {
+              callback();
+            }
           }
         } else {
           console.error('Audio error: status', status);
@@ -233,9 +285,5 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
 function isAVPlaybackStatusSuccess(
   src: AVPlaybackStatus,
 ): src is AVPlaybackStatusSuccess {
-  if ('error' in src) {
-    return false;
-  }
-
-  return true;
+  return !('error' in src);
 }
