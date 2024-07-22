@@ -9,11 +9,10 @@ import ChoiceButton from './ChoiceButton';
 import {ResultModal} from './result-modal';
 import InstructionButton from '../../components/InstructionButton';
 import MusicButton from '../../components/MusicButton';
-import {useSoundStore} from '../../store/audio';
+import {useSoundStore, SOUNDS_QUESTION} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
 import COLORS from '../../utils/color';
 import FONT from '../../utils/font';
-import {SOUNDS_QUESTION} from '../../store/audio';
 import {FindGameScreenRouteProp} from '../menu/types';
 import {NavigationProp} from '../types';
 
@@ -155,7 +154,9 @@ export function FindGame() {
         </View>
       </View>
       <View style={[styles.footer]}>
-        {sound.QUESTION !== undefined ? <InstructionButton sound={sound.QUESTION} /> : null}
+        {sound.QUESTION !== undefined ? (
+          <InstructionButton sound={sound.QUESTION} />
+        ) : null}
         <MusicButton />
       </View>
     </View>

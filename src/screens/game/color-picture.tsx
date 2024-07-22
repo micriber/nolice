@@ -10,9 +10,9 @@ import Blue from '../../../assets/svg/splash-blue.svg';
 // @ts-ignore
 import Brown from '../../../assets/svg/splash-brown.svg';
 // @ts-ignore
-import Grey from '../../../assets/svg/splash-grey.svg';
-// @ts-ignore
 import Green from '../../../assets/svg/splash-green.svg';
+// @ts-ignore
+import Grey from '../../../assets/svg/splash-grey.svg';
 // @ts-ignore
 import Orange from '../../../assets/svg/splash-orange.svg';
 // @ts-ignore

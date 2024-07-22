@@ -1,4 +1,5 @@
 import analytics from '@react-native-firebase/analytics';
+import {AVPlaybackSource} from 'expo-av';
 import React, {useState} from 'react';
 import {Modal, StyleSheet, Text, View} from 'react-native';
 
@@ -6,7 +7,6 @@ import PrimaryButton from '../../components/PrimaryButton';
 import {SOUNDS, useSoundStore} from '../../store/audio';
 import COLORS from '../../utils/color';
 import FONT from '../../utils/font';
-import {AVPlaybackSource} from "expo-av";
 
 type Props = {
   onClose?: () => void;
@@ -36,7 +36,7 @@ export function ResultModal(props: Props) {
 
     const soundCallback = async () => {
       await soundStore.play(props.sound, async () => setSoundFinished(true));
-    }
+    };
     if (props.success) {
       await soundStore.play(SOUNDS.BRAVO, soundCallback);
     } else {
@@ -106,12 +106,14 @@ export function ResultModal(props: Props) {
                 justifyContent: 'center',
               },
             ]}>
-            {soundFinished ? <PrimaryButton
-              name="SUIVANT"
-              onPress={() => {
-                props.onNext();
-              }}
-            /> : null }
+            {soundFinished ? (
+              <PrimaryButton
+                name="SUIVANT"
+                onPress={() => {
+                  props.onNext();
+                }}
+              />
+            ) : null}
           </View>
         </View>
       </View>
