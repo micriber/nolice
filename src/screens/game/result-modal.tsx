@@ -1,5 +1,6 @@
 import analytics from '@react-native-firebase/analytics';
-import React from 'react';
+import {AVPlaybackSource} from 'expo-av';
+import React, {useState} from 'react';
 import {Modal, StyleSheet, Text, View} from 'react-native';
 
 import PrimaryButton from '../../components/PrimaryButton';
@@ -17,11 +18,14 @@ type Props = {
   children?: React.ReactNode;
   questionId?: string;
   gameId?: string;
+  sound: AVPlaybackSource;
 };
 
 export function ResultModal(props: Props) {
   const soundStore = useSoundStore();
+  const [soundFinished, setSoundFinished] = useState(false);
   async function onShow() {
+    setSoundFinished(false);
     await analytics().logEvent('result', {
       success: props.success,
       answer: props.answer,
@@ -30,10 +34,13 @@ export function ResultModal(props: Props) {
       game_id: props.gameId,
     });
 
+    const soundCallback = async () => {
+      await soundStore.play(props.sound, async () => setSoundFinished(true));
+    };
     if (props.success) {
-      await soundStore.play(SOUNDS.BRAVO);
+      await soundStore.play(SOUNDS.BRAVO, soundCallback);
     } else {
-      await soundStore.play(SOUNDS.DOMMAGE);
+      await soundStore.play(SOUNDS.DOMMAGE, soundCallback);
     }
   }
 
@@ -99,12 +106,14 @@ export function ResultModal(props: Props) {
                 justifyContent: 'center',
               },
             ]}>
-            <PrimaryButton
-              name="SUIVANT"
-              onPress={() => {
-                props.onNext();
-              }}
-            />
+            {soundFinished ? (
+              <PrimaryButton
+                name="SUIVANT"
+                onPress={() => {
+                  props.onNext();
+                }}
+              />
+            ) : null}
           </View>
         </View>
       </View>

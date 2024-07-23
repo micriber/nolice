@@ -9,8 +9,9 @@ import uuid from 'react-native-uuid';
 import ChoiceButton from './ChoiceButton';
 import {AnimalImage} from './animal-picture';
 import {ResultModal} from './result-modal';
+import InstructionButton from '../../components/InstructionButton';
 import MusicButton from '../../components/MusicButton';
-import {SOUNDS, useSoundStore} from '../../store/audio';
+import {SOUNDS_COUNT_QUESTION, useSoundStore} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
 import {shuffle} from '../../utils/array';
 import COLORS from '../../utils/color';
@@ -40,14 +41,29 @@ type AnimalSoundMap = {
 };
 
 const animalSoundMap: AnimalSoundMap = {
-  duck: {label: 'de canards', sound: SOUNDS.COUNT.DUCK},
-  rabbit: {label: 'de lapins', sound: SOUNDS.COUNT.RABBIT},
-  dog: {label: 'de chiens', sound: SOUNDS.COUNT.DOG},
-  pig: {label: 'de cochons', sound: SOUNDS.COUNT.PIG},
-  cow: {label: 'de vaches', sound: SOUNDS.COUNT.COW},
-  cat: {label: 'de chats', sound: SOUNDS.COUNT.CAT},
-  bird: {label: "d'oiseaux", sound: SOUNDS.COUNT.BIRD},
-  sheep: {label: 'de moutons', sound: SOUNDS.COUNT.SHEEP},
+  duck: {label: 'de canards', sound: SOUNDS_COUNT_QUESTION.DUCK},
+  rabbit: {label: 'de lapins', sound: SOUNDS_COUNT_QUESTION.RABBIT},
+  dog: {label: 'de chiens', sound: SOUNDS_COUNT_QUESTION.DOG},
+  pig: {label: 'de cochons', sound: SOUNDS_COUNT_QUESTION.PIG},
+  cow: {label: 'de vaches', sound: SOUNDS_COUNT_QUESTION.COW},
+  cat: {label: 'de chats', sound: SOUNDS_COUNT_QUESTION.CAT},
+  bird: {label: "d'oiseaux", sound: SOUNDS_COUNT_QUESTION.BIRD},
+  sheep: {label: 'de moutons', sound: SOUNDS_COUNT_QUESTION.SHEEP},
+};
+
+export interface SoundCountType {
+  [key: string]: AVPlaybackSource;
+}
+const responseSoundMap: SoundCountType = {
+  1: SOUNDS_COUNT_QUESTION.ONE,
+  2: SOUNDS_COUNT_QUESTION.TWO,
+  3: SOUNDS_COUNT_QUESTION.THREE,
+  4: SOUNDS_COUNT_QUESTION.FOUR,
+  5: SOUNDS_COUNT_QUESTION.FIVE,
+  6: SOUNDS_COUNT_QUESTION.SIX,
+  7: SOUNDS_COUNT_QUESTION.SEVEN,
+  8: SOUNDS_COUNT_QUESTION.EIGHT,
+  9: SOUNDS_COUNT_QUESTION.NINE,
 };
 
 export function NumberGame({navigation}: Props) {
@@ -136,6 +152,7 @@ export function NumberGame({navigation}: Props) {
         visible={modalVisible}
         questionId={questionId}
         gameId={gameId}
+        sound={responseSoundMap[answer]}
         choice={choice}
       />
       <View style={[styles.header]}>
@@ -212,6 +229,7 @@ export function NumberGame({navigation}: Props) {
         </View>
       </View>
       <View style={[styles.footer]}>
+        {sound !== undefined ? <InstructionButton sound={sound} /> : null}
         <MusicButton />
       </View>
     </View>
@@ -234,7 +252,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   footer: {
-    alignItems: 'flex-end',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 100,
     flex: 0.2,
     marginTop: -20,
   },

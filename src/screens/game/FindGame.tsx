@@ -9,7 +9,7 @@ import ChoiceButton from './ChoiceButton';
 import {ResultModal} from './result-modal';
 import InstructionButton from '../../components/InstructionButton';
 import MusicButton from '../../components/MusicButton';
-import {useSoundStore} from '../../store/audio';
+import {useSoundStore, SOUNDS_QUESTION} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
 import COLORS from '../../utils/color';
 import FONT from '../../utils/font';
@@ -38,7 +38,7 @@ export function FindGame() {
 
   useEffect(() => {
     const playAudio = async () => {
-      return await soundStore.play(sound);
+      return await soundStore.play(sound.QUESTION);
     };
 
     if (isLoaded) {
@@ -60,7 +60,8 @@ export function FindGame() {
   if (!isLoaded) return <></>;
 
   const question = store.questions[store.currentIndex];
-  const {label, sound, key} = questionConfig[question.answer];
+  const {label, key} = questionConfig[question.answer];
+  const sound = SOUNDS_QUESTION[gameType.toUpperCase()][key.toUpperCase()];
 
   return (
     <View style={styles.container}>
@@ -79,7 +80,8 @@ export function FindGame() {
         questionId={questionId}
         gameId={gameId}
         choice={choice}
-        answer={key}>
+        answer={key}
+        sound={sound.ANSWER}>
         <ChoiceButton
           key={question.answer}
           type={gameType}
@@ -152,7 +154,9 @@ export function FindGame() {
         </View>
       </View>
       <View style={[styles.footer]}>
-        {sound !== undefined ? <InstructionButton sound={sound} /> : null}
+        {sound.QUESTION !== undefined ? (
+          <InstructionButton sound={sound.QUESTION} />
+        ) : null}
         <MusicButton />
       </View>
     </View>
