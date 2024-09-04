@@ -27,7 +27,7 @@ export function GameSelectionMenu({navigation}: Props) {
       {key: 'pink', label: 'le rose'},
       {key: 'green', label: 'le vert'},
       {key: 'black', label: 'le noir'},
-      {key: 'purple', label: 'le voilet'},
+      {key: 'purple', label: 'le violet'},
       {key: 'orange', label: "l'orange"},
       {key: 'grey', label: 'le gris'},
     ];
