@@ -38,7 +38,8 @@
           "project": "nolice",
           "organization": "micriber"
         }
-      ]
+      ],
+      "expo-audio"
     ]
   }
 }

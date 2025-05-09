@@ -6,8 +6,8 @@ import {ScoreScreenRouteProp} from './types';
 import PrimaryButton from '../../components/PrimaryButton';
 import {SOUNDS, useSoundStore} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
-import COLORS from '../../utils/color';
-import FONT from '../../utils/font';
+import {COLORS} from '../../utils/color';
+import {FONT} from '../../utils/font';
 import {NavigationProp} from '../types';
 
 export default function ScoreScreen() {

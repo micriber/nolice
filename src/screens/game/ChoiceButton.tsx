@@ -3,8 +3,8 @@ import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {AnimalImage} from './animal-picture';
 import {ColorImage} from './color-picture';
 import {ShapeImage} from './shape-picture';
-import COLORS from '../../utils/color';
-import FONT from '../../utils/font';
+import {COLORS} from '../../utils/color';
+import {FONT} from '../../utils/font';
 
 export default function ChoiceButton(props: {
   value: string;

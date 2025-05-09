@@ -6,7 +6,7 @@ import {StyleSheet, View} from 'react-native';
 import Logo from '../../../assets/svg/logo.svg';
 import MusicButton from '../../components/MusicButton';
 import PrimaryButton from '../../components/PrimaryButton';
-import COLORS from '../../utils/color';
+import {COLORS} from '../../utils/color';
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
