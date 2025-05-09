@@ -4,8 +4,8 @@ import {StyleSheet, Text, View} from 'react-native';
 
 import MusicButton from '../../components/MusicButton';
 import PrimaryButton from '../../components/PrimaryButton';
-import COLORS from '../../utils/color';
-import FONT from '../../utils/font';
+import {COLORS} from '../../utils/color';
+import {FONT} from '../../utils/font';
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;

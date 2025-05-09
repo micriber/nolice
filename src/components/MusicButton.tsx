@@ -4,8 +4,8 @@ import React from 'react';
 import {TouchableOpacity} from 'react-native';
 
 import {useSoundStore} from '../store/audio';
-import COLORS from '../utils/color';
-import FONT from '../utils/font';
+import {COLORS} from '../utils/color';
+import {FONT} from '../utils/font';
 
 export default function SoundButton() {
   const soundStore = useSoundStore();

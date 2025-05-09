@@ -8,8 +8,8 @@ import ColorLogo from '../../assets/svg/logo-color-game.svg';
 import NumberLogo from '../../assets/svg/logo-number-game.svg';
 import {AnimalImage} from '../screens/game/animal-picture';
 import {ShapeImage} from '../screens/game/shape-picture';
-import COLORS from '../utils/color';
-import FONT from '../utils/font';
+import {COLORS} from '../utils/color';
+import {FONT} from '../utils/font';
 
 export default function PrimaryButton(props: {
   name: string;

@@ -11,8 +11,8 @@ import InstructionButton from '../../components/InstructionButton';
 import MusicButton from '../../components/MusicButton';
 import {useSoundStore, SOUNDS_QUESTION} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
-import COLORS from '../../utils/color';
-import FONT from '../../utils/font';
+import {COLORS} from '../../utils/color';
+import {FONT} from '../../utils/font';
 import {FindGameScreenRouteProp} from '../menu/types';
 import {NavigationProp} from '../types';
 

@@ -5,8 +5,8 @@ import {Modal, StyleSheet, Text, View} from 'react-native';
 
 import PrimaryButton from '../../components/PrimaryButton';
 import {SOUNDS, useSoundStore} from '../../store/audio';
-import COLORS from '../../utils/color';
-import FONT from '../../utils/font';
+import {COLORS} from '../../utils/color';
+import {FONT} from '../../utils/font';
 
 type Props = {
   onClose?: () => void;

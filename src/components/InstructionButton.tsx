@@ -1,12 +1,13 @@
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import analytics from '@react-native-firebase/analytics';
 import {AVPlaybackSource} from 'expo-av';
+// import {} from 'expo-audio'
 import React from 'react';
 import {TouchableOpacity} from 'react-native';
 
 import {useSoundStore} from '../store/audio';
-import COLORS from '../utils/color';
-import FONT from '../utils/font';
+import {COLORS} from '../utils/color';
+import {FONT} from '../utils/font';
 
 type Props = {
   sound: AVPlaybackSource;

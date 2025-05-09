@@ -14,8 +14,8 @@ import MusicButton from '../../components/MusicButton';
 import {SOUNDS_COUNT_QUESTION, useSoundStore} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
 import {shuffle} from '../../utils/array';
-import COLORS from '../../utils/color';
-import FONT from '../../utils/font';
+import {COLORS} from '../../utils/color';
+import {FONT} from '../../utils/font';
 import {getRandomInt} from '../../utils/random';
 
 type Props = {
