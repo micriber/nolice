@@ -41,7 +41,7 @@
     "@types/react": "~18.2.45",
     "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.14.1",
-    "eas-cli": "^7.3.0",
+    "eas-cli": "^16.18.0",
     "eslint": "^8.57.0",
     "eslint-config-universe": "^13.0.0",
     "expo-dev-client": "~3.3.12",
