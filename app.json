@@ -21,7 +21,7 @@
       },
       "googleServicesFile": "./google-services.json",
       "package": "com.micriber.nolice",
-      "versionCode": 6
+      "versionCode": 7
     },
     "extra": {
       "eas": {
