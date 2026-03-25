@@ -1,4 +1,4 @@
-import analytics from '@react-native-firebase/analytics';
+import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {StyleSheet, View} from 'react-native';
 
@@ -14,7 +14,7 @@ type Props = {
 
 export function MainMenu({navigation}: Props) {
   const handleClick = async () => {
-    await analytics().logEvent('play');
+    await logEvent(getAnalytics(), 'play');
     navigation.navigate('GameSelectionMenu');
   };
 

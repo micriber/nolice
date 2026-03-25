@@ -1,4 +1,4 @@
-import analytics from '@react-native-firebase/analytics';
+import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {AudioSource} from 'expo-audio';
 import React, {useState} from 'react';
 import {Modal, StyleSheet, Text, View} from 'react-native';
@@ -26,7 +26,7 @@ export function ResultModal(props: Props) {
   const [soundFinished, setSoundFinished] = useState(false);
   async function onShow() {
     setSoundFinished(false);
-    await analytics().logEvent('result', {
+    await logEvent(getAnalytics(), 'result', {
       success: props.success,
       answer: props.answer,
       choice: props.choice,

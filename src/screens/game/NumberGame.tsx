@@ -1,4 +1,4 @@
-import analytics from '@react-native-firebase/analytics';
+import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {AudioSource} from 'expo-audio';
 import React, {useEffect, useState} from 'react';
@@ -107,7 +107,7 @@ export function NumberGame({navigation}: Props) {
 
     if (isLoaded) {
       playAudio();
-      analytics().logEvent('question', {
+      logEvent(getAnalytics(), 'question', {
         event_name: 'question',
         question_id: questionId,
         game_id: gameId,

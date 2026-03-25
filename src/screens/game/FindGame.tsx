@@ -1,4 +1,4 @@
-import analytics from '@react-native-firebase/analytics';
+import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {useNavigation, useRoute} from '@react-navigation/core';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
@@ -43,7 +43,7 @@ export function FindGame() {
 
     if (isLoaded) {
       playAudio().catch(console.error);
-      analytics().logEvent('question', {
+      logEvent(getAnalytics(), 'question', {
         event_name: 'question',
         question_id: questionId,
         game_id: gameId,

@@ -1,5 +1,5 @@
 import {MaterialCommunityIcons} from '@expo/vector-icons';
-import analytics from '@react-native-firebase/analytics';
+import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {AudioSource} from 'expo-audio';
 import React from 'react';
 import {TouchableOpacity} from 'react-native';
@@ -17,7 +17,7 @@ export default function InstructionButton(props: Props) {
   return (
     <TouchableOpacity
       onPress={async () => {
-        await analytics().logEvent('instruction');
+        await logEvent(getAnalytics(), 'instruction');
         await soundStore.play(props.sound);
       }}>
       <MaterialCommunityIcons

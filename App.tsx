@@ -1,5 +1,5 @@
 import {TitilliumWeb_700Bold, useFonts} from '@expo-google-fonts/titillium-web';
-import analytics from '@react-native-firebase/analytics';
+import {getAnalytics, logScreenView} from '@react-native-firebase/analytics';
 import {
   NavigationContainer,
   useNavigationContainerRef,
@@ -64,7 +64,7 @@ function App() {
             navigationRef.current?.getCurrentRoute()?.name;
 
           if (previousRouteName !== currentRouteName) {
-            await analytics().logScreenView({
+            await logScreenView(getAnalytics(), {
               screen_name: currentRouteName,
               screen_class: currentRouteName,
             });
