@@ -1,5 +1,5 @@
 import analytics from '@react-native-firebase/analytics';
-import {AVPlaybackSource} from 'expo-av';
+import {AudioSource} from 'expo-audio';
 import React, {useState} from 'react';
 import {Modal, StyleSheet, Text, View} from 'react-native';
 
@@ -18,7 +18,7 @@ type Props = {
   children?: React.ReactNode;
   questionId?: string;
   gameId?: string;
-  sound: AVPlaybackSource;
+  sound: AudioSource;
 };
 
 export function ResultModal(props: Props) {

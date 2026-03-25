@@ -1,6 +1,6 @@
 import analytics from '@react-native-firebase/analytics';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {AVPlaybackSource} from 'expo-av';
+import {AudioSource} from 'expo-audio';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
@@ -36,7 +36,7 @@ enum Animal {
 type AnimalSoundMap = {
   [animal: string]: {
     label: string;
-    sound: AVPlaybackSource;
+    sound: AudioSource;
   };
 };
 
@@ -52,7 +52,7 @@ const animalSoundMap: AnimalSoundMap = {
 };
 
 export interface SoundCountType {
-  [key: string]: AVPlaybackSource;
+  [key: string]: AudioSource;
 }
 const responseSoundMap: SoundCountType = {
   1: SOUNDS_COUNT_QUESTION.ONE,

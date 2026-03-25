@@ -1,6 +1,9 @@
 import {TitilliumWeb_700Bold, useFonts} from '@expo-google-fonts/titillium-web';
 import analytics from '@react-native-firebase/analytics';
-import {NavigationContainer} from '@react-navigation/native';
+import {
+  NavigationContainer,
+  useNavigationContainerRef,
+} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import * as Sentry from '@sentry/react-native';
 import * as SplashScreen from 'expo-splash-screen';
@@ -26,8 +29,8 @@ Sentry.init({
 });
 
 function App() {
-  const routeNameRef = React.useRef();
-  const navigationRef = React.useRef();
+  const routeNameRef = React.useRef<string | undefined>(undefined);
+  const navigationRef = useNavigationContainerRef<StackNavigatorParamList>();
 
   const [fontsLoaded] = useFonts({
     TitilliumWeb_700Bold,
@@ -52,14 +55,13 @@ function App() {
     <>
       <NavigationContainer
         onReady={() => {
-          // @ts-ignore
-          routeNameRef.current = navigationRef.current.getCurrentRoute().name;
+          routeNameRef.current = navigationRef.current?.getCurrentRoute()?.name;
           return onReady();
         }}
         onStateChange={async () => {
           const previousRouteName = routeNameRef.current;
-          // @ts-ignore
-          const currentRouteName = navigationRef.current.getCurrentRoute().name;
+          const currentRouteName =
+            navigationRef.current?.getCurrentRoute()?.name;
 
           if (previousRouteName !== currentRouteName) {
             await analytics().logScreenView({
@@ -69,7 +71,6 @@ function App() {
           }
           routeNameRef.current = currentRouteName;
         }}
-        // @ts-ignore
         ref={navigationRef}>
         <Stack.Navigator
           initialRouteName="MainMenu"

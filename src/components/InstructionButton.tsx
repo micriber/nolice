@@ -1,6 +1,6 @@
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import analytics from '@react-native-firebase/analytics';
-import {AVPlaybackSource} from 'expo-av';
+import {AudioSource} from 'expo-audio';
 import React from 'react';
 import {TouchableOpacity} from 'react-native';
 
@@ -9,7 +9,7 @@ import COLORS from '../utils/color';
 import FONT from '../utils/font';
 
 type Props = {
-  sound: AVPlaybackSource;
+  sound: AudioSource;
 };
 export default function InstructionButton(props: Props) {
   const soundStore = useSoundStore();
