@@ -4,6 +4,7 @@ import {AudioSource} from 'expo-audio';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import uuid from 'react-native-uuid';
 
 import ChoiceButton from './ChoiceButton';
@@ -11,6 +12,7 @@ import {AnimalImage} from './animal-picture';
 import {ResultModal} from './result-modal';
 import InstructionButton from '../../components/InstructionButton';
 import MusicButton from '../../components/MusicButton';
+import ProgressDots from '../../components/ProgressDots';
 import {SOUNDS_COUNT_QUESTION, useSoundStore} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
 import {shuffle} from '../../utils/array';
@@ -132,11 +134,10 @@ export function NumberGame({navigation}: Props) {
         <AnimalImage key={i} type={animal} />
       ))
     : [];
-  const {label, sound} = animalSoundMap[animal];
-  const questionLabel = `Combien comptes-tu ${label} ?`;
+  const {sound} = animalSoundMap[animal];
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ResultModal
         answer={answer.toString()}
         onNext={() => {
@@ -153,67 +154,25 @@ export function NumberGame({navigation}: Props) {
         questionId={questionId}
         gameId={gameId}
         sound={responseSoundMap[answer]}
-        choice={choice}
-      />
-      <View style={[styles.header]}>
-        <View
-          style={[
-            {
-              flex: 1.5,
-              flexDirection: 'row',
-            },
-          ]}>
-          <Text
-            style={{
-              fontSize: RFPercentage(4),
-              fontFamily: FONT.FAMILY,
-              color: COLORS.FONT.BASE,
-              flex: 3,
-            }}>
-            Question {store.currentIndex + 1} sur {maxQuestion}
-          </Text>
+        choice={choice}>
+        <View style={styles.modalAnswer}>
+          <Text style={styles.modalAnswerText}>{answer}</Text>
         </View>
-        <View
-          style={[
-            {
-              alignContent: 'center',
-              justifyContent: 'center',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              flex: 8,
-            },
-          ]}>
-          {animalsElements}
-        </View>
+      </ResultModal>
+
+      <View style={styles.progress}>
+        <ProgressDots
+          questions={store.questions}
+          currentIndex={store.currentIndex}
+        />
       </View>
-      <View style={styles.body}>
-        <View
-          style={[
-            {
-              flex: 1,
-              marginBottom: '5%',
-            },
-          ]}>
-          <Text
-            style={{
-              fontSize: RFPercentage(4),
-              fontFamily: FONT.FAMILY,
-              color: COLORS.FONT.BASE,
-              textAlign: 'center',
-            }}>
-            {questionLabel}
-          </Text>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignContent: 'center',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            flex: 3.5,
-            gap: 20,
-            marginTop: -20,
-          }}>
+
+      <View style={styles.animalsArea}>
+        <View style={styles.animalsGrid}>{animalsElements}</View>
+      </View>
+
+      <View style={styles.choicesArea}>
+        <View style={styles.choicesGrid}>
           {question?.possibilities?.map((possibility) => (
             <ChoiceButton
               type="number"
@@ -228,34 +187,70 @@ export function NumberGame({navigation}: Props) {
           ))}
         </View>
       </View>
-      <View style={[styles.footer]}>
+
+      <View style={styles.footer}>
         {sound !== undefined ? <InstructionButton sound={sound} /> : null}
         <MusicButton />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.BACKGROUND,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    justifyContent: 'center',
-    flexDirection: 'column',
+    paddingHorizontal: RFPercentage(2),
+    paddingTop: RFPercentage(3),
   },
-  header: {
-    flex: 1,
+  progress: {
+    paddingVertical: RFPercentage(1),
   },
-  body: {
-    flex: 1.1,
+  animalsArea: {
+    flex: 4,
     justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.SURFACE,
+    borderRadius: RFPercentage(2.5),
+    marginHorizontal: RFPercentage(1),
+    padding: RFPercentage(1),
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  animalsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  choicesArea: {
+    flex: 4,
+    justifyContent: 'center',
+  },
+  choicesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: RFPercentage(1),
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 100,
-    flex: 0.2,
-    marginTop: -20,
+    gap: RFPercentage(6),
+    paddingBottom: RFPercentage(2),
+    paddingTop: RFPercentage(1),
+  },
+  modalAnswer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalAnswerText: {
+    fontSize: FONT.SIZE.GIANT,
+    fontFamily: FONT.FAMILY,
+    color: COLORS.FONT.BASE,
   },
 });

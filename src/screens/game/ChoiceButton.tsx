@@ -1,4 +1,5 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {RFPercentage} from 'react-native-responsive-fontsize';
 
 import {AnimalImage} from './animal-picture';
 import {ColorImage} from './color-picture';
@@ -12,70 +13,67 @@ export default function ChoiceButton(props: {
   onPress: () => void;
 }) {
   let element;
-  let playButtonStyle = styles.playButton;
-  const type = props.type;
-  switch (type) {
+  let bgColor;
+
+  switch (props.type) {
     case 'number':
-      element = <Text style={styles.playButtonText}>{props.value}</Text>;
-      playButtonStyle = {
-        ...playButtonStyle,
-        backgroundColor: COLORS.BUTTON.SECONDARY,
-      };
+      element = <Text style={styles.numberText}>{props.value}</Text>;
+      bgColor = COLORS.BUTTON.SECONDARY;
       break;
     case 'color':
       element = <ColorImage type={props.value} />;
-      playButtonStyle = {...playButtonStyle, backgroundColor: COLORS.FONT.BASE};
+      bgColor = COLORS.SURFACE;
       break;
     case 'animal':
       element = <AnimalImage type={props.value} />;
-      playButtonStyle = {...playButtonStyle, backgroundColor: '#1e779c'};
+      bgColor = COLORS.SURFACE;
       break;
     case 'shape':
       element = <ShapeImage type={props.value} />;
-      playButtonStyle = {...playButtonStyle, backgroundColor: COLORS.FONT.BASE};
+      bgColor = COLORS.SURFACE;
       break;
     default:
       element = null;
+      bgColor = COLORS.SURFACE;
   }
 
   return (
     <View style={styles.containerView}>
-      <TouchableOpacity style={playButtonStyle} onPress={props.onPress}>
+      <TouchableOpacity
+        style={[styles.button, {backgroundColor: bgColor}]}
+        onPress={props.onPress}
+        activeOpacity={0.7}>
         {element}
       </TouchableOpacity>
     </View>
   );
 }
 
+const BUTTON_SIZE = RFPercentage(16);
+
 const styles = StyleSheet.create({
   containerView: {
-    minHeight: '35%',
-    minWidth: '35%',
+    width: '44%',
+    aspectRatio: 1,
     alignItems: 'center',
-  },
-  playButton: {
-    alignItems: 'center',
-    backgroundColor: COLORS.BUTTON.SECONDARY,
-    minHeight: 75,
-    minWidth: 75,
-    maxHeight: 100,
-    maxWidth: 100,
     justifyContent: 'center',
-    padding: 10,
-    borderRadius: 500,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 2,
   },
-  playButtonText: {
-    fontSize: FONT.SIZE.BASE,
+  button: {
+    width: BUTTON_SIZE,
+    height: BUTTON_SIZE,
+    borderRadius: BUTTON_SIZE / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: RFPercentage(1.5),
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 3},
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  numberText: {
+    fontSize: FONT.SIZE.BIG,
     fontFamily: FONT.FAMILY,
-    color: COLORS.FONT.BASE,
-    marginBottom: 5,
+    color: COLORS.FONT.LIGHT,
   },
 });

@@ -1,13 +1,15 @@
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {useNavigation, useRoute} from '@react-navigation/core';
-import {StyleSheet, View, Text, Image} from 'react-native';
+import {StyleSheet, View} from 'react-native';
+import {RFPercentage} from 'react-native-responsive-fontsize';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {ScoreScreenRouteProp} from './types';
 import PrimaryButton from '../../components/PrimaryButton';
 import {SOUNDS, useSoundStore} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
 import COLORS from '../../utils/color';
-import FONT from '../../utils/font';
 import {NavigationProp} from '../types';
 
 export default function ScoreScreen() {
@@ -25,20 +27,22 @@ export default function ScoreScreen() {
   const results = store.getResults();
   const isGood = results >= maxQuestion / 2;
   const isPerfect = results === maxQuestion;
-  const congratulationSource = require('../../../assets/congratulation.jpeg');
-  const retrySource = require('../../../assets/retry.jpeg');
 
-  let message;
-  if (!isGood) {
-    message = 'Il y a des erreurs mais je suis sûr que tu peux mieux faire.';
-  } else if (isPerfect) {
-    message = 'Bravo ! Tu as bien répondu à toutes les questions.';
+  let trophyIcon: 'trophy' | 'emoticon-happy-outline' | 'emoticon-sad-outline';
+  let trophyColor: string;
+  if (isPerfect) {
+    trophyIcon = 'trophy';
+    trophyColor = COLORS.ICON;
+  } else if (isGood) {
+    trophyIcon = 'emoticon-happy-outline';
+    trophyColor = COLORS.FONT.SUCCESS;
   } else {
-    message = 'Bravo ! Tu as bien répondu à la plupart des questions.';
+    trophyIcon = 'emoticon-sad-outline';
+    trophyColor = COLORS.FONT.ERROR;
   }
 
   return (
-    <View
+    <SafeAreaView
       style={styles.container}
       onLayout={async () => {
         await logEvent(getAnalytics(), 'score', {
@@ -49,27 +53,36 @@ export default function ScoreScreen() {
         });
         await soundStore.play(isGood ? SOUNDS.CONGRATULATION : SOUNDS.RETRY);
       }}>
-      <View style={styles.header}>
-        <Image
-          style={styles.image}
-          source={isGood ? congratulationSource : retrySource}
+      <View style={styles.iconArea}>
+        <MaterialCommunityIcons
+          name={trophyIcon}
+          size={RFPercentage(18)}
+          color={trophyColor}
         />
       </View>
-      <View style={styles.body}>
-        <Text style={[styles.score, styles.message]}>{message}</Text>
-        <Text style={styles.score}>
-          Résultat :{' '}
-          <Text
-            style={[{color: isGood ? COLORS.FONT.SUCCESS : COLORS.FONT.ERROR}]}>
-            {results}
-          </Text>{' '}
-          / {maxQuestion}
-        </Text>
+
+      <View style={styles.starsArea}>
+        <View style={styles.starsRow}>
+          {store.questions.map((q, i) => (
+            <MaterialCommunityIcons
+              key={i}
+              name={q.success ? 'star' : 'star-outline'}
+              size={RFPercentage(5)}
+              color={q.success ? COLORS.ICON : COLORS.PROGRESS.INACTIVE}
+            />
+          ))}
+        </View>
       </View>
-      <View style={styles.footer}>
-        <PrimaryButton name="REJOUER" onPress={handleClick} />
+
+      <View style={styles.buttonArea}>
+        <PrimaryButton
+          icon="replay"
+          onPress={handleClick}
+          size="large"
+          color={COLORS.BUTTON.PRIMARY}
+        />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -77,38 +90,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.BACKGROUND,
-    padding: 20,
+    padding: RFPercentage(3),
     justifyContent: 'center',
-    flexDirection: 'column',
   },
-  header: {
+  iconArea: {
+    flex: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  starsArea: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  starsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: RFPercentage(0.5),
+  },
+  buttonArea: {
     flex: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  image: {
-    height: '90%',
-    resizeMode: 'center',
-  },
-  body: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  score: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-    fontSize: FONT.SIZE.BASE,
-    fontFamily: FONT.FAMILY,
-    color: COLORS.FONT.BASE,
-  },
-  message: {
-    marginBottom: '10%',
-    fontSize: FONT.SIZE.SMALL,
-  },
-  footer: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },

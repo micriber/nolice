@@ -9,6 +9,7 @@ import * as Sentry from '@sentry/react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import {StatusBar} from 'expo-status-bar';
 import React, {useCallback, useEffect} from 'react';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 import {NumberGame, FindGame} from './src/screens/game';
 import {MainMenu, GameSelectionMenu} from './src/screens/menu';
@@ -52,7 +53,7 @@ function App() {
   }
 
   return (
-    <>
+    <SafeAreaProvider>
       <NavigationContainer
         onReady={() => {
           routeNameRef.current = navigationRef.current?.getCurrentRoute()?.name;
@@ -105,7 +106,7 @@ function App() {
         </Stack.Navigator>
       </NavigationContainer>
       <StatusBar />
-    </>
+    </SafeAreaProvider>
   );
 }
 

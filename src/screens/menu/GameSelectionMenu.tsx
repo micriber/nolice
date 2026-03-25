@@ -1,11 +1,17 @@
 import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {RFPercentage} from 'react-native-responsive-fontsize';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
+// @ts-ignore
+import ColorLogo from '../../../assets/svg/logo-color-game.svg';
+// @ts-ignore
+import NumberLogo from '../../../assets/svg/logo-number-game.svg';
 import MusicButton from '../../components/MusicButton';
-import PrimaryButton from '../../components/PrimaryButton';
+import {AnimalImage} from '../game/animal-picture';
+import {ShapeImage} from '../game/shape-picture';
 import COLORS from '../../utils/color';
-import FONT from '../../utils/font';
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -66,44 +72,49 @@ export function GameSelectionMenu({navigation}: Props) {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.titre}>Selection du jeu</Text>
-      </View>
-      <View style={styles.body}>
-        <View style={styles.body}>
-          <PrimaryButton
-            name="NOMBRE"
+    <SafeAreaView style={styles.container}>
+      <View style={styles.grid}>
+        <View style={styles.row}>
+          <TouchableOpacity
+            style={[styles.tile, {backgroundColor: COLORS.GAME.NUMBER}]}
             onPress={handleNumberButton}
-            game="number"
-          />
-        </View>
-        <View style={styles.body}>
-          <PrimaryButton
-            name="COULEUR"
+            activeOpacity={0.8}>
+            <View style={styles.tileIcon}>
+              <NumberLogo />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tile, {backgroundColor: COLORS.GAME.COLOR}]}
             onPress={handleColorButton}
-            game="color"
-          />
+            activeOpacity={0.8}>
+            <View style={styles.tileIcon}>
+              <ColorLogo />
+            </View>
+          </TouchableOpacity>
         </View>
-        <View style={styles.body}>
-          <PrimaryButton
-            name="ANIMAUX"
+        <View style={styles.row}>
+          <TouchableOpacity
+            style={[styles.tile, {backgroundColor: COLORS.GAME.ANIMAL}]}
             onPress={handleAnimalButton}
-            game="animal"
-          />
-        </View>
-        <View style={styles.body}>
-          <PrimaryButton
-            name="FORME"
+            activeOpacity={0.8}>
+            <View style={styles.tileIcon}>
+              <AnimalImage type="duck" />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tile, {backgroundColor: COLORS.GAME.SHAPE}]}
             onPress={handleShapeButton}
-            game="shape"
-          />
+            activeOpacity={0.8}>
+            <View style={styles.tileIcon}>
+              <ShapeImage type="star" />
+            </View>
+          </TouchableOpacity>
         </View>
       </View>
       <View style={styles.footer}>
         <MusicButton />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -111,30 +122,40 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.BACKGROUND,
-    padding: 20,
+    padding: RFPercentage(2.5),
     justifyContent: 'center',
-    flexDirection: 'column',
   },
-  header: {
-    flex: 2,
-    justifyContent: 'center',
-    fontSize: FONT.SIZE.SMALL,
-  },
-  titre: {
-    textAlign: 'center',
-    fontSize: FONT.SIZE.MEDIUM,
-    fontFamily: FONT.FAMILY,
-    color: COLORS.FONT.BASE,
-  },
-  body: {
+  grid: {
     flex: 5,
+    justifyContent: 'center',
+    gap: RFPercentage(2),
+  },
+  row: {
+    flex: 1,
+    flexDirection: 'row',
+    gap: RFPercentage(2),
+  },
+  tile: {
+    flex: 1,
+    borderRadius: RFPercentage(3),
     alignItems: 'center',
-    width: '100%',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  tileIcon: {
+    width: RFPercentage(15),
+    height: RFPercentage(15),
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
   },
   footer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
   },
 });

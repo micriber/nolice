@@ -1,18 +1,19 @@
 import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {useNavigation, useRoute} from '@react-navigation/core';
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import uuid from 'react-native-uuid';
 
 import ChoiceButton from './ChoiceButton';
 import {ResultModal} from './result-modal';
 import InstructionButton from '../../components/InstructionButton';
 import MusicButton from '../../components/MusicButton';
+import ProgressDots from '../../components/ProgressDots';
 import {useSoundStore, SOUNDS_QUESTION} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
 import COLORS from '../../utils/color';
-import FONT from '../../utils/font';
 import {FindGameScreenRouteProp} from '../menu/types';
 import {NavigationProp} from '../types';
 
@@ -60,11 +61,11 @@ export function FindGame() {
   if (!isLoaded) return <></>;
 
   const question = store.questions[store.currentIndex];
-  const {label, key} = questionConfig[question.answer];
+  const {key} = questionConfig[question.answer];
   const sound = SOUNDS_QUESTION[gameType.toUpperCase()][key.toUpperCase()];
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ResultModal
         onNext={() => {
           if (!store.hasMoreQuestion()) {
@@ -89,56 +90,16 @@ export function FindGame() {
           onPress={() => {}}
         />
       </ResultModal>
-      <View style={[styles.header]}>
-        <View
-          style={[
-            {
-              flex: 1,
-              flexDirection: 'row',
-            },
-          ]}>
-          <Text
-            style={{
-              fontSize: RFPercentage(4),
-              fontFamily: FONT.FAMILY,
-              color: COLORS.FONT.BASE,
-              flex: 3,
-            }}>
-            Question {store.currentIndex + 1} sur {maxQuestion}
-          </Text>
-        </View>
-        <View
-          style={[
-            {
-              alignContent: 'center',
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              flex: 3,
-            },
-          ]}>
-          <Text
-            style={{
-              fontSize: RFPercentage(4),
-              fontFamily: FONT.FAMILY,
-              color: COLORS.FONT.BASE,
-              textAlign: 'center',
-            }}>
-            Trouve {label}
-          </Text>
-        </View>
+
+      <View style={styles.progress}>
+        <ProgressDots
+          questions={store.questions}
+          currentIndex={store.currentIndex}
+        />
       </View>
-      <View style={styles.body}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignContent: 'center',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            flex: 3,
-            gap: 20,
-          }}>
+
+      <View style={styles.choicesArea}>
+        <View style={styles.choicesGrid}>
           {question?.possibilities?.map((possibility) => (
             <ChoiceButton
               key={possibility.value}
@@ -153,37 +114,43 @@ export function FindGame() {
           ))}
         </View>
       </View>
-      <View style={[styles.footer]}>
+
+      <View style={styles.footer}>
         {sound.QUESTION !== undefined ? (
           <InstructionButton sound={sound.QUESTION} />
         ) : null}
         <MusicButton />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.BACKGROUND,
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    justifyContent: 'center',
-    flexDirection: 'column',
+    paddingHorizontal: RFPercentage(2),
+    paddingTop: RFPercentage(3),
   },
-  header: {
+  progress: {
+    paddingVertical: RFPercentage(1),
+  },
+  choicesArea: {
     flex: 1,
-  },
-  body: {
-    flex: 2,
     justifyContent: 'center',
+  },
+  choicesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: RFPercentage(2),
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 100,
-    flex: 0.3,
-    marginTop: -20,
-    marginBottom: 30,
+    gap: RFPercentage(6),
+    paddingBottom: RFPercentage(2),
+    paddingTop: RFPercentage(1),
   },
 });

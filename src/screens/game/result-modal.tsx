@@ -1,12 +1,13 @@
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {AudioSource} from 'expo-audio';
 import React, {useState} from 'react';
-import {Modal, StyleSheet, Text, View} from 'react-native';
+import {Modal, StyleSheet, View} from 'react-native';
+import {RFPercentage} from 'react-native-responsive-fontsize';
 
 import PrimaryButton from '../../components/PrimaryButton';
 import {SOUNDS, useSoundStore} from '../../store/audio';
 import COLORS from '../../utils/color';
-import FONT from '../../utils/font';
 
 type Props = {
   onClose?: () => void;
@@ -24,6 +25,7 @@ type Props = {
 export function ResultModal(props: Props) {
   const soundStore = useSoundStore();
   const [soundFinished, setSoundFinished] = useState(false);
+
   async function onShow() {
     setSoundFinished(false);
     await logEvent(getAnalytics(), 'result', {
@@ -44,38 +46,6 @@ export function ResultModal(props: Props) {
     }
   }
 
-  let content;
-  if (props.children) {
-    content = (
-      <View
-        style={[
-          {
-            flex: 3,
-            marginTop: 30,
-            flexDirection: 'row',
-            alignContent: 'center',
-            justifyContent: 'center',
-          },
-        ]}>
-        {props.children}
-      </View>
-    );
-  } else if (props.answer) {
-    content = (
-      <Text
-        style={[
-          styles.modalText,
-          {
-            fontSize: FONT.SIZE.GIANT,
-            flex: 3,
-            marginTop: 30,
-          },
-        ]}>
-        {props.answer}
-      </Text>
-    );
-  }
-
   return (
     <Modal
       animationType="fade"
@@ -85,33 +55,30 @@ export function ResultModal(props: Props) {
       onRequestClose={() => {
         props.onClose && props.onClose();
       }}>
-      <View style={styles.centeredView}>
-        <View style={styles.modalView}>
-          <Text
-            style={[
-              styles.modalText,
-              {
-                color: props.success ? COLORS.FONT.SUCCESS : COLORS.FONT.ERROR,
-                fontSize: FONT.SIZE.BASE,
-              },
-            ]}>
-            {props.success ? 'BRAVO !' : 'FAUX !'}
-          </Text>
-          <Text style={styles.modalText}>La bonne réponse</Text>
-          {content ?? <></>}
-          <View
-            style={[
-              {
-                flex: 2,
-                justifyContent: 'center',
-              },
-            ]}>
+      <View style={styles.overlay}>
+        <View style={styles.modal}>
+          <View style={styles.feedbackIcon}>
+            <MaterialCommunityIcons
+              name={props.success ? 'check-circle' : 'close-circle'}
+              size={RFPercentage(12)}
+              color={
+                props.success ? COLORS.FONT.SUCCESS : COLORS.FONT.ERROR
+              }
+            />
+          </View>
+
+          <View style={styles.answerArea}>
+            {props.children ?? null}
+          </View>
+
+          <View style={styles.nextButton}>
             {soundFinished ? (
               <PrimaryButton
-                name="SUIVANT"
-                onPress={() => {
-                  props.onNext();
-                }}
+                icon="arrow-right"
+                onPress={props.onNext}
+                color={
+                  props.success ? COLORS.FONT.SUCCESS : COLORS.BUTTON.PRIMARY
+                }
               />
             ) : null}
           </View>
@@ -122,34 +89,40 @@ export function ResultModal(props: Props) {
 }
 
 const styles = StyleSheet.create({
-  centeredView: {
+  overlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: COLORS.OVERLAY,
   },
-  modalView: {
-    flexDirection: 'column',
-    margin: 20,
+  modal: {
+    width: '85%',
+    height: '55%',
     backgroundColor: COLORS.BACKGROUND,
-    borderRadius: 20,
-    padding: '5%',
+    borderRadius: RFPercentage(3),
+    padding: RFPercentage(3),
     alignItems: 'center',
+    justifyContent: 'space-between',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    height: '60%',
+    shadowOffset: {width: 0, height: 6},
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 8,
   },
-  modalText: {
-    flex: 1,
-    fontSize: FONT.SIZE.BASE,
-    color: COLORS.FONT.BASE,
-    fontFamily: FONT.FAMILY,
-    textAlign: 'center',
+  feedbackIcon: {
+    flex: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  answerArea: {
+    flex: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  nextButton: {
+    flex: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

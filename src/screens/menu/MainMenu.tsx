@@ -1,9 +1,7 @@
 import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {StyleSheet, View} from 'react-native';
-
-// @ts-ignore
-import Logo from '../../../assets/svg/logo.svg';
+import {Image, StyleSheet, View} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import MusicButton from '../../components/MusicButton';
 import PrimaryButton from '../../components/PrimaryButton';
 import COLORS from '../../utils/color';
@@ -19,19 +17,21 @@ export function MainMenu({navigation}: Props) {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Logo />
+        <Image
+          source={require('../../../assets/logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
       </View>
       <View style={styles.body}>
-        <View style={styles.body}>
-          <PrimaryButton name="JOUER" onPress={handleClick} />
-        </View>
-        <View style={styles.body}>
-          <MusicButton />
-        </View>
+        <PrimaryButton icon="play" onPress={handleClick} size="large" />
       </View>
-    </View>
+      <View style={styles.footer}>
+        <MusicButton />
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -44,12 +44,22 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   header: {
-    flex: 2,
+    flex: 3,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logo: {
+    width: '85%',
+    height: '85%',
   },
   body: {
+    flex: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footer: {
     flex: 1,
     alignItems: 'center',
-    width: '100%',
+    justifyContent: 'center',
   },
 });
