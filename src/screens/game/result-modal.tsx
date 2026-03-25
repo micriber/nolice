@@ -1,5 +1,5 @@
-import analytics from '@react-native-firebase/analytics';
-import {AVPlaybackSource} from 'expo-av';
+import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
+import {AudioSource} from 'expo-audio';
 import React, {useState} from 'react';
 import {Modal, StyleSheet, Text, View} from 'react-native';
 
@@ -18,7 +18,7 @@ type Props = {
   children?: React.ReactNode;
   questionId?: string;
   gameId?: string;
-  sound: AVPlaybackSource;
+  sound: AudioSource;
 };
 
 export function ResultModal(props: Props) {
@@ -26,7 +26,7 @@ export function ResultModal(props: Props) {
   const [soundFinished, setSoundFinished] = useState(false);
   async function onShow() {
     setSoundFinished(false);
-    await analytics().logEvent('result', {
+    await logEvent(getAnalytics(), 'result', {
       success: props.success,
       answer: props.answer,
       choice: props.choice,

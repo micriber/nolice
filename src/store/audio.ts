@@ -1,21 +1,20 @@
 import * as Sentry from '@sentry/react-native';
 import {
-  Audio,
-  AVPlaybackSource,
-  AVPlaybackStatus,
-  InterruptionModeAndroid,
-} from 'expo-av';
-import {AVPlaybackStatusSuccess} from 'expo-av/src/AV.types';
+  AudioSource,
+  createAudioPlayer,
+  AudioPlayer,
+  setAudioModeAsync,
+} from 'expo-audio';
 import {create} from 'zustand';
 
 interface AudioStoreState {
   backgroundPlaying: boolean;
   backgroundLoaded: boolean;
-  soundObject: Audio.SoundObject | null;
+  currentPlayer: AudioPlayer | null;
   pauseBackground: () => Promise<void>;
   unPauseBackground: () => Promise<void>;
-  playBackground: (src: AVPlaybackSource) => Promise<void>;
-  play: (src: AVPlaybackSource, callback?: () => void) => Promise<void>;
+  playBackground: (src: AudioSource) => Promise<void>;
+  play: (src: AudioSource, callback?: () => void) => Promise<void>;
 }
 
 const DOMMAGE_SOUND_PATH = '../../assets/audio/dommage.mp3';
@@ -101,17 +100,17 @@ type SoundsTypeQuestion = {
 
 export interface SoundQuestionType {
   [key: string]: {
-    QUESTION: AVPlaybackSource;
-    ANSWER: AVPlaybackSource;
+    QUESTION: AudioSource;
+    ANSWER: AudioSource;
   };
 }
 
 type SoundsType = {
-  DOMMAGE: AVPlaybackSource;
-  RETRY: AVPlaybackSource;
-  BRAVO: AVPlaybackSource;
-  MUSIC: AVPlaybackSource;
-  CONGRATULATION: AVPlaybackSource;
+  DOMMAGE: AudioSource;
+  RETRY: AudioSource;
+  BRAVO: AudioSource;
+  MUSIC: AudioSource;
+  CONGRATULATION: AudioSource;
 };
 
 export const SOUNDS: SoundsType = {
@@ -123,7 +122,7 @@ export const SOUNDS: SoundsType = {
 };
 
 export interface SoundCountType {
-  [key: string]: AVPlaybackSource;
+  [key: string]: AudioSource;
 }
 export const SOUNDS_COUNT_QUESTION: SoundCountType = {
   DUCK: require(COUNT_DUCK_SOUND_PATH),
@@ -275,106 +274,80 @@ function errorSafe(callback: () => void, message: string = 'Audio error:') {
   }
 }
 
-const soundObjectBackground = new Audio.Sound();
+let backgroundPlayer: AudioPlayer | null = null;
 
 export const useSoundStore = create<AudioStoreState>((set, get) => ({
   backgroundPlaying: false,
   backgroundLoaded: false,
-  soundObject: null,
-  play: async (src: AVPlaybackSource, callback?: () => void) => {
-    const {soundObject} = get();
-    if (soundObject?.sound && !soundObject?.status?.isLoaded) {
-      return Promise.reject(new Error('Audio not loaded'));
-    }
+  currentPlayer: null,
+  play: async (src: AudioSource, callback?: () => void) => {
+    const {currentPlayer} = get();
 
     try {
-      if (
-        soundObject?.sound &&
-        isAVPlaybackStatusSuccess(soundObject.status) &&
-        soundObject?.status?.isPlaying
-      ) {
-        await soundObject.sound.stopAsync();
+      if (currentPlayer) {
+        currentPlayer.remove();
+        set({currentPlayer: null});
       }
     } catch (err) {
-      console.log(soundObject?.status);
-      if (
-        soundObject?.sound &&
-        isAVPlaybackStatusSuccess(soundObject.status) &&
-        soundObject?.status?.positionMillis > 0
-      ) {
-        console.error('Audio error: stop', err);
-      } else {
-        console.log('Audio log: stop', err);
-      }
+      console.error('Audio error: cleanup previous player', err);
     }
 
     try {
-      if (soundObject?.sound) {
-        await soundObject.sound.unloadAsync();
-      }
-    } catch (err) {
-      console.log(soundObject?.status);
-      console.error('Audio error: unload', err);
-    }
+      const player = createAudioPlayer(src);
+      set({currentPlayer: player});
 
-    try {
-      const soundObject = await Audio.Sound.createAsync(src, {
-        shouldPlay: true,
-      });
-      if (!isAVPlaybackStatusSuccess(soundObject.status)) {
-        return Promise.reject(new Error('Audio not not success loaded'));
-      }
-      set({soundObject});
-      soundObject.sound.setOnPlaybackStatusUpdate((status) => {
-        if (isAVPlaybackStatusSuccess(status)) {
-          if (status.didJustFinish) {
-            soundObject.sound.unloadAsync();
-            set({soundObject: null});
-            if (callback) {
-              callback();
-            }
+      player.addListener('playbackStatusUpdate', (status) => {
+        if (status.didJustFinish) {
+          player.remove();
+          set({currentPlayer: null});
+          if (callback) {
+            callback();
           }
-        } else {
-          console.error('Audio error: status', status);
         }
       });
+
+      player.play();
     } catch (err) {
       console.error('Audio error: play', err);
-      set({soundObject: null});
+      set({currentPlayer: null});
     }
   },
-  playBackground: async (src: AVPlaybackSource) => {
+  playBackground: async (src: AudioSource) => {
     errorSafe(async () => {
       if (!get().backgroundPlaying) {
-        await Audio.setAudioModeAsync({
-          interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+        await setAudioModeAsync({
+          interruptionMode: 'doNotMix',
         });
-        await soundObjectBackground.unloadAsync();
-        set(() => ({backgroundLoaded: true}));
-        set({backgroundPlaying: true});
-        await soundObjectBackground.loadAsync(src);
-        await soundObjectBackground.setIsLoopingAsync(true);
-        await soundObjectBackground.setVolumeAsync(0.2);
-        await soundObjectBackground.playFromPositionAsync(2000);
+
+        if (backgroundPlayer) {
+          backgroundPlayer.remove();
+        }
+
+        backgroundPlayer = createAudioPlayer(src);
+        backgroundPlayer.loop = true;
+        backgroundPlayer.volume = 0.2;
+
+        set({backgroundLoaded: true, backgroundPlaying: true});
+
+        await backgroundPlayer.seekTo(2);
+        backgroundPlayer.play();
       }
     }, 'Audio error: playBackground');
   },
   pauseBackground: async () => {
     errorSafe(async () => {
-      await soundObjectBackground.pauseAsync();
+      if (backgroundPlayer) {
+        backgroundPlayer.pause();
+      }
       set({backgroundPlaying: false});
     }, 'Audio error: pauseBackground');
   },
   unPauseBackground: async () => {
     errorSafe(async () => {
-      await soundObjectBackground.playAsync();
+      if (backgroundPlayer) {
+        backgroundPlayer.play();
+      }
       set({backgroundPlaying: true});
     }, 'Audio error: unPauseBackground');
   },
 }));
-
-function isAVPlaybackStatusSuccess(
-  src: AVPlaybackStatus,
-): src is AVPlaybackStatusSuccess {
-  return !('error' in src);
-}

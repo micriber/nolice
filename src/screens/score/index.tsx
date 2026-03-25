@@ -1,4 +1,4 @@
-import analytics from '@react-native-firebase/analytics';
+import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {useNavigation, useRoute} from '@react-navigation/core';
 import {StyleSheet, View, Text, Image} from 'react-native';
 
@@ -41,7 +41,7 @@ export default function ScoreScreen() {
     <View
       style={styles.container}
       onLayout={async () => {
-        await analytics().logEvent('score', {
+        await logEvent(getAnalytics(), 'score', {
           game_id: gameId,
           results,
           isGood,
