@@ -1,10 +1,13 @@
 import * as Sentry from '@sentry/react-native';
+import {Asset} from 'expo-asset';
 import {
   AudioSource,
   createAudioPlayer,
   AudioPlayer,
   setAudioModeAsync,
+  preload,
 } from 'expo-audio';
+import {File, Paths} from 'expo-file-system';
 import {create} from 'zustand';
 
 interface AudioStoreState {
@@ -12,11 +15,13 @@ interface AudioStoreState {
   backgroundLoaded: boolean;
   currentPlayer: AudioPlayer | null;
   audioLoading: boolean;
+  assetsLoaded: boolean;
   pauseBackground: () => Promise<void>;
   unPauseBackground: () => Promise<void>;
   playBackground: (src: AudioSource) => Promise<void>;
   play: (src: AudioSource, callback?: () => void) => Promise<void>;
   replay: () => Promise<void>;
+  preloadAllAssets: () => Promise<void>;
 }
 
 const DOMMAGE_SOUND_PATH = '../../assets/audio/dommage.mp3';
@@ -278,11 +283,90 @@ function errorSafe(callback: () => void, message: string = 'Audio error:') {
 
 let backgroundPlayer: AudioPlayer | null = null;
 
+const resolvedUris = new Map<number, string>();
+
+function resolveSource(src: AudioSource): AudioSource {
+  if (typeof src === 'number') {
+    const uri = resolvedUris.get(src);
+    if (uri) return {uri};
+  }
+  return src;
+}
+
+async function resolveAssetToFile(src: number): Promise<string | null> {
+  const asset = Asset.fromModule(src);
+  await asset.downloadAsync();
+  const localUri = asset.localUri;
+  if (!localUri) {
+    Sentry.logger.warn('Audio: localUri missing after downloadAsync', {
+      src: String(src),
+      assetUri: asset.uri ?? 'null',
+    });
+    return null;
+  }
+  if (localUri.startsWith('file://')) {
+    return localUri;
+  }
+  const dest = new File(Paths.cache, `preload-${src}.mp3`);
+  try {
+    if (!dest.exists) {
+      const source = new File(localUri);
+      source.copy(dest);
+    }
+    return dest.uri;
+  } catch (copyErr: any) {
+    Sentry.logger.error('Audio error: copy asset to cache', {
+      src: String(src),
+      localUri,
+      dest: dest.uri,
+      error: copyErr?.message ?? String(copyErr),
+    });
+    Sentry.captureException(copyErr);
+    return null;
+  }
+}
+
 export const useSoundStore = create<AudioStoreState>((set, get) => ({
   backgroundPlaying: false,
   backgroundLoaded: false,
   currentPlayer: null,
   audioLoading: false,
+  assetsLoaded: false,
+  preloadAllAssets: async () => {
+    const sources: AudioSource[] = [
+      SOUNDS.BRAVO,
+      SOUNDS.DOMMAGE,
+      SOUNDS.CONGRATULATION,
+      SOUNDS.RETRY,
+      ...Object.values(SOUNDS_COUNT_QUESTION),
+    ];
+    for (const gameType of Object.keys(SOUNDS_QUESTION)) {
+      for (const key of Object.keys(SOUNDS_QUESTION[gameType])) {
+        sources.push(SOUNDS_QUESTION[gameType][key].QUESTION);
+        sources.push(SOUNDS_QUESTION[gameType][key].ANSWER);
+      }
+    }
+    await Promise.all(
+      sources.map(async (src) => {
+        if (typeof src !== 'number') return;
+        let filePath: string | null = null;
+        try {
+          filePath = await resolveAssetToFile(src);
+          if (!filePath) return;
+          resolvedUris.set(src, filePath);
+          await preload({uri: filePath});
+        } catch (err: any) {
+          Sentry.logger.error('Audio error: preload asset', {
+            src: String(src),
+            filePath: filePath ?? 'null',
+            error: err?.message ?? String(err),
+          });
+          Sentry.captureException(err);
+        }
+      }),
+    );
+    set({assetsLoaded: true});
+  },
   play: async (src: AudioSource, callback?: () => void) => {
     const {currentPlayer} = get();
 
@@ -302,7 +386,7 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
     set({audioLoading: true});
 
     try {
-      const player = createAudioPlayer(src);
+      const player = createAudioPlayer(resolveSource(src));
       set({currentPlayer: player});
 
       const loadingTimeout = setTimeout(() => {
@@ -313,6 +397,7 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
 
       let callbackFired = false;
       player.addListener('playbackStatusUpdate', (status) => {
+        if (get().currentPlayer !== player) return;
         if (status.playing && get().audioLoading) {
           clearTimeout(loadingTimeout);
           set({audioLoading: false});

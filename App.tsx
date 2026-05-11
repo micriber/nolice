@@ -46,15 +46,25 @@ function App() {
       });
       Sentry.captureException(err);
     });
+    soundStore.preloadAllAssets().catch((err: any) => {
+      Sentry.logger.error('Audio error: preload all assets', {
+        error: err?.message ?? String(err),
+      });
+      Sentry.captureException(err);
+    });
   }, []);
 
   const onReady = useCallback(async () => {
-    if (fontsLoaded && soundStore.backgroundLoaded) {
+    if (fontsLoaded && soundStore.backgroundLoaded && soundStore.assetsLoaded) {
       await SplashScreen.hideAsync();
     }
-  }, [soundStore.backgroundLoaded, fontsLoaded]);
+  }, [soundStore.backgroundLoaded, soundStore.assetsLoaded, fontsLoaded]);
 
-  if (!fontsLoaded || !soundStore.backgroundLoaded) {
+  if (
+    !fontsLoaded ||
+    !soundStore.backgroundLoaded ||
+    !soundStore.assetsLoaded
+  ) {
     return null;
   }
 
