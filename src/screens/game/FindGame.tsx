@@ -38,37 +38,40 @@ export function FindGame() {
     setIsLoaded(true);
   }, []);
 
+  const question = store.questions[store.currentIndex];
+  const configItem = question ? questionConfig[question.answer] : undefined;
+  const sound = configItem
+    ? SOUNDS_QUESTION[gameType.toUpperCase()]?.[configItem.key.toUpperCase()]
+    : undefined;
+  const possibilitiesValid =
+    question?.possibilities?.every((p) => questionConfig[p.value]) ?? false;
+
   useEffect(() => {
+    if (!isLoaded || !configItem || !sound || !possibilitiesValid) return;
     const playAudio = async () => {
       return await soundStore.play(sound.QUESTION);
     };
-
-    if (isLoaded) {
-      playAudio().catch((err: any) => {
-        Sentry.logger.error('Audio error: FindGame question play', {
-          error: err?.message ?? String(err),
-        });
-        Sentry.captureException(err);
+    playAudio().catch((err: any) => {
+      Sentry.logger.error('Audio error: FindGame question play', {
+        error: err?.message ?? String(err),
       });
-      logEvent(getAnalytics(), 'question', {
-        event_name: 'question',
-        question_id: questionId,
-        game_id: gameId,
-        gameType,
-        answer: questionConfig[question.answer].key,
-        possibility1: questionConfig[question?.possibilities[0].value].key,
-        possibility2: questionConfig[question?.possibilities[1].value].key,
-        possibility3: questionConfig[question?.possibilities[2].value].key,
-        possibility4: questionConfig[question?.possibilities[3].value].key,
-      });
-    }
+      Sentry.captureException(err);
+    });
+    logEvent(getAnalytics(), 'question', {
+      event_name: 'question',
+      question_id: questionId,
+      game_id: gameId,
+      gameType,
+      answer: configItem.key,
+      possibility1: questionConfig[question?.possibilities[0].value]?.key,
+      possibility2: questionConfig[question?.possibilities[1].value]?.key,
+      possibility3: questionConfig[question?.possibilities[2].value]?.key,
+      possibility4: questionConfig[question?.possibilities[3].value]?.key,
+    });
   }, [isLoaded, store.currentIndex]);
 
-  if (!isLoaded) return <></>;
-
-  const question = store.questions[store.currentIndex];
-  const {label, key} = questionConfig[question.answer];
-  const sound = SOUNDS_QUESTION[gameType.toUpperCase()][key.toUpperCase()];
+  if (!isLoaded || !configItem || !sound || !possibilitiesValid) return <></>;
+  const {label, key} = configItem;
 
   return (
     <SafeAreaView style={styles.container}>

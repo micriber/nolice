@@ -101,39 +101,39 @@ export function NumberGame({navigation}: Props) {
     setIsLoaded(true);
   }, []);
 
-  useEffect(() => {
-    const playAudio = async () => {
-      return await soundStore.play(sound);
-    };
-
-    if (isLoaded) {
-      playAudio();
-      logEvent(getAnalytics(), 'question', {
-        event_name: 'question',
-        question_id: questionId,
-        game_id: gameId,
-        gameType: 'number',
-        animal,
-        answer: question.answer,
-        possibility1: question?.possibilities[0].value,
-        possibility2: question?.possibilities[1].value,
-        possibility3: question?.possibilities[2].value,
-        possibility4: question?.possibilities[3].value,
-      });
-    }
-  }, [isLoaded, store.currentIndex]);
-
-  if (!isLoaded) return <></>;
-
   const question = store.questions[store.currentIndex];
   const answer = question?.answer;
   const animal = animals[store.currentIndex];
+  const animalSound = animal ? animalSoundMap[animal] : undefined;
+
+  useEffect(() => {
+    if (!isLoaded || !question || !animalSound) return;
+    const playAudio = async () => {
+      return await soundStore.play(animalSound.sound);
+    };
+    playAudio();
+    logEvent(getAnalytics(), 'question', {
+      event_name: 'question',
+      question_id: questionId,
+      game_id: gameId,
+      gameType: 'number',
+      animal,
+      answer: question.answer,
+      possibility1: question?.possibilities[0].value,
+      possibility2: question?.possibilities[1].value,
+      possibility3: question?.possibilities[2].value,
+      possibility4: question?.possibilities[3].value,
+    });
+  }, [isLoaded, store.currentIndex]);
+
+  if (!isLoaded || !question || !animalSound) return <></>;
+
   const animalsElements = answer
     ? Array.from({length: answer}, (_, i) => (
         <AnimalImage key={i} type={animal} />
       ))
     : [];
-  const {label, sound} = animalSoundMap[animal];
+  const {label, sound} = animalSound;
   const questionLabel = `Combien comptes-tu ${label} ?`;
 
   return (

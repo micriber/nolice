@@ -282,6 +282,9 @@ function errorSafe(callback: () => void, message: string = 'Audio error:') {
 }
 
 let backgroundPlayer: AudioPlayer | null = null;
+let foregroundPlayer: AudioPlayer | null = null;
+let foregroundCallback: (() => void) | null = null;
+let foregroundCallbackFired = false;
 
 const resolvedUris = new Map<number, string>();
 
@@ -333,6 +336,14 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
   audioLoading: false,
   assetsLoaded: false,
   preloadAllAssets: async () => {
+    try {
+      await setAudioModeAsync({interruptionMode: 'doNotMix'});
+    } catch (err: any) {
+      Sentry.logger.error('Audio error: setAudioModeAsync at boot', {
+        error: err?.message ?? String(err),
+      });
+      Sentry.captureException(err);
+    }
     const sources: AudioSource[] = [
       SOUNDS.BRAVO,
       SOUNDS.DOMMAGE,
@@ -368,59 +379,54 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
     set({assetsLoaded: true});
   },
   play: async (src: AudioSource, callback?: () => void) => {
-    const {currentPlayer} = get();
-
-    if (currentPlayer) {
-      try {
-        currentPlayer.pause();
-        currentPlayer.remove();
-      } catch (err: any) {
-        Sentry.logger.error('Audio error: cleanup previous player', {
-          error: err?.message ?? String(err),
-        });
-        Sentry.captureException(err);
-      }
-      set({currentPlayer: null});
-    }
-
+    foregroundCallback = callback ?? null;
+    foregroundCallbackFired = false;
     set({audioLoading: true});
 
     try {
-      const player = createAudioPlayer(resolveSource(src));
-      set({currentPlayer: player});
+      const resolved = resolveSource(src);
 
-      const loadingTimeout = setTimeout(() => {
+      if (!foregroundPlayer) {
+        foregroundPlayer = createAudioPlayer(resolved);
+        set({currentPlayer: foregroundPlayer});
+
+        foregroundPlayer.addListener('playbackStatusUpdate', (status) => {
+          if (status.playing && get().audioLoading) {
+            set({audioLoading: false});
+          }
+          if (status.didJustFinish) {
+            if (get().audioLoading) {
+              set({audioLoading: false});
+            }
+            if (!foregroundCallbackFired && foregroundCallback) {
+              foregroundCallbackFired = true;
+              const cb = foregroundCallback;
+              foregroundCallback = null;
+              cb();
+            }
+          }
+        });
+      } else {
+        try {
+          foregroundPlayer.pause();
+        } catch {}
+        foregroundPlayer.replace(resolved);
+      }
+
+      setTimeout(() => {
         if (get().audioLoading) {
           set({audioLoading: false});
         }
       }, 2000);
 
-      let callbackFired = false;
-      player.addListener('playbackStatusUpdate', (status) => {
-        if (get().currentPlayer !== player) return;
-        if (status.playing && get().audioLoading) {
-          clearTimeout(loadingTimeout);
-          set({audioLoading: false});
-        }
-        if (status.didJustFinish) {
-          clearTimeout(loadingTimeout);
-          if (get().audioLoading) {
-            set({audioLoading: false});
-          }
-          if (!callbackFired && callback) {
-            callbackFired = true;
-            callback();
-          }
-        }
-      });
-
-      player.play();
+      await foregroundPlayer.seekTo(0);
+      foregroundPlayer.play();
     } catch (err: any) {
       Sentry.logger.error('Audio error: play', {
         error: err?.message ?? String(err),
       });
       Sentry.captureException(err);
-      set({currentPlayer: null, audioLoading: false});
+      set({audioLoading: false});
     }
   },
   replay: async () => {

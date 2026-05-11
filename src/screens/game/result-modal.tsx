@@ -1,6 +1,6 @@
 import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {AudioSource} from 'expo-audio';
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Modal, StyleSheet, Text, View} from 'react-native';
 
 import PrimaryButton from '../../components/PrimaryButton';
@@ -24,8 +24,23 @@ type Props = {
 export function ResultModal(props: Props) {
   const soundStore = useSoundStore();
   const [soundFinished, setSoundFinished] = useState(false);
+  const safetyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
+    },
+    [],
+  );
+
   async function onShow() {
     setSoundFinished(false);
+
+    if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
+    safetyTimeoutRef.current = setTimeout(() => {
+      setSoundFinished(true);
+    }, 4000);
+
     await logEvent(getAnalytics(), 'result', {
       success: props.success,
       answer: props.answer,
