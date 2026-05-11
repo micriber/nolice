@@ -3,6 +3,7 @@ import {useNavigation, useRoute} from '@react-navigation/core';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import uuid from 'react-native-uuid';
 
 import ChoiceButton from './ChoiceButton';
@@ -64,7 +65,7 @@ export function FindGame() {
   const sound = SOUNDS_QUESTION[gameType.toUpperCase()][key.toUpperCase()];
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ResultModal
         onNext={() => {
           if (!store.hasMoreQuestion()) {
@@ -103,7 +104,9 @@ export function FindGame() {
               fontFamily: FONT.FAMILY,
               color: COLORS.FONT.BASE,
               flex: 3,
-            }}>
+            }}
+            numberOfLines={1}
+            adjustsFontSizeToFit>
             Question {store.currentIndex + 1} sur {maxQuestion}
           </Text>
         </View>
@@ -124,7 +127,9 @@ export function FindGame() {
               fontFamily: FONT.FAMILY,
               color: COLORS.FONT.BASE,
               textAlign: 'center',
-            }}>
+            }}
+            numberOfLines={1}
+            adjustsFontSizeToFit>
             Trouve {label}
           </Text>
         </View>
@@ -159,7 +164,7 @@ export function FindGame() {
         ) : null}
         <MusicButton />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
@@ -167,7 +172,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.BACKGROUND,
     paddingHorizontal: 20,
-    paddingTop: 40,
     justifyContent: 'center',
     flexDirection: 'column',
   },

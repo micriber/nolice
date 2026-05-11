@@ -1,5 +1,5 @@
 import {TitilliumWeb_700Bold, useFonts} from '@expo-google-fonts/titillium-web';
-import {getAnalytics, logScreenView} from '@react-native-firebase/analytics';
+import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {
   NavigationContainer,
   useNavigationContainerRef,
@@ -9,6 +9,7 @@ import * as Sentry from '@sentry/react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import {StatusBar} from 'expo-status-bar';
 import React, {useCallback, useEffect} from 'react';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 import {NumberGame, FindGame} from './src/screens/game';
 import {MainMenu, GameSelectionMenu} from './src/screens/menu';
@@ -52,7 +53,7 @@ function App() {
   }
 
   return (
-    <>
+    <SafeAreaProvider>
       <NavigationContainer
         onReady={() => {
           routeNameRef.current = navigationRef.current?.getCurrentRoute()?.name;
@@ -64,7 +65,7 @@ function App() {
             navigationRef.current?.getCurrentRoute()?.name;
 
           if (previousRouteName !== currentRouteName) {
-            await logScreenView(getAnalytics(), {
+            await logEvent(getAnalytics(), 'screen_view', {
               screen_name: currentRouteName,
               screen_class: currentRouteName,
             });
@@ -105,7 +106,7 @@ function App() {
         </Stack.Navigator>
       </NavigationContainer>
       <StatusBar />
-    </>
+    </SafeAreaProvider>
   );
 }
 

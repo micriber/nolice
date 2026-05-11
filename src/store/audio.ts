@@ -283,13 +283,14 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
   play: async (src: AudioSource, callback?: () => void) => {
     const {currentPlayer} = get();
 
-    try {
-      if (currentPlayer) {
+    if (currentPlayer) {
+      try {
+        currentPlayer.pause();
         currentPlayer.remove();
-        set({currentPlayer: null});
+      } catch (err) {
+        console.error('Audio error: cleanup previous player', err);
       }
-    } catch (err) {
-      console.error('Audio error: cleanup previous player', err);
+      set({currentPlayer: null});
     }
 
     try {
@@ -299,7 +300,9 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
       player.addListener('playbackStatusUpdate', (status) => {
         if (status.didJustFinish) {
           player.remove();
-          set({currentPlayer: null});
+          if (get().currentPlayer === player) {
+            set({currentPlayer: null});
+          }
           if (callback) {
             callback();
           }

@@ -4,6 +4,7 @@ import {AudioSource} from 'expo-audio';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import uuid from 'react-native-uuid';
 
 import ChoiceButton from './ChoiceButton';
@@ -136,7 +137,7 @@ export function NumberGame({navigation}: Props) {
   const questionLabel = `Combien comptes-tu ${label} ?`;
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ResultModal
         answer={answer.toString()}
         onNext={() => {
@@ -169,7 +170,9 @@ export function NumberGame({navigation}: Props) {
               fontFamily: FONT.FAMILY,
               color: COLORS.FONT.BASE,
               flex: 3,
-            }}>
+            }}
+            numberOfLines={1}
+            adjustsFontSizeToFit>
             Question {store.currentIndex + 1} sur {maxQuestion}
           </Text>
         </View>
@@ -232,7 +235,7 @@ export function NumberGame({navigation}: Props) {
         {sound !== undefined ? <InstructionButton sound={sound} /> : null}
         <MusicButton />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
@@ -240,7 +243,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.BACKGROUND,
     paddingHorizontal: 20,
-    paddingTop: 20,
     justifyContent: 'center',
     flexDirection: 'column',
   },

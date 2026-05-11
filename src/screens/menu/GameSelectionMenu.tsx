@@ -1,6 +1,7 @@
 import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {StyleSheet, Text, View} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 import MusicButton from '../../components/MusicButton';
 import PrimaryButton from '../../components/PrimaryButton';
@@ -66,9 +67,11 @@ export function GameSelectionMenu({navigation}: Props) {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.titre}>Selection du jeu</Text>
+        <Text style={styles.titre} numberOfLines={1} adjustsFontSizeToFit>
+          Selection du jeu
+        </Text>
       </View>
       <View style={styles.body}>
         <View style={styles.body}>
@@ -103,7 +106,7 @@ export function GameSelectionMenu({navigation}: Props) {
       <View style={styles.footer}>
         <MusicButton />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

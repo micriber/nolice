@@ -1,6 +1,7 @@
 import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {StyleSheet, View} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 // @ts-ignore
 import Logo from '../../../assets/svg/logo.svg';
@@ -19,7 +20,7 @@ export function MainMenu({navigation}: Props) {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Logo />
       </View>
@@ -31,7 +32,7 @@ export function MainMenu({navigation}: Props) {
           <MusicButton />
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

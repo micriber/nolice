@@ -94,26 +94,33 @@ export function ResultModal(props: Props) {
                 color: props.success ? COLORS.FONT.SUCCESS : COLORS.FONT.ERROR,
                 fontSize: FONT.SIZE.BASE,
               },
-            ]}>
+            ]}
+            numberOfLines={1}
+            adjustsFontSizeToFit>
             {props.success ? 'BRAVO !' : 'FAUX !'}
           </Text>
-          <Text style={styles.modalText}>La bonne réponse</Text>
+          <Text
+            style={styles.modalText}
+            numberOfLines={1}
+            adjustsFontSizeToFit>
+            La bonne réponse
+          </Text>
           {content ?? <></>}
           <View
             style={[
               {
                 flex: 2,
                 justifyContent: 'center',
+                opacity: soundFinished ? 1 : 0,
               },
-            ]}>
-            {soundFinished ? (
-              <PrimaryButton
-                name="SUIVANT"
-                onPress={() => {
-                  props.onNext();
-                }}
-              />
-            ) : null}
+            ]}
+            pointerEvents={soundFinished ? 'auto' : 'none'}>
+            <PrimaryButton
+              name="SUIVANT"
+              onPress={() => {
+                props.onNext();
+              }}
+            />
           </View>
         </View>
       </View>
