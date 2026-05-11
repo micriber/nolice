@@ -10,6 +10,7 @@ export default function ChoiceButton(props: {
   value: string;
   type: string;
   onPress: () => void;
+  disabled?: boolean;
 }) {
   let element;
   let playButtonStyle = styles.playButton;
@@ -40,7 +41,10 @@ export default function ChoiceButton(props: {
 
   return (
     <View style={styles.containerView}>
-      <TouchableOpacity style={playButtonStyle} onPress={props.onPress}>
+      <TouchableOpacity
+        style={[playButtonStyle, props.disabled && styles.disabled]}
+        onPress={props.onPress}
+        disabled={props.disabled}>
         {element}
       </TouchableOpacity>
     </View>
@@ -77,5 +81,8 @@ const styles = StyleSheet.create({
     fontFamily: FONT.FAMILY,
     color: COLORS.FONT.BASE,
     marginBottom: 5,
+  },
+  disabled: {
+    opacity: 0.4,
   },
 });

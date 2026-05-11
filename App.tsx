@@ -27,6 +27,7 @@ Sentry.init({
   // We recommend adjusting this value in production.
   tracesSampleRate: 1.0,
   environment: 'development',
+  enableLogs: true,
 });
 
 function App() {
@@ -39,7 +40,12 @@ function App() {
 
   const soundStore = useSoundStore();
   useEffect(() => {
-    soundStore.playBackground(SOUNDS.MUSIC).catch(console.error);
+    soundStore.playBackground(SOUNDS.MUSIC).catch((err: any) => {
+      Sentry.logger.error('Audio error: background music init', {
+        error: err?.message ?? String(err),
+      });
+      Sentry.captureException(err);
+    });
   }, []);
 
   const onReady = useCallback(async () => {

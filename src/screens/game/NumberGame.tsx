@@ -222,6 +222,7 @@ export function NumberGame({navigation}: Props) {
               type="number"
               key={possibility.value}
               value={possibility.value.toString()}
+              disabled={soundStore.audioLoading}
               onPress={() => {
                 question.success = possibility.isGood;
                 setChoice(possibility.value.toString());
@@ -232,7 +233,7 @@ export function NumberGame({navigation}: Props) {
         </View>
       </View>
       <View style={[styles.footer]}>
-        {sound !== undefined ? <InstructionButton sound={sound} /> : null}
+        <InstructionButton />
         <MusicButton />
       </View>
     </SafeAreaView>

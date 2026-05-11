@@ -11,10 +11,12 @@ interface AudioStoreState {
   backgroundPlaying: boolean;
   backgroundLoaded: boolean;
   currentPlayer: AudioPlayer | null;
+  audioLoading: boolean;
   pauseBackground: () => Promise<void>;
   unPauseBackground: () => Promise<void>;
   playBackground: (src: AudioSource) => Promise<void>;
   play: (src: AudioSource, callback?: () => void) => Promise<void>;
+  replay: () => Promise<void>;
 }
 
 const DOMMAGE_SOUND_PATH = '../../assets/audio/dommage.mp3';
@@ -265,7 +267,7 @@ function errorSafe(callback: () => void, message: string = 'Audio error:') {
   try {
     callback();
   } catch (error: any) {
-    console.error(message, error);
+    Sentry.logger.error(message, {error: error?.message ?? String(error)});
     if (error.name !== 'AudioFocusNotAcquiredException') {
       Sentry.withScope(function () {
         Sentry.captureException(error);
@@ -280,6 +282,7 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
   backgroundPlaying: false,
   backgroundLoaded: false,
   currentPlayer: null,
+  audioLoading: false,
   play: async (src: AudioSource, callback?: () => void) => {
     const {currentPlayer} = get();
 
@@ -287,32 +290,65 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
       try {
         currentPlayer.pause();
         currentPlayer.remove();
-      } catch (err) {
-        console.error('Audio error: cleanup previous player', err);
+      } catch (err: any) {
+        Sentry.logger.error('Audio error: cleanup previous player', {
+          error: err?.message ?? String(err),
+        });
+        Sentry.captureException(err);
       }
       set({currentPlayer: null});
     }
+
+    set({audioLoading: true});
 
     try {
       const player = createAudioPlayer(src);
       set({currentPlayer: player});
 
+      const loadingTimeout = setTimeout(() => {
+        if (get().audioLoading) {
+          set({audioLoading: false});
+        }
+      }, 2000);
+
+      let callbackFired = false;
       player.addListener('playbackStatusUpdate', (status) => {
+        if (status.playing && get().audioLoading) {
+          clearTimeout(loadingTimeout);
+          set({audioLoading: false});
+        }
         if (status.didJustFinish) {
-          player.remove();
-          if (get().currentPlayer === player) {
-            set({currentPlayer: null});
+          clearTimeout(loadingTimeout);
+          if (get().audioLoading) {
+            set({audioLoading: false});
           }
-          if (callback) {
+          if (!callbackFired && callback) {
+            callbackFired = true;
             callback();
           }
         }
       });
 
       player.play();
-    } catch (err) {
-      console.error('Audio error: play', err);
-      set({currentPlayer: null});
+    } catch (err: any) {
+      Sentry.logger.error('Audio error: play', {
+        error: err?.message ?? String(err),
+      });
+      Sentry.captureException(err);
+      set({currentPlayer: null, audioLoading: false});
+    }
+  },
+  replay: async () => {
+    const player = get().currentPlayer;
+    if (!player) return;
+    try {
+      await player.seekTo(0);
+      player.play();
+    } catch (err: any) {
+      Sentry.logger.error('Audio error: replay', {
+        error: err?.message ?? String(err),
+      });
+      Sentry.captureException(err);
     }
   },
   playBackground: async (src: AudioSource) => {

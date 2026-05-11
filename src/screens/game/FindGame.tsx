@@ -1,5 +1,6 @@
 import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {useNavigation, useRoute} from '@react-navigation/core';
+import * as Sentry from '@sentry/react-native';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
@@ -43,7 +44,12 @@ export function FindGame() {
     };
 
     if (isLoaded) {
-      playAudio().catch(console.error);
+      playAudio().catch((err: any) => {
+        Sentry.logger.error('Audio error: FindGame question play', {
+          error: err?.message ?? String(err),
+        });
+        Sentry.captureException(err);
+      });
       logEvent(getAnalytics(), 'question', {
         event_name: 'question',
         question_id: questionId,
@@ -149,6 +155,7 @@ export function FindGame() {
               key={possibility.value}
               type={gameType}
               value={questionConfig[possibility.value].key}
+              disabled={soundStore.audioLoading}
               onPress={() => {
                 question.success = possibility.isGood;
                 setChoice(questionConfig[possibility.value].key);
@@ -159,9 +166,7 @@ export function FindGame() {
         </View>
       </View>
       <View style={[styles.footer]}>
-        {sound.QUESTION !== undefined ? (
-          <InstructionButton sound={sound.QUESTION} />
-        ) : null}
+        <InstructionButton />
         <MusicButton />
       </View>
     </SafeAreaView>
