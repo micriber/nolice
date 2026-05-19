@@ -1,6 +1,7 @@
-import analytics from '@react-native-firebase/analytics';
+import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {useNavigation, useRoute} from '@react-navigation/core';
 import {StyleSheet, View, Text, Image} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {ScoreScreenRouteProp} from './types';
 import PrimaryButton from '../../components/PrimaryButton';
@@ -38,10 +39,10 @@ export default function ScoreScreen() {
   }
 
   return (
-    <View
+    <SafeAreaView
       style={styles.container}
       onLayout={async () => {
-        await analytics().logEvent('score', {
+        await logEvent(getAnalytics(), 'score', {
           game_id: gameId,
           results,
           isGood,
@@ -57,7 +58,7 @@ export default function ScoreScreen() {
       </View>
       <View style={styles.body}>
         <Text style={[styles.score, styles.message]}>{message}</Text>
-        <Text style={styles.score}>
+        <Text style={styles.score} numberOfLines={1} adjustsFontSizeToFit>
           Résultat :{' '}
           <Text
             style={[{color: isGood ? COLORS.FONT.SUCCESS : COLORS.FONT.ERROR}]}>
@@ -69,7 +70,7 @@ export default function ScoreScreen() {
       <View style={styles.footer}>
         <PrimaryButton name="REJOUER" onPress={handleClick} />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

@@ -35,7 +35,12 @@ export default function PrimaryButton(props: {
       onPress={props.onPress}>
       <View style={[styles.buttonContainer]}>
         <View style={[styles.textContainer]}>
-          <Text style={styles.playButtonText}>{props.name}</Text>
+          <Text
+            style={styles.playButtonText}
+            numberOfLines={1}
+            adjustsFontSizeToFit>
+            {props.name}
+          </Text>
         </View>
         {logo}
       </View>

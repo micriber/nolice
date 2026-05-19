@@ -1,6 +1,6 @@
-import analytics from '@react-native-firebase/analytics';
-import {AVPlaybackSource} from 'expo-av';
-import React, {useState} from 'react';
+import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
+import {AudioSource} from 'expo-audio';
+import React, {useEffect, useRef, useState} from 'react';
 import {Modal, StyleSheet, Text, View} from 'react-native';
 
 import PrimaryButton from '../../components/PrimaryButton';
@@ -18,15 +18,30 @@ type Props = {
   children?: React.ReactNode;
   questionId?: string;
   gameId?: string;
-  sound: AVPlaybackSource;
+  sound: AudioSource;
 };
 
 export function ResultModal(props: Props) {
   const soundStore = useSoundStore();
   const [soundFinished, setSoundFinished] = useState(false);
+  const safetyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
+    },
+    [],
+  );
+
   async function onShow() {
     setSoundFinished(false);
-    await analytics().logEvent('result', {
+
+    if (safetyTimeoutRef.current) clearTimeout(safetyTimeoutRef.current);
+    safetyTimeoutRef.current = setTimeout(() => {
+      setSoundFinished(true);
+    }, 4000);
+
+    await logEvent(getAnalytics(), 'result', {
       success: props.success,
       answer: props.answer,
       choice: props.choice,
@@ -94,26 +109,30 @@ export function ResultModal(props: Props) {
                 color: props.success ? COLORS.FONT.SUCCESS : COLORS.FONT.ERROR,
                 fontSize: FONT.SIZE.BASE,
               },
-            ]}>
+            ]}
+            numberOfLines={1}
+            adjustsFontSizeToFit>
             {props.success ? 'BRAVO !' : 'FAUX !'}
           </Text>
-          <Text style={styles.modalText}>La bonne réponse</Text>
+          <Text style={styles.modalText} numberOfLines={1} adjustsFontSizeToFit>
+            La bonne réponse
+          </Text>
           {content ?? <></>}
           <View
             style={[
               {
                 flex: 2,
                 justifyContent: 'center',
+                opacity: soundFinished ? 1 : 0,
               },
-            ]}>
-            {soundFinished ? (
-              <PrimaryButton
-                name="SUIVANT"
-                onPress={() => {
-                  props.onNext();
-                }}
-              />
-            ) : null}
+            ]}
+            pointerEvents={soundFinished ? 'auto' : 'none'}>
+            <PrimaryButton
+              name="SUIVANT"
+              onPress={() => {
+                props.onNext();
+              }}
+            />
           </View>
         </View>
       </View>

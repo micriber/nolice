@@ -1,9 +1,10 @@
-import analytics from '@react-native-firebase/analytics';
+import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {AVPlaybackSource} from 'expo-av';
+import {AudioSource} from 'expo-audio';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import uuid from 'react-native-uuid';
 
 import ChoiceButton from './ChoiceButton';
@@ -36,7 +37,7 @@ enum Animal {
 type AnimalSoundMap = {
   [animal: string]: {
     label: string;
-    sound: AVPlaybackSource;
+    sound: AudioSource;
   };
 };
 
@@ -52,7 +53,7 @@ const animalSoundMap: AnimalSoundMap = {
 };
 
 export interface SoundCountType {
-  [key: string]: AVPlaybackSource;
+  [key: string]: AudioSource;
 }
 const responseSoundMap: SoundCountType = {
   1: SOUNDS_COUNT_QUESTION.ONE,
@@ -100,43 +101,43 @@ export function NumberGame({navigation}: Props) {
     setIsLoaded(true);
   }, []);
 
-  useEffect(() => {
-    const playAudio = async () => {
-      return await soundStore.play(sound);
-    };
-
-    if (isLoaded) {
-      playAudio();
-      analytics().logEvent('question', {
-        event_name: 'question',
-        question_id: questionId,
-        game_id: gameId,
-        gameType: 'number',
-        animal,
-        answer: question.answer,
-        possibility1: question?.possibilities[0].value,
-        possibility2: question?.possibilities[1].value,
-        possibility3: question?.possibilities[2].value,
-        possibility4: question?.possibilities[3].value,
-      });
-    }
-  }, [isLoaded, store.currentIndex]);
-
-  if (!isLoaded) return <></>;
-
   const question = store.questions[store.currentIndex];
   const answer = question?.answer;
   const animal = animals[store.currentIndex];
+  const animalSound = animal ? animalSoundMap[animal] : undefined;
+
+  useEffect(() => {
+    if (!isLoaded || !question || !animalSound) return;
+    const playAudio = async () => {
+      return await soundStore.play(animalSound.sound);
+    };
+    playAudio();
+    logEvent(getAnalytics(), 'question', {
+      event_name: 'question',
+      question_id: questionId,
+      game_id: gameId,
+      gameType: 'number',
+      animal,
+      answer: question.answer,
+      possibility1: question?.possibilities[0].value,
+      possibility2: question?.possibilities[1].value,
+      possibility3: question?.possibilities[2].value,
+      possibility4: question?.possibilities[3].value,
+    });
+  }, [isLoaded, store.currentIndex]);
+
+  if (!isLoaded || !question || !animalSound) return <></>;
+
   const animalsElements = answer
     ? Array.from({length: answer}, (_, i) => (
         <AnimalImage key={i} type={animal} />
       ))
     : [];
-  const {label, sound} = animalSoundMap[animal];
+  const {label} = animalSound;
   const questionLabel = `Combien comptes-tu ${label} ?`;
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ResultModal
         answer={answer.toString()}
         onNext={() => {
@@ -169,7 +170,9 @@ export function NumberGame({navigation}: Props) {
               fontFamily: FONT.FAMILY,
               color: COLORS.FONT.BASE,
               flex: 3,
-            }}>
+            }}
+            numberOfLines={1}
+            adjustsFontSizeToFit>
             Question {store.currentIndex + 1} sur {maxQuestion}
           </Text>
         </View>
@@ -219,6 +222,7 @@ export function NumberGame({navigation}: Props) {
               type="number"
               key={possibility.value}
               value={possibility.value.toString()}
+              disabled={soundStore.audioLoading}
               onPress={() => {
                 question.success = possibility.isGood;
                 setChoice(possibility.value.toString());
@@ -229,10 +233,10 @@ export function NumberGame({navigation}: Props) {
         </View>
       </View>
       <View style={[styles.footer]}>
-        {sound !== undefined ? <InstructionButton sound={sound} /> : null}
+        <InstructionButton />
         <MusicButton />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
@@ -240,7 +244,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.BACKGROUND,
     paddingHorizontal: 20,
-    paddingTop: 20,
     justifyContent: 'center',
     flexDirection: 'column',
   },

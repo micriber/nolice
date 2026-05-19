@@ -1,11 +1,15 @@
 import {TitilliumWeb_700Bold, useFonts} from '@expo-google-fonts/titillium-web';
-import analytics from '@react-native-firebase/analytics';
-import {NavigationContainer} from '@react-navigation/native';
+import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
+import {
+  NavigationContainer,
+  useNavigationContainerRef,
+} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import * as Sentry from '@sentry/react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import {StatusBar} from 'expo-status-bar';
 import React, {useCallback, useEffect} from 'react';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 import {NumberGame, FindGame} from './src/screens/game';
 import {MainMenu, GameSelectionMenu} from './src/screens/menu';
@@ -23,11 +27,12 @@ Sentry.init({
   // We recommend adjusting this value in production.
   tracesSampleRate: 1.0,
   environment: 'development',
+  enableLogs: true,
 });
 
 function App() {
-  const routeNameRef = React.useRef();
-  const navigationRef = React.useRef();
+  const routeNameRef = React.useRef<string | undefined>(undefined);
+  const navigationRef = useNavigationContainerRef<StackNavigatorParamList>();
 
   const [fontsLoaded] = useFonts({
     TitilliumWeb_700Bold,
@@ -35,41 +40,54 @@ function App() {
 
   const soundStore = useSoundStore();
   useEffect(() => {
-    soundStore.playBackground(SOUNDS.MUSIC).catch(console.error);
+    soundStore.playBackground(SOUNDS.MUSIC).catch((err: any) => {
+      Sentry.logger.error('Audio error: background music init', {
+        error: err?.message ?? String(err),
+      });
+      Sentry.captureException(err);
+    });
+    soundStore.preloadAllAssets().catch((err: any) => {
+      Sentry.logger.error('Audio error: preload all assets', {
+        error: err?.message ?? String(err),
+      });
+      Sentry.captureException(err);
+    });
   }, []);
 
   const onReady = useCallback(async () => {
-    if (fontsLoaded && soundStore.backgroundLoaded) {
+    if (fontsLoaded && soundStore.backgroundLoaded && soundStore.assetsLoaded) {
       await SplashScreen.hideAsync();
     }
-  }, [soundStore.backgroundLoaded, fontsLoaded]);
+  }, [soundStore.backgroundLoaded, soundStore.assetsLoaded, fontsLoaded]);
 
-  if (!fontsLoaded || !soundStore.backgroundLoaded) {
+  if (
+    !fontsLoaded ||
+    !soundStore.backgroundLoaded ||
+    !soundStore.assetsLoaded
+  ) {
     return null;
   }
 
   return (
-    <>
+    <SafeAreaProvider>
       <NavigationContainer
         onReady={() => {
-          // @ts-ignore
-          routeNameRef.current = navigationRef.current.getCurrentRoute().name;
+          routeNameRef.current = navigationRef.current?.getCurrentRoute()?.name;
           return onReady();
         }}
         onStateChange={async () => {
           const previousRouteName = routeNameRef.current;
-          // @ts-ignore
-          const currentRouteName = navigationRef.current.getCurrentRoute().name;
+          const currentRouteName =
+            navigationRef.current?.getCurrentRoute()?.name;
 
           if (previousRouteName !== currentRouteName) {
-            await analytics().logScreenView({
+            await logEvent(getAnalytics(), 'screen_view', {
               screen_name: currentRouteName,
               screen_class: currentRouteName,
             });
           }
           routeNameRef.current = currentRouteName;
         }}
-        // @ts-ignore
         ref={navigationRef}>
         <Stack.Navigator
           initialRouteName="MainMenu"
@@ -104,7 +122,7 @@ function App() {
         </Stack.Navigator>
       </NavigationContainer>
       <StatusBar />
-    </>
+    </SafeAreaProvider>
   );
 }
 

@@ -1,8 +1,10 @@
-import analytics from '@react-native-firebase/analytics';
+import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {useNavigation, useRoute} from '@react-navigation/core';
+import * as Sentry from '@sentry/react-native';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import uuid from 'react-native-uuid';
 
 import ChoiceButton from './ChoiceButton';
@@ -36,35 +38,43 @@ export function FindGame() {
     setIsLoaded(true);
   }, []);
 
+  const question = store.questions[store.currentIndex];
+  const configItem = question ? questionConfig[question.answer] : undefined;
+  const sound = configItem
+    ? SOUNDS_QUESTION[gameType.toUpperCase()]?.[configItem.key.toUpperCase()]
+    : undefined;
+  const possibilitiesValid =
+    question?.possibilities?.every((p) => questionConfig[p.value]) ?? false;
+
   useEffect(() => {
+    if (!isLoaded || !configItem || !sound || !possibilitiesValid) return;
     const playAudio = async () => {
       return await soundStore.play(sound.QUESTION);
     };
-
-    if (isLoaded) {
-      playAudio().catch(console.error);
-      analytics().logEvent('question', {
-        event_name: 'question',
-        question_id: questionId,
-        game_id: gameId,
-        gameType,
-        answer: questionConfig[question.answer].key,
-        possibility1: questionConfig[question?.possibilities[0].value].key,
-        possibility2: questionConfig[question?.possibilities[1].value].key,
-        possibility3: questionConfig[question?.possibilities[2].value].key,
-        possibility4: questionConfig[question?.possibilities[3].value].key,
+    playAudio().catch((err: any) => {
+      Sentry.logger.error('Audio error: FindGame question play', {
+        error: err?.message ?? String(err),
       });
-    }
+      Sentry.captureException(err);
+    });
+    logEvent(getAnalytics(), 'question', {
+      event_name: 'question',
+      question_id: questionId,
+      game_id: gameId,
+      gameType,
+      answer: configItem.key,
+      possibility1: questionConfig[question?.possibilities[0].value]?.key,
+      possibility2: questionConfig[question?.possibilities[1].value]?.key,
+      possibility3: questionConfig[question?.possibilities[2].value]?.key,
+      possibility4: questionConfig[question?.possibilities[3].value]?.key,
+    });
   }, [isLoaded, store.currentIndex]);
 
-  if (!isLoaded) return <></>;
-
-  const question = store.questions[store.currentIndex];
-  const {label, key} = questionConfig[question.answer];
-  const sound = SOUNDS_QUESTION[gameType.toUpperCase()][key.toUpperCase()];
+  if (!isLoaded || !configItem || !sound || !possibilitiesValid) return <></>;
+  const {label, key} = configItem;
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ResultModal
         onNext={() => {
           if (!store.hasMoreQuestion()) {
@@ -103,7 +113,9 @@ export function FindGame() {
               fontFamily: FONT.FAMILY,
               color: COLORS.FONT.BASE,
               flex: 3,
-            }}>
+            }}
+            numberOfLines={1}
+            adjustsFontSizeToFit>
             Question {store.currentIndex + 1} sur {maxQuestion}
           </Text>
         </View>
@@ -124,7 +136,9 @@ export function FindGame() {
               fontFamily: FONT.FAMILY,
               color: COLORS.FONT.BASE,
               textAlign: 'center',
-            }}>
+            }}
+            numberOfLines={1}
+            adjustsFontSizeToFit>
             Trouve {label}
           </Text>
         </View>
@@ -144,6 +158,7 @@ export function FindGame() {
               key={possibility.value}
               type={gameType}
               value={questionConfig[possibility.value].key}
+              disabled={soundStore.audioLoading}
               onPress={() => {
                 question.success = possibility.isGood;
                 setChoice(questionConfig[possibility.value].key);
@@ -154,12 +169,10 @@ export function FindGame() {
         </View>
       </View>
       <View style={[styles.footer]}>
-        {sound.QUESTION !== undefined ? (
-          <InstructionButton sound={sound.QUESTION} />
-        ) : null}
+        <InstructionButton />
         <MusicButton />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
@@ -167,7 +180,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.BACKGROUND,
     paddingHorizontal: 20,
-    paddingTop: 40,
     justifyContent: 'center',
     flexDirection: 'column',
   },

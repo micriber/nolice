@@ -1,6 +1,7 @@
-import analytics from '@react-native-firebase/analytics';
+import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {StyleSheet, Text, View} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 import MusicButton from '../../components/MusicButton';
 import PrimaryButton from '../../components/PrimaryButton';
@@ -13,12 +14,12 @@ type Props = {
 
 export function GameSelectionMenu({navigation}: Props) {
   const handleNumberButton = async () => {
-    await analytics().logEvent('NumberGame');
+    await logEvent(getAnalytics(), 'NumberGame');
     navigation.navigate('NumberGame');
   };
 
   const handleColorButton = async () => {
-    await analytics().logEvent('ColorGame');
+    await logEvent(getAnalytics(), 'ColorGame');
     const questionConfig = [
       {key: 'yellow', label: 'le jaune'},
       {key: 'red', label: 'le rouge'},
@@ -35,7 +36,7 @@ export function GameSelectionMenu({navigation}: Props) {
   };
 
   const handleAnimalButton = async () => {
-    await analytics().logEvent('AnimalGame');
+    await logEvent(getAnalytics(), 'AnimalGame');
     const questionConfig = [
       {key: 'bird', label: "l'oiseau"},
       {key: 'cat', label: 'le chat'},
@@ -50,7 +51,7 @@ export function GameSelectionMenu({navigation}: Props) {
   };
 
   const handleShapeButton = async () => {
-    await analytics().logEvent('ShapeGame');
+    await logEvent(getAnalytics(), 'ShapeGame');
     const questionConfig = [
       {key: 'circle', label: 'le cercle'},
       {key: 'cross', label: 'la croix'},
@@ -66,9 +67,11 @@ export function GameSelectionMenu({navigation}: Props) {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.titre}>Selection du jeu</Text>
+        <Text style={styles.titre} numberOfLines={1} adjustsFontSizeToFit>
+          Selection du jeu
+        </Text>
       </View>
       <View style={styles.body}>
         <View style={styles.body}>
@@ -103,7 +106,7 @@ export function GameSelectionMenu({navigation}: Props) {
       <View style={styles.footer}>
         <MusicButton />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

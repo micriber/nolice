@@ -1,21 +1,27 @@
 import * as Sentry from '@sentry/react-native';
+import {Asset} from 'expo-asset';
 import {
-  Audio,
-  AVPlaybackSource,
-  AVPlaybackStatus,
-  InterruptionModeAndroid,
-} from 'expo-av';
-import {AVPlaybackStatusSuccess} from 'expo-av/src/AV.types';
+  AudioSource,
+  createAudioPlayer,
+  AudioPlayer,
+  setAudioModeAsync,
+  preload,
+} from 'expo-audio';
+import {File, Paths} from 'expo-file-system';
 import {create} from 'zustand';
 
 interface AudioStoreState {
   backgroundPlaying: boolean;
   backgroundLoaded: boolean;
-  soundObject: Audio.SoundObject | null;
+  currentPlayer: AudioPlayer | null;
+  audioLoading: boolean;
+  assetsLoaded: boolean;
   pauseBackground: () => Promise<void>;
   unPauseBackground: () => Promise<void>;
-  playBackground: (src: AVPlaybackSource) => Promise<void>;
-  play: (src: AVPlaybackSource, callback?: () => void) => Promise<void>;
+  playBackground: (src: AudioSource) => Promise<void>;
+  play: (src: AudioSource, callback?: () => void) => Promise<void>;
+  replay: () => Promise<void>;
+  preloadAllAssets: () => Promise<void>;
 }
 
 const DOMMAGE_SOUND_PATH = '../../assets/audio/dommage.mp3';
@@ -101,17 +107,17 @@ type SoundsTypeQuestion = {
 
 export interface SoundQuestionType {
   [key: string]: {
-    QUESTION: AVPlaybackSource;
-    ANSWER: AVPlaybackSource;
+    QUESTION: AudioSource;
+    ANSWER: AudioSource;
   };
 }
 
 type SoundsType = {
-  DOMMAGE: AVPlaybackSource;
-  RETRY: AVPlaybackSource;
-  BRAVO: AVPlaybackSource;
-  MUSIC: AVPlaybackSource;
-  CONGRATULATION: AVPlaybackSource;
+  DOMMAGE: AudioSource;
+  RETRY: AudioSource;
+  BRAVO: AudioSource;
+  MUSIC: AudioSource;
+  CONGRATULATION: AudioSource;
 };
 
 export const SOUNDS: SoundsType = {
@@ -123,7 +129,7 @@ export const SOUNDS: SoundsType = {
 };
 
 export interface SoundCountType {
-  [key: string]: AVPlaybackSource;
+  [key: string]: AudioSource;
 }
 export const SOUNDS_COUNT_QUESTION: SoundCountType = {
   DUCK: require(COUNT_DUCK_SOUND_PATH),
@@ -266,7 +272,7 @@ function errorSafe(callback: () => void, message: string = 'Audio error:') {
   try {
     callback();
   } catch (error: any) {
-    console.error(message, error);
+    Sentry.logger.error(message, {error: error?.message ?? String(error)});
     if (error.name !== 'AudioFocusNotAcquiredException') {
       Sentry.withScope(function () {
         Sentry.captureException(error);
@@ -275,106 +281,203 @@ function errorSafe(callback: () => void, message: string = 'Audio error:') {
   }
 }
 
-const soundObjectBackground = new Audio.Sound();
+let backgroundPlayer: AudioPlayer | null = null;
+let foregroundPlayer: AudioPlayer | null = null;
+let foregroundCallback: (() => void) | null = null;
+let foregroundCallbackFired = false;
+
+const resolvedUris = new Map<number, string>();
+
+function resolveSource(src: AudioSource): AudioSource {
+  if (typeof src === 'number') {
+    const uri = resolvedUris.get(src);
+    if (uri) return {uri};
+  }
+  return src;
+}
+
+async function resolveAssetToFile(src: number): Promise<string | null> {
+  const asset = Asset.fromModule(src);
+  await asset.downloadAsync();
+  const localUri = asset.localUri;
+  if (!localUri) {
+    Sentry.logger.warn('Audio: localUri missing after downloadAsync', {
+      src: String(src),
+      assetUri: asset.uri ?? 'null',
+    });
+    return null;
+  }
+  if (localUri.startsWith('file://')) {
+    return localUri;
+  }
+  const dest = new File(Paths.cache, `preload-${src}.mp3`);
+  try {
+    if (!dest.exists) {
+      const source = new File(localUri);
+      source.copy(dest);
+    }
+    return dest.uri;
+  } catch (copyErr: any) {
+    Sentry.logger.error('Audio error: copy asset to cache', {
+      src: String(src),
+      localUri,
+      dest: dest.uri,
+      error: copyErr?.message ?? String(copyErr),
+    });
+    Sentry.captureException(copyErr);
+    return null;
+  }
+}
 
 export const useSoundStore = create<AudioStoreState>((set, get) => ({
   backgroundPlaying: false,
   backgroundLoaded: false,
-  soundObject: null,
-  play: async (src: AVPlaybackSource, callback?: () => void) => {
-    const {soundObject} = get();
-    if (soundObject?.sound && !soundObject?.status?.isLoaded) {
-      return Promise.reject(new Error('Audio not loaded'));
-    }
-
+  currentPlayer: null,
+  audioLoading: false,
+  assetsLoaded: false,
+  preloadAllAssets: async () => {
     try {
-      if (
-        soundObject?.sound &&
-        isAVPlaybackStatusSuccess(soundObject.status) &&
-        soundObject?.status?.isPlaying
-      ) {
-        await soundObject.sound.stopAsync();
-      }
-    } catch (err) {
-      console.log(soundObject?.status);
-      if (
-        soundObject?.sound &&
-        isAVPlaybackStatusSuccess(soundObject.status) &&
-        soundObject?.status?.positionMillis > 0
-      ) {
-        console.error('Audio error: stop', err);
-      } else {
-        console.log('Audio log: stop', err);
-      }
-    }
-
-    try {
-      if (soundObject?.sound) {
-        await soundObject.sound.unloadAsync();
-      }
-    } catch (err) {
-      console.log(soundObject?.status);
-      console.error('Audio error: unload', err);
-    }
-
-    try {
-      const soundObject = await Audio.Sound.createAsync(src, {
-        shouldPlay: true,
+      await setAudioModeAsync({interruptionMode: 'doNotMix'});
+    } catch (err: any) {
+      Sentry.logger.error('Audio error: setAudioModeAsync at boot', {
+        error: err?.message ?? String(err),
       });
-      if (!isAVPlaybackStatusSuccess(soundObject.status)) {
-        return Promise.reject(new Error('Audio not not success loaded'));
+      Sentry.captureException(err);
+    }
+    const sources: AudioSource[] = [
+      SOUNDS.BRAVO,
+      SOUNDS.DOMMAGE,
+      SOUNDS.CONGRATULATION,
+      SOUNDS.RETRY,
+      ...Object.values(SOUNDS_COUNT_QUESTION),
+    ];
+    for (const gameType of Object.keys(SOUNDS_QUESTION)) {
+      for (const key of Object.keys(SOUNDS_QUESTION[gameType])) {
+        sources.push(SOUNDS_QUESTION[gameType][key].QUESTION);
+        sources.push(SOUNDS_QUESTION[gameType][key].ANSWER);
       }
-      set({soundObject});
-      soundObject.sound.setOnPlaybackStatusUpdate((status) => {
-        if (isAVPlaybackStatusSuccess(status)) {
+    }
+    await Promise.all(
+      sources.map(async (src) => {
+        if (typeof src !== 'number') return;
+        let filePath: string | null = null;
+        try {
+          filePath = await resolveAssetToFile(src);
+          if (!filePath) return;
+          resolvedUris.set(src, filePath);
+          await preload({uri: filePath});
+        } catch (err: any) {
+          Sentry.logger.error('Audio error: preload asset', {
+            src: String(src),
+            filePath: filePath ?? 'null',
+            error: err?.message ?? String(err),
+          });
+          Sentry.captureException(err);
+        }
+      }),
+    );
+    set({assetsLoaded: true});
+  },
+  play: async (src: AudioSource, callback?: () => void) => {
+    foregroundCallback = callback ?? null;
+    foregroundCallbackFired = false;
+    set({audioLoading: true});
+
+    try {
+      const resolved = resolveSource(src);
+
+      if (!foregroundPlayer) {
+        foregroundPlayer = createAudioPlayer(resolved);
+        set({currentPlayer: foregroundPlayer});
+
+        foregroundPlayer.addListener('playbackStatusUpdate', (status) => {
+          if (status.playing && get().audioLoading) {
+            set({audioLoading: false});
+          }
           if (status.didJustFinish) {
-            soundObject.sound.unloadAsync();
-            set({soundObject: null});
-            if (callback) {
-              callback();
+            if (get().audioLoading) {
+              set({audioLoading: false});
+            }
+            if (!foregroundCallbackFired && foregroundCallback) {
+              foregroundCallbackFired = true;
+              const cb = foregroundCallback;
+              foregroundCallback = null;
+              cb();
             }
           }
-        } else {
-          console.error('Audio error: status', status);
+        });
+      } else {
+        try {
+          foregroundPlayer.pause();
+        } catch {}
+        foregroundPlayer.replace(resolved);
+      }
+
+      setTimeout(() => {
+        if (get().audioLoading) {
+          set({audioLoading: false});
         }
+      }, 2000);
+
+      await foregroundPlayer.seekTo(0);
+      foregroundPlayer.play();
+    } catch (err: any) {
+      Sentry.logger.error('Audio error: play', {
+        error: err?.message ?? String(err),
       });
-    } catch (err) {
-      console.error('Audio error: play', err);
-      set({soundObject: null});
+      Sentry.captureException(err);
+      set({audioLoading: false});
     }
   },
-  playBackground: async (src: AVPlaybackSource) => {
+  replay: async () => {
+    const player = get().currentPlayer;
+    if (!player) return;
+    try {
+      await player.seekTo(0);
+      player.play();
+    } catch (err: any) {
+      Sentry.logger.error('Audio error: replay', {
+        error: err?.message ?? String(err),
+      });
+      Sentry.captureException(err);
+    }
+  },
+  playBackground: async (src: AudioSource) => {
     errorSafe(async () => {
       if (!get().backgroundPlaying) {
-        await Audio.setAudioModeAsync({
-          interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+        await setAudioModeAsync({
+          interruptionMode: 'doNotMix',
         });
-        await soundObjectBackground.unloadAsync();
-        set(() => ({backgroundLoaded: true}));
-        set({backgroundPlaying: true});
-        await soundObjectBackground.loadAsync(src);
-        await soundObjectBackground.setIsLoopingAsync(true);
-        await soundObjectBackground.setVolumeAsync(0.2);
-        await soundObjectBackground.playFromPositionAsync(2000);
+
+        if (backgroundPlayer) {
+          backgroundPlayer.remove();
+        }
+
+        backgroundPlayer = createAudioPlayer(src);
+        backgroundPlayer.loop = true;
+        backgroundPlayer.volume = 0.2;
+
+        set({backgroundLoaded: true, backgroundPlaying: true});
+
+        await backgroundPlayer.seekTo(2);
+        backgroundPlayer.play();
       }
     }, 'Audio error: playBackground');
   },
   pauseBackground: async () => {
     errorSafe(async () => {
-      await soundObjectBackground.pauseAsync();
+      if (backgroundPlayer) {
+        backgroundPlayer.pause();
+      }
       set({backgroundPlaying: false});
     }, 'Audio error: pauseBackground');
   },
   unPauseBackground: async () => {
     errorSafe(async () => {
-      await soundObjectBackground.playAsync();
+      if (backgroundPlayer) {
+        backgroundPlayer.play();
+      }
       set({backgroundPlaying: true});
     }, 'Audio error: unPauseBackground');
   },
 }));
-
-function isAVPlaybackStatusSuccess(
-  src: AVPlaybackStatus,
-): src is AVPlaybackStatusSuccess {
-  return !('error' in src);
-}

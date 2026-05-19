@@ -2,7 +2,7 @@
   "expo": {
     "name": "nolice",
     "slug": "nolice",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -11,9 +11,6 @@
       "resizeMode": "contain",
       "backgroundColor": "#53afd5"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
@@ -21,7 +18,7 @@
       },
       "googleServicesFile": "./google-services.json",
       "package": "com.micriber.nolice",
-      "versionCode": 7
+      "versionCode": 8
     },
     "extra": {
       "eas": {
@@ -44,12 +41,13 @@
         "expo-build-properties",
         {
           "android": {
-            "compileSdkVersion": 35,
-            "targetSdkVersion": 35,
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36,
             "minSdkVersion": 24
           }
         }
-      ]
+      ],
+      "expo-audio"
     ]
   }
 }

@@ -1,5 +1,5 @@
 import {MaterialCommunityIcons} from '@expo/vector-icons';
-import analytics from '@react-native-firebase/analytics';
+import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import React from 'react';
 import {TouchableOpacity} from 'react-native';
 
@@ -21,7 +21,7 @@ export default function SoundButton() {
   return (
     <TouchableOpacity
       onPress={async () => {
-        await analytics().logEvent('sound', {
+        await logEvent(getAnalytics(), 'sound', {
           pause: soundStore.backgroundPlaying ? 'pause' : 'unpause',
         });
         await toggleBackgroundPlaying();

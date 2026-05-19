@@ -1,13 +1,13 @@
 import {RouteProp} from '@react-navigation/core';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {AVPlaybackSource} from 'expo-av';
+import {AudioSource} from 'expo-audio';
 
 import {StackNavigatorParamList} from '../types';
 
 export type QuestionConfig = {
   key: string;
   label: string;
-  sound: AVPlaybackSource;
+  sound: AudioSource;
 };
 
 export type FindGameParams = {
