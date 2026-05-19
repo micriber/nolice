@@ -19,7 +19,7 @@ import {SOUNDS, useSoundStore} from './src/store/audio';
 
 const Stack = createNativeStackNavigator<StackNavigatorParamList>();
 
-SplashScreen.preventAutoHideAsync();
+void SplashScreen.preventAutoHideAsync();
 
 Sentry.init({
   dsn: 'https://570746aa3468ae86a390bdc148e51e52@o919929.ingest.sentry.io/4506847089590272',

@@ -1,25 +1,24 @@
 import React from 'react';
 import {View} from 'react-native';
-// @ts-ignore
 import {RFPercentage} from 'react-native-responsive-fontsize';
 
-// @ts-ignore
+// @ts-expect-error
 import Circle from '../../../assets/svg/shape-circle.svg';
-// @ts-ignore
+// @ts-expect-error
 import Cross from '../../../assets/svg/shape-cross.svg';
-// @ts-ignore
+// @ts-expect-error
 import Heart from '../../../assets/svg/shape-heart.svg';
-// @ts-ignore
+// @ts-expect-error
 import Losange from '../../../assets/svg/shape-losange.svg';
-// @ts-ignore
+// @ts-expect-error
 import Oval from '../../../assets/svg/shape-oval.svg';
-// @ts-ignore
+// @ts-expect-error
 import Rectangle from '../../../assets/svg/shape-rectangle.svg';
-// @ts-ignore
+// @ts-expect-error
 import Square from '../../../assets/svg/shape-square.svg';
-// @ts-ignore
+// @ts-expect-error
 import Star from '../../../assets/svg/shape-star.svg';
-// @ts-ignore
+// @ts-expect-error
 import Triangle from '../../../assets/svg/shape-triangle.svg';
 
 export function ShapeImage({type = 'heart'}) {

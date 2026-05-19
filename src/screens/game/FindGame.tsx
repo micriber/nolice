@@ -27,8 +27,8 @@ export function FindGame() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [choice, setChoice] = useState('choice');
-  const [questionId, setQuestionId] = useState(uuid.v4() as string);
-  const [gameId] = useState(uuid.v4() as string);
+  const [questionId, setQuestionId] = useState(uuid.v4());
+  const [gameId] = useState(uuid.v4());
 
   const maxQuestion = 10;
   const maxAnswer = questionConfig.length - 1;
@@ -49,7 +49,7 @@ export function FindGame() {
   useEffect(() => {
     if (!isLoaded || !configItem || !sound || !possibilitiesValid) return;
     const playAudio = async () => {
-      return await soundStore.play(sound.QUESTION);
+      await soundStore.play(sound.QUESTION);
     };
     playAudio().catch((err: any) => {
       Sentry.logger.error('Audio error: FindGame question play', {
@@ -57,7 +57,7 @@ export function FindGame() {
       });
       Sentry.captureException(err);
     });
-    logEvent(getAnalytics(), 'question', {
+    void logEvent(getAnalytics(), 'question', {
       event_name: 'question',
       question_id: questionId,
       game_id: gameId,
@@ -79,9 +79,10 @@ export function FindGame() {
         onNext={() => {
           if (!store.hasMoreQuestion()) {
             setModalVisible(false);
-            return navigation.navigate('Score', {gameId});
+            navigation.navigate('Score', {gameId});
+            return;
           }
-          setQuestionId(uuid.v4() as string);
+          setQuestionId(uuid.v4());
           store.nextQuestion();
           setModalVisible(false);
         }}
