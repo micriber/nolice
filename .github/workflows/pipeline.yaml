@@ -40,6 +40,9 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
+      # Pin npm: dependency resolution & `audit fix` classification differ
+      # between npm versions. Keep this in sync with the version devs use.
+      - run: npm i -g npm@10.9.3
       - name: Check package-lock.json is in sync with package.json
         run: |
           npm install --package-lock-only
@@ -53,6 +56,9 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
+      # Pin npm: dependency resolution & `audit fix` classification differ
+      # between npm versions. Keep this in sync with the version devs use.
+      - run: npm i -g npm@10.9.3
       - name: Ensure all non-breaking `npm audit fix` patches are applied
         run: |
           npm audit fix --package-lock-only
