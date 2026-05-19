@@ -74,8 +74,8 @@ export function NumberGame({navigation}: Props) {
   const store = useGameScoreStore();
   const soundStore = useSoundStore();
   const [choice, setChoice] = useState('choice');
-  const [questionId, setQuestionId] = useState(uuid.v4() as string);
-  const [gameId] = useState(uuid.v4() as string);
+  const [questionId, setQuestionId] = useState(uuid.v4());
+  const [gameId] = useState(uuid.v4());
 
   const maxQuestion = 10;
   const maxAnswer = 9;
@@ -109,10 +109,10 @@ export function NumberGame({navigation}: Props) {
   useEffect(() => {
     if (!isLoaded || !question || !animalSound) return;
     const playAudio = async () => {
-      return await soundStore.play(animalSound.sound);
+      await soundStore.play(animalSound.sound);
     };
-    playAudio();
-    logEvent(getAnalytics(), 'question', {
+    void playAudio();
+    void logEvent(getAnalytics(), 'question', {
       event_name: 'question',
       question_id: questionId,
       game_id: gameId,
@@ -143,9 +143,10 @@ export function NumberGame({navigation}: Props) {
         onNext={() => {
           if (!store.hasMoreQuestion()) {
             setModalVisible(false);
-            return navigation.navigate('Score', {gameId});
+            navigation.navigate('Score', {gameId});
+            return;
           }
-          setQuestionId(uuid.v4() as string);
+          setQuestionId(uuid.v4());
           store.nextQuestion();
           setModalVisible(false);
         }}

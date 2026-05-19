@@ -9,14 +9,10 @@ module.exports = {
       },
     },
   ],
-  // rules: {
-  //   '@typescript-eslint/no-unused-vars': [
-  //     'warn', // or "error"
-  //     {
-  //       argsIgnorePattern: '^_',
-  //       varsIgnorePattern: '^_',
-  //       caughtErrorsIgnorePattern: '^_',
-  //     },
-  //   ],
-  // },
+  rules: {
+    // `@typescript-eslint/no-floating-promises` wants intentional
+    // fire-and-forget calls marked with `void`; allow that form so the
+    // two rules don't conflict.
+    'no-void': ['warn', {allowAsStatement: true}],
+  },
 };

@@ -3,7 +3,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {StyleSheet, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-// @ts-ignore
+// @ts-expect-error
 import Logo from '../../../assets/svg/logo.svg';
 import MusicButton from '../../components/MusicButton';
 import PrimaryButton from '../../components/PrimaryButton';

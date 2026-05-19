@@ -2,9 +2,9 @@ import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {RFPercentage} from 'react-native-responsive-fontsize';
 
-// @ts-ignore
+// @ts-expect-error
 import ColorLogo from '../../assets/svg/logo-color-game.svg';
-// @ts-ignore
+// @ts-expect-error
 import NumberLogo from '../../assets/svg/logo-number-game.svg';
 import {AnimalImage} from '../screens/game/animal-picture';
 import {ShapeImage} from '../screens/game/shape-picture';

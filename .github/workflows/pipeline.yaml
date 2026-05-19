@@ -73,6 +73,30 @@ jobs:
       - run: npm ci
       - name: Bundle the Android JS (catches broken asset/import resolution)
         run: npx expo export -p android
+  expo-doctor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+      - run: npm ci
+      - name: Validate native config & SDK compatibility
+        run: npx expo-doctor
+  expo-install-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+      - run: npm ci
+      - name: Check dependencies match the Expo SDK versions
+        run: npx expo install --check
   check-all-green:
     if: always()
     needs:
@@ -81,6 +105,8 @@ jobs:
       - lockfile
       - audit
       - bundle
+      - expo-doctor
+      - expo-install-check
     runs-on: ubuntu-22.04
     steps:
       - name: Decide whether the needed jobs succeeded or failed

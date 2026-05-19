@@ -1,27 +1,26 @@
 import React from 'react';
 import {View} from 'react-native';
-// @ts-ignore
 import {RFPercentage} from 'react-native-responsive-fontsize';
 
-// @ts-ignore
+// @ts-expect-error
 import Black from '../../../assets/svg/splash-black.svg';
-// @ts-ignore
+// @ts-expect-error
 import Blue from '../../../assets/svg/splash-blue.svg';
-// @ts-ignore
+// @ts-expect-error
 import Brown from '../../../assets/svg/splash-brown.svg';
-// @ts-ignore
+// @ts-expect-error
 import Green from '../../../assets/svg/splash-green.svg';
-// @ts-ignore
+// @ts-expect-error
 import Grey from '../../../assets/svg/splash-grey.svg';
-// @ts-ignore
+// @ts-expect-error
 import Orange from '../../../assets/svg/splash-orange.svg';
-// @ts-ignore
+// @ts-expect-error
 import Pink from '../../../assets/svg/splash-pink.svg';
-// @ts-ignore
+// @ts-expect-error
 import Purple from '../../../assets/svg/splash-purple.svg';
-// @ts-ignore
+// @ts-expect-error
 import Red from '../../../assets/svg/splash-red.svg';
-// @ts-ignore
+// @ts-expect-error
 import Yellow from '../../../assets/svg/splash-yellow.svg';
 
 export function ColorImage({type = 'red'}) {

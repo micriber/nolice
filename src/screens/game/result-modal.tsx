@@ -50,7 +50,9 @@ export function ResultModal(props: Props) {
     });
 
     const soundCallback = async () => {
-      await soundStore.play(props.sound, async () => setSoundFinished(true));
+      await soundStore.play(props.sound, async () => {
+        setSoundFinished(true);
+      });
     };
     if (props.success) {
       await soundStore.play(SOUNDS.BRAVO, soundCallback);
@@ -98,7 +100,7 @@ export function ResultModal(props: Props) {
       visible={props.visible}
       onShow={onShow}
       onRequestClose={() => {
-        props.onClose && props.onClose();
+        props.onClose?.();
       }}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>

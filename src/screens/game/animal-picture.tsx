@@ -1,23 +1,22 @@
 import React from 'react';
 import {View} from 'react-native';
-// @ts-ignore
 import {RFPercentage} from 'react-native-responsive-fontsize';
 
-// @ts-ignore
+// @ts-expect-error
 import Bird from '../../../assets/svg/bird.svg';
-// @ts-ignore
+// @ts-expect-error
 import Cat from '../../../assets/svg/cat.svg';
-// @ts-ignore
+// @ts-expect-error
 import Cow from '../../../assets/svg/cow.svg';
-// @ts-ignore
+// @ts-expect-error
 import Dog from '../../../assets/svg/dog.svg';
-// @ts-ignore
+// @ts-expect-error
 import Duck from '../../../assets/svg/duck.svg';
-// @ts-ignore
+// @ts-expect-error
 import Pig from '../../../assets/svg/pig.svg';
-// @ts-ignore
+// @ts-expect-error
 import Rabbit from '../../../assets/svg/rabbit.svg';
-// @ts-ignore
+// @ts-expect-error
 import Sheep from '../../../assets/svg/sheep.svg';
 
 export function AnimalImage({type = 'duck'}) {
