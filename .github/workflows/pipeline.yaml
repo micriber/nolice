@@ -31,11 +31,52 @@ jobs:
       - run: npm ci
       - name: Lint
         run: npm run ts:check
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Check package-lock.json is in sync with package.json
+        run: |
+          npm install --package-lock-only
+          git diff --exit-code package-lock.json
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Ensure all non-breaking `npm audit fix` patches are applied
+        run: |
+          npm audit fix --package-lock-only
+          git diff --exit-code package-lock.json
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - name: Bundle the Android JS (catches broken asset/import resolution)
+        run: npx expo export -p android
   check-all-green:
     if: always()
     needs:
       - lint
       - typescript
+      - lockfile
+      - audit
+      - bundle
     runs-on: ubuntu-22.04
     steps:
       - name: Decide whether the needed jobs succeeded or failed
