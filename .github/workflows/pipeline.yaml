@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 20.x
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
       - run: npm ci
       - name: Lint
@@ -23,19 +23,64 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 20
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
       - run: npm ci
       - name: Lint
         run: npm run ts:check
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+      - name: Check package-lock.json is in sync with package.json
+        run: |
+          npm install --package-lock-only
+          git diff --exit-code package-lock.json
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+      - name: Ensure all non-breaking `npm audit fix` patches are applied
+        run: |
+          # `npm audit fix` exits non-zero whenever ANY vulnerability
+          # remains (e.g. the --force-only ones), even if it changed
+          # nothing. We only care whether it modified the lock, so
+          # ignore its exit code and let `git diff` be the real gate.
+          npm audit fix --package-lock-only || true
+          git diff --exit-code package-lock.json
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+      - run: npm ci
+      - name: Bundle the Android JS (catches broken asset/import resolution)
+        run: npx expo export -p android
   check-all-green:
     if: always()
     needs:
       - lint
       - typescript
+      - lockfile
+      - audit
+      - bundle
     runs-on: ubuntu-22.04
     steps:
       - name: Decide whether the needed jobs succeeded or failed
