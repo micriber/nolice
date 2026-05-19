@@ -114,10 +114,7 @@ export function ResultModal(props: Props) {
             adjustsFontSizeToFit>
             {props.success ? 'BRAVO !' : 'FAUX !'}
           </Text>
-          <Text
-            style={styles.modalText}
-            numberOfLines={1}
-            adjustsFontSizeToFit>
+          <Text style={styles.modalText} numberOfLines={1} adjustsFontSizeToFit>
             La bonne réponse
           </Text>
           {content ?? <></>}

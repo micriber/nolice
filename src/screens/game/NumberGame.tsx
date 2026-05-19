@@ -133,7 +133,7 @@ export function NumberGame({navigation}: Props) {
         <AnimalImage key={i} type={animal} />
       ))
     : [];
-  const {label, sound} = animalSound;
+  const {label} = animalSound;
   const questionLabel = `Combien comptes-tu ${label} ?`;
 
   return (
