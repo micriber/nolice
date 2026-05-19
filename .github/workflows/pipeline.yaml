@@ -61,7 +61,11 @@ jobs:
       - run: npm i -g npm@10.9.3
       - name: Ensure all non-breaking `npm audit fix` patches are applied
         run: |
-          npm audit fix --package-lock-only
+          # `npm audit fix` exits non-zero whenever ANY vulnerability
+          # remains (e.g. the --force-only ones), even if it changed
+          # nothing. We only care whether it modified the lock, so
+          # ignore its exit code and let `git diff` be the real gate.
+          npm audit fix --package-lock-only || true
           git diff --exit-code package-lock.json
   bundle:
     runs-on: ubuntu-latest
