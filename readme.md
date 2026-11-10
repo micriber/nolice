@@ -1,5 +1,35 @@
 # NOLICE
 
+## Idées d’évolution — Nolice – Maternelle
+
+L’objectif à terme est de proposer six jeux sous le nom **Nolice – Maternelle**. Aux quatre jeux actuels (nombres, animaux, couleurs et formes) s’ajouterait un jeu de lettres : « Trouve la lettre A », avec quatre choix comme A, S, L et F, en commençant par les majuscules.
+
+Les deux pistes suivantes sont à explorer pour le sixième jeu ; le choix reste ouvert.
+
+### Les suites
+
+L’enfant observe une suite d’animaux ou de formes et choisit l’image qui vient après parmi quatre propositions. Consigne orale : « Qu’est-ce qui vient après ? »
+
+Exemple : chat, chien, chat, chien, **?** → chat.
+
+Progression possible :
+
+- Deux éléments en alternance : chat, chien, chat, chien…
+- Trois éléments : rond, carré, triangle, rond, carré…
+- Un motif avec répétition : chat, chat, chien, chat, chat…
+
+Afficher suffisamment de répétitions pour rendre le motif identifiable. Le jeu doit pouvoir se jouer sans savoir lire et pourrait réutiliser les illustrations existantes.
+
+### Les tailles
+
+L’enfant compare plusieurs représentations du même animal ou objet à différentes tailles et touche celle qui répond à la consigne : « Trouve le plus grand » ou « Trouve le plus petit ».
+
+Exemple : quatre lapins de tailles différentes → toucher le plus petit.
+
+Conserver la même illustration pour que seule la taille varie, avec des écarts bien visibles et une seule bonne réponse. Une progression possible serait de commencer avec deux choix, puis d’en proposer trois ou quatre.
+
+Une version **Nolice – Élémentaire** est également envisagée ensuite, avec des jeux adaptés à ce niveau ; les premières pistes sont un jeu de calcul et un jeu où il faut deviner des mots.
+
 ### Requirements
 
 Make sure you have the following installed:
