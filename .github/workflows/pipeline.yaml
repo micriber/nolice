@@ -31,6 +31,18 @@ jobs:
       - run: npm ci
       - name: Lint
         run: npm run ts:check
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+      - run: npm ci
+      - name: Unit tests
+        run: npm test
   lockfile:
     runs-on: ubuntu-latest
     steps:
@@ -102,6 +114,7 @@ jobs:
     needs:
       - lint
       - typescript
+      - test
       - lockfile
       - audit
       - bundle
