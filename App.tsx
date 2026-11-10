@@ -1,4 +1,9 @@
-import {TitilliumWeb_700Bold, useFonts} from '@expo-google-fonts/titillium-web';
+import {Fredoka_600SemiBold, Fredoka_700Bold} from '@expo-google-fonts/fredoka';
+import {
+  Nunito_700Bold,
+  Nunito_800ExtraBold,
+  useFonts,
+} from '@expo-google-fonts/nunito';
 import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {
   NavigationContainer,
@@ -12,10 +17,12 @@ import React, {useCallback, useEffect} from 'react';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 import {NumberGame, FindGame} from './src/screens/game';
-import {MainMenu, GameSelectionMenu} from './src/screens/menu';
+import {Home} from './src/screens/home';
 import ScoreScreen from './src/screens/score';
+import SettingsScreen from './src/screens/settings';
 import {StackNavigatorParamList} from './src/screens/types';
-import {SOUNDS, useSoundStore} from './src/store/audio';
+import {MUSIC_TRACKS, useSoundStore} from './src/store/audio';
+import {useSettingsStore} from './src/store/settings';
 
 const Stack = createNativeStackNavigator<StackNavigatorParamList>();
 
@@ -35,18 +42,28 @@ function App() {
   const navigationRef = useNavigationContainerRef<StackNavigatorParamList>();
 
   const [fontsLoaded] = useFonts({
-    TitilliumWeb_700Bold,
+    Fredoka_600SemiBold,
+    Fredoka_700Bold,
+    Nunito_700Bold,
+    Nunito_800ExtraBold,
   });
 
-  const soundStore = useSoundStore();
+  const playBackground = useSoundStore((s) => s.playBackground);
+  const preloadAllAssets = useSoundStore((s) => s.preloadAllAssets);
+  const backgroundLoaded = useSoundStore((s) => s.backgroundLoaded);
+  const assetsLoaded = useSoundStore((s) => s.assetsLoaded);
+  const musicTrack = useSettingsStore((state) => state.musicTrack);
   useEffect(() => {
-    soundStore.playBackground(SOUNDS.MUSIC).catch((err: any) => {
+    playBackground(MUSIC_TRACKS[musicTrack]).catch((err: any) => {
       Sentry.logger.error('Audio error: background music init', {
         error: err?.message ?? String(err),
       });
       Sentry.captureException(err);
     });
-    soundStore.preloadAllAssets().catch((err: any) => {
+  }, [musicTrack]);
+
+  useEffect(() => {
+    preloadAllAssets().catch((err: any) => {
       Sentry.logger.error('Audio error: preload all assets', {
         error: err?.message ?? String(err),
       });
@@ -55,16 +72,12 @@ function App() {
   }, []);
 
   const onReady = useCallback(async () => {
-    if (fontsLoaded && soundStore.backgroundLoaded && soundStore.assetsLoaded) {
+    if (fontsLoaded && backgroundLoaded && assetsLoaded) {
       await SplashScreen.hideAsync();
     }
-  }, [soundStore.backgroundLoaded, soundStore.assetsLoaded, fontsLoaded]);
+  }, [backgroundLoaded, assetsLoaded, fontsLoaded]);
 
-  if (
-    !fontsLoaded ||
-    !soundStore.backgroundLoaded ||
-    !soundStore.assetsLoaded
-  ) {
+  if (!fontsLoaded || !backgroundLoaded || !assetsLoaded) {
     return null;
   }
 
@@ -90,18 +103,18 @@ function App() {
         }}
         ref={navigationRef}>
         <Stack.Navigator
-          initialRouteName="MainMenu"
+          initialRouteName="Home"
           screenOptions={{
             headerShown: false,
           }}>
           <Stack.Screen
-            name="MainMenu"
-            component={MainMenu}
+            name="Home"
+            component={Home}
             options={{animation: 'fade'}}
           />
           <Stack.Screen
-            name="GameSelectionMenu"
-            component={GameSelectionMenu}
+            name="Settings"
+            component={SettingsScreen}
             options={{animation: 'fade'}}
           />
           <Stack.Screen
@@ -121,7 +134,7 @@ function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
-      <StatusBar />
+      <StatusBar style="dark" />
     </SafeAreaProvider>
   );
 }

@@ -1,5 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <defs/>
-  <rect x="25" y="50" width="150" height="100" style="stroke: rgba(0, 0, 0, 0); fill: rgb(191, 0, 0);"/>
+  <defs>
+    <linearGradient id="rectangleFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#62BCE0"/>
+      <stop offset="1" stop-color="#33A8D6"/>
+    </linearGradient>
+  </defs>
+  <rect x="20" y="49" width="160" height="102" rx="5" fill="url(#rectangleFill)" stroke="#1B8CBE" stroke-width="3" stroke-linejoin="round"/>
 </svg>

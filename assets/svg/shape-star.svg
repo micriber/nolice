@@ -1,5 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <defs/>
-  <path d="M 100 10 L 118.541 75.432 L 175 76.844 L 130 118.695 L 146.353 185 L 100 145.432 L 53.647 185 L 70 118.695 L 25 76.844 L 81.459 75.432 L 100 10 Z" style="stroke: rgba(0, 0, 0, 0); fill: rgb(237, 103, 0);"/>
+  <defs>
+    <linearGradient id="starFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFC565"/>
+      <stop offset="1" stop-color="#FFB23E"/>
+    </linearGradient>
+  </defs>
+  <path d="M 100 18 L 123 70 L 180 76 L 137 115 L 149 172 L 100 143 L 51 172 L 63 115 L 20 76 L 77 70 Z" fill="url(#starFill)" stroke="#F09019" stroke-width="3" stroke-linejoin="round"/>
 </svg>

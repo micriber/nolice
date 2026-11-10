@@ -1,5 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <defs/>
-  <path d="M 100 25 L 175 175 L 25 175 L 100 25 Z" style="stroke: rgba(0, 0, 0, 0); fill: rgb(209, 204, 0);"/>
+  <defs>
+    <linearGradient id="triangleFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#65D6A4"/>
+      <stop offset="1" stop-color="#37C98B"/>
+    </linearGradient>
+  </defs>
+  <path d="M 100 24 L 181 166 L 19 166 Z" fill="url(#triangleFill)" stroke="#1FA86F" stroke-width="3" stroke-linejoin="round"/>
 </svg>

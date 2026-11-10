@@ -1,62 +1,47 @@
 import React from 'react';
-import {View} from 'react-native';
-import {RFPercentage} from 'react-native-responsive-fontsize';
+import {Image, ImageSourcePropType} from 'react-native';
 
-// @ts-expect-error
-import Bird from '../../../assets/svg/bird.svg';
-// @ts-expect-error
-import Cat from '../../../assets/svg/cat.svg';
-// @ts-expect-error
-import Cow from '../../../assets/svg/cow.svg';
-// @ts-expect-error
-import Dog from '../../../assets/svg/dog.svg';
-// @ts-expect-error
-import Duck from '../../../assets/svg/duck.svg';
-// @ts-expect-error
-import Pig from '../../../assets/svg/pig.svg';
-// @ts-expect-error
-import Rabbit from '../../../assets/svg/rabbit.svg';
-// @ts-expect-error
-import Sheep from '../../../assets/svg/sheep.svg';
+function rasterAnimal(source: ImageSourcePropType) {
+  return function Animal({width, height}: {width: number; height: number}) {
+    return (
+      <Image
+        source={source}
+        style={{width, height}}
+        resizeMode="contain"
+        fadeDuration={0}
+      />
+    );
+  };
+}
 
-export function AnimalImage({type = 'duck'}) {
-  let animal;
-  switch (type) {
-    case 'duck':
-      animal = <Duck />;
-      break;
-    case 'rabbit':
-      animal = <Rabbit />;
-      break;
-    case 'dog':
-      animal = <Dog />;
-      break;
-    case 'pig':
-      animal = <Pig />;
-      break;
-    case 'cow':
-      animal = <Cow />;
-      break;
-    case 'cat':
-      animal = <Cat />;
-      break;
-    case 'bird':
-      animal = <Bird />;
-      break;
-    case 'sheep':
-      animal = <Sheep />;
-      break;
-  }
-  return (
-    <View
-      style={[
-        {
-          height: RFPercentage(13),
-          width: RFPercentage(10),
-          flexGrow: 1,
-        },
-      ]}>
-      {animal}
-    </View>
-  );
+const Dog = rasterAnimal(require('../../../assets/animals/dog.png'));
+const Rabbit = rasterAnimal(require('../../../assets/animals/rabbit.png'));
+const Pig = rasterAnimal(require('../../../assets/animals/pig.png'));
+const Cow = rasterAnimal(require('../../../assets/animals/cow.png'));
+const Bird = rasterAnimal(require('../../../assets/animals/bird.png'));
+const Cat = rasterAnimal(require('../../../assets/animals/cat.png'));
+const Duck = rasterAnimal(require('../../../assets/animals/duck.png'));
+const Sheep = rasterAnimal(require('../../../assets/animals/sheep.png'));
+
+export const ANIMALS: {[key: string]: React.ComponentType<any>} = {
+  duck: Duck,
+  rabbit: Rabbit,
+  dog: Dog,
+  pig: Pig,
+  cow: Cow,
+  cat: Cat,
+  bird: Bird,
+  sheep: Sheep,
+};
+
+export function AnimalImage({
+  type = 'duck',
+  size,
+}: {
+  type?: string;
+  size: number;
+}) {
+  const Animal = ANIMALS[type];
+  if (!Animal) return null;
+  return <Animal width={size} height={size} />;
 }

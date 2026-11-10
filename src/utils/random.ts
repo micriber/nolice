@@ -1,3 +1,5 @@
+import {shuffle} from './array';
+
 export function getRandomInt(max: number) {
   // On ajoute +1 parce que le max, n'est pas le max
   // maintenant le max est le vrai.
@@ -10,17 +12,10 @@ export function getRandomRangeIntUnique(
   max: number,
   quantity: number,
   exclude: number,
-) {
-  if (quantity > max - min + 1 || max < min) {
-    return null;
+): number[] {
+  const candidates: number[] = [];
+  for (let value = min; value <= max; value++) {
+    if (value !== exclude) candidates.push(value);
   }
-  const randomIntList: number[] = [];
-  while (randomIntList.length < quantity) {
-    const randomInt = Math.floor(Math.random() * (max - min + 1)) + min;
-    if (!randomIntList.includes(randomInt) && randomInt !== exclude) {
-      randomIntList.push(randomInt);
-    }
-  }
-
-  return randomIntList;
+  return shuffle(candidates).slice(0, quantity);
 }

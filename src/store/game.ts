@@ -1,7 +1,7 @@
 import {create} from 'zustand';
 
 import {shuffle} from '../utils/array';
-import {getRandomInt, getRandomRangeIntUnique} from '../utils/random';
+import {getRandomRangeIntUnique} from '../utils/random';
 
 export type Possibility = {
   value: number;
@@ -15,10 +15,18 @@ export type Question = {
 };
 
 // Made with hate by @bersiroth
-function newQuestion(answer: number, maxAnswer: number): Question {
-  const range = Math.max(Math.floor(maxAnswer / 3), 3);
+function newQuestion(
+  answer: number,
+  minAnswer: number,
+  maxAnswer: number,
+  closeChoices: boolean,
+): Question {
+  const answerCount = maxAnswer - minAnswer + 1;
+  const range = closeChoices
+    ? Math.max(Math.floor(answerCount / 3), 3)
+    : answerCount;
   const randomRange = getRandomRangeIntUnique(
-    Math.max(answer - range, 1),
+    Math.max(answer - range, minAnswer),
     Math.min(answer + range, maxAnswer),
     3,
     answer,
@@ -26,7 +34,7 @@ function newQuestion(answer: number, maxAnswer: number): Question {
 
   const possibilities: Possibility[] = [
     {value: answer, isGood: true},
-    ...(randomRange?.map((value) => ({value, isGood: false})) ?? []),
+    ...randomRange.map((value) => ({value, isGood: false})),
   ];
 
   return {
@@ -39,7 +47,13 @@ function newQuestion(answer: number, maxAnswer: number): Question {
 interface GameScoreState {
   currentIndex: number;
   questions: Question[];
-  init: (maxQuestion: number, maxAnswer: number) => void;
+  init: (
+    maxQuestion: number,
+    maxAnswer: number,
+    minAnswer: number,
+    closeChoices: boolean,
+  ) => void;
+  answer: (isGood: boolean) => void;
   nextQuestion: () => void;
   hasMoreQuestion: () => boolean;
   getResults: () => number;
@@ -48,19 +62,33 @@ interface GameScoreState {
 export const useGameScoreStore = create<GameScoreState>((set, get) => ({
   currentIndex: 0,
   questions: [],
-  init: (maxQuestion: number = 10, maxAnswer: number = 9) => {
-    let questions: Question[] = [];
-    for (let i = 0; questions.length < maxQuestion; i++) {
-      let answer = 0;
-      answer = i >= maxAnswer ? getRandomInt(maxAnswer - 1) : i + 1;
-      questions.push(newQuestion(answer, maxAnswer));
+  init: (maxQuestion, maxAnswer, minAnswer, closeChoices) => {
+    const answerCount = maxAnswer - minAnswer + 1;
+    const questions: Question[] = [];
+    let round: number[] = [];
+    for (let i = 0; i < maxQuestion && answerCount > 0; i++) {
+      // Par tours complets : toutes les réponses sortent avant qu'une seule ne revienne.
+      if (round.length === 0) {
+        round = shuffle(
+          Array.from({length: answerCount}, (_, n) => minAnswer + n),
+        );
+        // La réponse qui ferme un tour ne doit pas ouvrir le suivant.
+        if (round[round.length - 1] === questions[i - 1]?.answer) {
+          round.reverse();
+        }
+      }
+      const answer = round.pop()!;
+      questions.push(newQuestion(answer, minAnswer, maxAnswer, closeChoices));
     }
 
-    do {
-      questions = shuffle(questions);
-    } while (questions.some((v, i, a) => v.answer === a[i + 1]?.answer));
-
     set(() => ({questions, currentIndex: 0}));
+  },
+  answer: (isGood) => {
+    set((state) => ({
+      questions: state.questions.map((question, i) =>
+        i === state.currentIndex ? {...question, success: isGood} : question,
+      ),
+    }));
   },
   nextQuestion: () => {
     set((state) => {

@@ -1,38 +1,27 @@
 import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {AudioSource} from 'expo-audio';
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import {RFPercentage} from 'react-native-responsive-fontsize';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {StyleSheet, View} from 'react-native';
 import uuid from 'react-native-uuid';
 
-import ChoiceButton from './ChoiceButton';
+import GameHeader from './GameHeader';
+import Tile from './Tile';
 import {AnimalImage} from './animal-picture';
-import {ResultModal} from './result-modal';
-import InstructionButton from '../../components/InstructionButton';
-import MusicButton from '../../components/MusicButton';
+import {ResultSheet} from './result-sheet';
+import Confetti from '../../components/Confetti';
+import Screen from '../../components/Screen';
 import {SOUNDS_COUNT_QUESTION, useSoundStore} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
+import {useSettingsStore} from '../../store/settings';
 import {shuffle} from '../../utils/array';
-import COLORS from '../../utils/color';
-import FONT from '../../utils/font';
+import {gameConfig, shade} from '../../utils/color';
 import {getRandomInt} from '../../utils/random';
+import {useScale} from '../../utils/scale';
+import {NavigationProp} from '../types';
 
 type Props = {
-  navigation: NativeStackNavigationProp<any>;
+  navigation: NavigationProp;
 };
-
-enum Animal {
-  duck,
-  rabbit,
-  dog,
-  pig,
-  cow,
-  cat,
-  bird,
-  sheep,
-}
 
 type AnimalSoundMap = {
   [animal: string]: {
@@ -52,6 +41,8 @@ const animalSoundMap: AnimalSoundMap = {
   sheep: {label: 'de moutons', sound: SOUNDS_COUNT_QUESTION.SHEEP},
 };
 
+const animalNames = Object.keys(animalSoundMap);
+
 export interface SoundCountType {
   [key: string]: AudioSource;
 }
@@ -67,27 +58,61 @@ const responseSoundMap: SoundCountType = {
   9: SOUNDS_COUNT_QUESTION.NINE,
 };
 
+const game = gameConfig('number');
+
+// Carte blanche avec les animaux à compter, taille adaptée au nombre.
+function CountField({count, animal}: {count: number; animal: string}) {
+  const scale = useScale();
+  const size =
+    (count <= 3 ? 96 : count <= 4 ? 84 : count <= 6 ? 70 : 56) * scale;
+  return (
+    <View
+      style={[
+        styles.countField,
+        {
+          minHeight: 190 * scale,
+          gap: 8 * scale,
+          paddingVertical: 18 * scale,
+          paddingHorizontal: 16 * scale,
+        },
+      ]}>
+      <View
+        style={[
+          styles.countGlow,
+          {
+            backgroundColor: shade(game.color, 0.4),
+            height: 100 * scale,
+            bottom: -34 * scale,
+          },
+        ]}
+      />
+      {Array.from({length: count}).map((_, i) => (
+        <AnimalImage key={i} type={animal} size={size} />
+      ))}
+    </View>
+  );
+}
+
 export function NumberGame({navigation}: Props) {
-  const [modalVisible, setModalVisible] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [animals, setAnimals] = useState(['duck']);
   const store = useGameScoreStore();
-  const soundStore = useSoundStore();
-  const [choice, setChoice] = useState('choice');
+  const playSound = useSoundStore((s) => s.play);
+  const stopSound = useSoundStore((s) => s.stop);
+  const audioLoading = useSoundStore((s) => s.audioLoading);
+  const decor = useSettingsStore((s) => s.decor);
+  const scale = useScale();
+  const [picked, setPicked] = useState<number | null>(null);
   const [questionId, setQuestionId] = useState(uuid.v4());
   const [gameId] = useState(uuid.v4());
 
   const maxQuestion = 10;
   const maxAnswer = 9;
-  const nbAnimals = Object.keys(Animal).length / 2;
 
   function generateAnimals() {
-    let animals: string[] = [];
-    for (let i = 0; animals.length < maxQuestion; i++) {
-      if (i === nbAnimals) {
-        i = getRandomInt(nbAnimals - 1);
-      }
-      animals.push(Animal[i]);
+    let animals = [...animalNames];
+    while (animals.length < maxQuestion) {
+      animals.push(animalNames[getRandomInt(animalNames.length) - 1]);
     }
     do {
       animals = shuffle(animals);
@@ -96,9 +121,12 @@ export function NumberGame({navigation}: Props) {
   }
 
   useEffect(() => {
-    store.init(maxQuestion, maxAnswer);
+    store.init(maxQuestion, maxAnswer, 1, true);
     generateAnimals();
     setIsLoaded(true);
+    return () => {
+      stopSound();
+    };
   }, []);
 
   const question = store.questions[store.currentIndex];
@@ -109,7 +137,7 @@ export function NumberGame({navigation}: Props) {
   useEffect(() => {
     if (!isLoaded || !question || !animalSound) return;
     const playAudio = async () => {
-      await soundStore.play(animalSound.sound);
+      await playSound(animalSound.sound);
     };
     void playAudio();
     void logEvent(getAnalytics(), 'question', {
@@ -128,138 +156,115 @@ export function NumberGame({navigation}: Props) {
 
   if (!isLoaded || !question || !animalSound) return <></>;
 
-  const animalsElements = answer
-    ? Array.from({length: answer}, (_, i) => (
-        <AnimalImage key={i} type={animal} />
-      ))
-    : [];
-  const {label} = animalSound;
-  const questionLabel = `Combien comptes-tu ${label} ?`;
+  const answered = picked !== null;
+  const correct = answered && question.success;
+  const results = store.questions.map((q, i) =>
+    i < store.currentIndex || (i === store.currentIndex && answered)
+      ? q.success
+      : undefined,
+  );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ResultModal
+    <Screen tint={game.color} scene={decor}>
+      <GameHeader
+        game={game}
+        total={maxQuestion}
+        results={results}
+        current={store.currentIndex}
+        replayDisabled={answered}
+        prompt={`Combien ${animalSound.label} ?`}
+        promptSize={22}
+        onHome={() => {
+          navigation.popTo('Home');
+        }}
+      />
+      <View
+        style={[
+          styles.content,
+          {gap: 22 * scale},
+          answered && {paddingBottom: 210 * scale},
+        ]}>
+        <CountField count={answer} animal={animal} />
+        <View style={[styles.choices, {gap: 12 * scale}]}>
+          {question?.possibilities?.map((possibility) => (
+            <View key={possibility.value} style={styles.choiceCell}>
+              <Tile
+                type="number"
+                value={possibility.value.toString()}
+                deepColor={game.deep}
+                contentSize={40 * scale}
+                state={
+                  !answered
+                    ? 'idle'
+                    : possibility.isGood
+                      ? 'right'
+                      : possibility.value === picked
+                        ? 'wrong'
+                        : 'dim'
+                }
+                disabled={answered || audioLoading}
+                onPress={() => {
+                  store.answer(possibility.isGood);
+                  setPicked(possibility.value);
+                }}
+              />
+            </View>
+          ))}
+        </View>
+      </View>
+      {correct && <Confetti />}
+      <ResultSheet
+        visible={answered}
+        success={question.success}
+        answerLabel={answer.toString()}
+        last={!store.hasMoreQuestion()}
+        sound={responseSoundMap[answer]}
+        choice={picked?.toString()}
         answer={answer.toString()}
+        questionId={questionId}
+        gameId={gameId}
         onNext={() => {
           if (!store.hasMoreQuestion()) {
-            setModalVisible(false);
-            navigation.navigate('Score', {gameId});
+            navigation.replace('Score', {gameId, gameType: 'number'});
             return;
           }
           setQuestionId(uuid.v4());
           store.nextQuestion();
-          setModalVisible(false);
+          setPicked(null);
         }}
-        success={question.success}
-        visible={modalVisible}
-        questionId={questionId}
-        gameId={gameId}
-        sound={responseSoundMap[answer]}
-        choice={choice}
       />
-      <View style={[styles.header]}>
-        <View
-          style={[
-            {
-              flex: 1.5,
-              flexDirection: 'row',
-            },
-          ]}>
-          <Text
-            style={{
-              fontSize: RFPercentage(4),
-              fontFamily: FONT.FAMILY,
-              color: COLORS.FONT.BASE,
-              flex: 3,
-            }}
-            numberOfLines={1}
-            adjustsFontSizeToFit>
-            Question {store.currentIndex + 1} sur {maxQuestion}
-          </Text>
-        </View>
-        <View
-          style={[
-            {
-              alignContent: 'center',
-              justifyContent: 'center',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              flex: 8,
-            },
-          ]}>
-          {animalsElements}
-        </View>
-      </View>
-      <View style={styles.body}>
-        <View
-          style={[
-            {
-              flex: 1,
-              marginBottom: '5%',
-            },
-          ]}>
-          <Text
-            style={{
-              fontSize: RFPercentage(4),
-              fontFamily: FONT.FAMILY,
-              color: COLORS.FONT.BASE,
-              textAlign: 'center',
-            }}>
-            {questionLabel}
-          </Text>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignContent: 'center',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            flex: 3.5,
-            gap: 20,
-            marginTop: -20,
-          }}>
-          {question?.possibilities?.map((possibility) => (
-            <ChoiceButton
-              type="number"
-              key={possibility.value}
-              value={possibility.value.toString()}
-              disabled={soundStore.audioLoading}
-              onPress={() => {
-                question.success = possibility.isGood;
-                setChoice(possibility.value.toString());
-                setModalVisible(true);
-              }}
-            />
-          ))}
-        </View>
-      </View>
-      <View style={[styles.footer]}>
-        <InstructionButton />
-        <MusicButton />
-      </View>
-    </SafeAreaView>
+    </Screen>
   );
 }
+
 const styles = StyleSheet.create({
-  container: {
+  content: {
     flex: 1,
-    backgroundColor: COLORS.BACKGROUND,
+    justifyContent: 'center',
     paddingHorizontal: 20,
-    justifyContent: 'center',
-    flexDirection: 'column',
   },
-  header: {
-    flex: 1,
-  },
-  body: {
-    flex: 1.1,
-    justifyContent: 'center',
-  },
-  footer: {
+  countField: {
+    borderRadius: 32,
+    backgroundColor: '#fff',
+    overflow: 'hidden',
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
     justifyContent: 'center',
-    gap: 100,
-    flex: 0.2,
-    marginTop: -20,
+    alignContent: 'center',
+    elevation: 6,
+  },
+  countGlow: {
+    position: 'absolute',
+    left: -12,
+    right: -12,
+    borderRadius: 100,
+    opacity: 0.25,
+  },
+  choices: {
+    flexDirection: 'row',
+  },
+  choiceCell: {
+    flex: 1,
   },
 });

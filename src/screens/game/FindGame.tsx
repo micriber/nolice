@@ -2,40 +2,47 @@ import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {useNavigation, useRoute} from '@react-navigation/core';
 import * as Sentry from '@sentry/react-native';
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import {RFPercentage} from 'react-native-responsive-fontsize';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {StyleSheet, View} from 'react-native';
 import uuid from 'react-native-uuid';
 
-import ChoiceButton from './ChoiceButton';
-import {ResultModal} from './result-modal';
-import InstructionButton from '../../components/InstructionButton';
-import MusicButton from '../../components/MusicButton';
+import GameHeader from './GameHeader';
+import Tile from './Tile';
+import {COLOR_HEX} from './color-picture';
+import {ResultSheet} from './result-sheet';
+import Confetti from '../../components/Confetti';
+import Screen from '../../components/Screen';
 import {useSoundStore, SOUNDS_QUESTION} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
-import COLORS from '../../utils/color';
-import FONT from '../../utils/font';
-import {FindGameScreenRouteProp} from '../menu/types';
-import {NavigationProp} from '../types';
+import {useSettingsStore} from '../../store/settings';
+import {gameConfig} from '../../utils/color';
+import {useScale} from '../../utils/scale';
+import {FindGameScreenRouteProp, NavigationProp} from '../types';
 
 export function FindGame() {
   const route = useRoute<FindGameScreenRouteProp>();
   const navigation = useNavigation<NavigationProp>();
   const {questionConfig, gameType} = route.params;
   const store = useGameScoreStore();
-  const soundStore = useSoundStore();
+  const playSound = useSoundStore((s) => s.play);
+  const stopSound = useSoundStore((s) => s.stop);
+  const audioLoading = useSoundStore((s) => s.audioLoading);
+  const decor = useSettingsStore((s) => s.decor);
+  const scale = useScale();
   const [isLoaded, setIsLoaded] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [choice, setChoice] = useState('choice');
+  const [picked, setPicked] = useState<number | null>(null);
   const [questionId, setQuestionId] = useState(uuid.v4());
   const [gameId] = useState(uuid.v4());
 
+  const game = gameConfig(gameType);
   const maxQuestion = 10;
   const maxAnswer = questionConfig.length - 1;
 
   useEffect(() => {
-    store.init(maxQuestion, maxAnswer);
+    store.init(maxQuestion, maxAnswer, 0, false);
     setIsLoaded(true);
+    return () => {
+      stopSound();
+    };
   }, []);
 
   const question = store.questions[store.currentIndex];
@@ -49,7 +56,7 @@ export function FindGame() {
   useEffect(() => {
     if (!isLoaded || !configItem || !sound || !possibilitiesValid) return;
     const playAudio = async () => {
-      await soundStore.play(sound.QUESTION);
+      await playSound(sound.QUESTION);
     };
     playAudio().catch((err: any) => {
       Sentry.logger.error('Audio error: FindGame question play', {
@@ -73,130 +80,93 @@ export function FindGame() {
   if (!isLoaded || !configItem || !sound || !possibilitiesValid) return <></>;
   const {label, key} = configItem;
 
+  const answered = picked !== null;
+  const correct = answered && question.success;
+  const results = store.questions.map((q, i) =>
+    i < store.currentIndex || (i === store.currentIndex && answered)
+      ? q.success
+      : undefined,
+  );
+
   return (
-    <SafeAreaView style={styles.container}>
-      <ResultModal
+    <Screen tint={game.color} scene={decor}>
+      <GameHeader
+        game={game}
+        total={maxQuestion}
+        results={results}
+        current={store.currentIndex}
+        replayDisabled={answered}
+        prompt={`Trouve ${label}`}
+        onHome={() => {
+          navigation.popTo('Home');
+        }}
+      />
+      <View style={[styles.content, answered && {paddingBottom: 210 * scale}]}>
+        <View style={[styles.choices, {gap: 16 * scale}]}>
+          {question?.possibilities?.map((possibility) => (
+            <View key={possibility.value} style={styles.choiceCell}>
+              <Tile
+                type={gameType}
+                value={questionConfig[possibility.value].key}
+                deepColor={game.deep}
+                contentSize={96 * scale}
+                state={
+                  !answered
+                    ? 'idle'
+                    : possibility.isGood
+                      ? 'right'
+                      : possibility.value === picked
+                        ? 'wrong'
+                        : 'dim'
+                }
+                disabled={answered || audioLoading}
+                onPress={() => {
+                  store.answer(possibility.isGood);
+                  setPicked(possibility.value);
+                }}
+              />
+            </View>
+          ))}
+        </View>
+      </View>
+      {correct && <Confetti />}
+      <ResultSheet
+        visible={answered}
+        success={question.success}
+        answerLabel={label}
+        swatch={gameType === 'color' ? COLOR_HEX[key] : undefined}
+        last={!store.hasMoreQuestion()}
+        sound={sound.ANSWER}
+        choice={picked !== null ? questionConfig[picked]?.key : undefined}
+        answer={key}
+        questionId={questionId}
+        gameId={gameId}
         onNext={() => {
           if (!store.hasMoreQuestion()) {
-            setModalVisible(false);
-            navigation.navigate('Score', {gameId});
+            navigation.replace('Score', {gameId, gameType});
             return;
           }
           setQuestionId(uuid.v4());
           store.nextQuestion();
-          setModalVisible(false);
+          setPicked(null);
         }}
-        success={question.success}
-        visible={modalVisible}
-        questionId={questionId}
-        gameId={gameId}
-        choice={choice}
-        answer={key}
-        sound={sound.ANSWER}>
-        <ChoiceButton
-          key={question.answer}
-          type={gameType}
-          value={key}
-          onPress={() => {}}
-        />
-      </ResultModal>
-      <View style={[styles.header]}>
-        <View
-          style={[
-            {
-              flex: 1,
-              flexDirection: 'row',
-            },
-          ]}>
-          <Text
-            style={{
-              fontSize: RFPercentage(4),
-              fontFamily: FONT.FAMILY,
-              color: COLORS.FONT.BASE,
-              flex: 3,
-            }}
-            numberOfLines={1}
-            adjustsFontSizeToFit>
-            Question {store.currentIndex + 1} sur {maxQuestion}
-          </Text>
-        </View>
-        <View
-          style={[
-            {
-              alignContent: 'center',
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              flex: 3,
-            },
-          ]}>
-          <Text
-            style={{
-              fontSize: RFPercentage(4),
-              fontFamily: FONT.FAMILY,
-              color: COLORS.FONT.BASE,
-              textAlign: 'center',
-            }}
-            numberOfLines={1}
-            adjustsFontSizeToFit>
-            Trouve {label}
-          </Text>
-        </View>
-      </View>
-      <View style={styles.body}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignContent: 'center',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            flex: 3,
-            gap: 20,
-          }}>
-          {question?.possibilities?.map((possibility) => (
-            <ChoiceButton
-              key={possibility.value}
-              type={gameType}
-              value={questionConfig[possibility.value].key}
-              disabled={soundStore.audioLoading}
-              onPress={() => {
-                question.success = possibility.isGood;
-                setChoice(questionConfig[possibility.value].key);
-                setModalVisible(true);
-              }}
-            />
-          ))}
-        </View>
-      </View>
-      <View style={[styles.footer]}>
-        <InstructionButton />
-        <MusicButton />
-      </View>
-    </SafeAreaView>
+      />
+    </Screen>
   );
 }
+
 const styles = StyleSheet.create({
-  container: {
+  content: {
     flex: 1,
-    backgroundColor: COLORS.BACKGROUND,
+    justifyContent: 'center',
     paddingHorizontal: 20,
-    justifyContent: 'center',
-    flexDirection: 'column',
   },
-  header: {
-    flex: 1,
-  },
-  body: {
-    flex: 2,
-    justifyContent: 'center',
-  },
-  footer: {
+  choices: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 100,
-    flex: 0.3,
-    marginTop: -20,
-    marginBottom: 30,
+  },
+  choiceCell: {
+    width: '45%',
   },
 });

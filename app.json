@@ -1,20 +1,15 @@
 {
   "expo": {
-    "name": "nolice",
+    "name": "Nolice",
     "slug": "nolice",
     "version": "1.1.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash-logo.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#53afd5"
-    },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/branding/adaptive-foreground.png",
+        "backgroundColor": "#EAF6FB"
       },
       "googleServicesFile": "./google-services.json",
       "package": "com.micriber.nolice",
@@ -38,6 +33,15 @@
       ],
       "expo-font",
       [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-logo.png",
+          "imageWidth": 160,
+          "resizeMode": "contain",
+          "backgroundColor": "#EAF6FB"
+        }
+      ],
+      [
         "expo-build-properties",
         {
           "android": {
@@ -48,7 +52,8 @@
         }
       ],
       "expo-audio",
-      "expo-asset"
+      "expo-asset",
+      "./plugins/withPortraitOnLargeScreens"
     ]
   }
 }

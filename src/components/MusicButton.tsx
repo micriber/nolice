@@ -1,38 +1,44 @@
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import React from 'react';
-import {TouchableOpacity} from 'react-native';
+import {ViewStyle} from 'react-native';
 
+import RoundBtn from './RoundBtn';
 import {useSoundStore} from '../store/audio';
-import COLORS from '../utils/color';
-import FONT from '../utils/font';
+import {NOL, shade} from '../utils/color';
 
-export default function SoundButton() {
-  const soundStore = useSoundStore();
+type Props = {
+  prim?: string;
+  size?: number;
+  style?: ViewStyle;
+};
 
-  const toggleBackgroundPlaying = async () => {
-    if (soundStore.backgroundPlaying) {
-      await soundStore.pauseBackground();
-    } else {
-      await soundStore.unPauseBackground();
-    }
+// Bouton musique : allumé = pastille pleine de couleur avec note,
+// coupé = pastille blanche avec note barrée (lisible pour un enfant de 2 ans).
+export default function MusicButton({prim = NOL.sky, size = 52, style}: Props) {
+  const on = useSoundStore((s) => s.backgroundPlaying);
+  const toggleBackground = useSoundStore((s) => s.toggleBackground);
+  const iconSize = Math.round(size * 0.44);
+
+  const toggleBackgroundPlaying = () => {
+    const playing = toggleBackground();
+    void logEvent(getAnalytics(), 'sound', {
+      pause: playing ? 'unpause' : 'pause',
+    });
   };
 
   return (
-    <TouchableOpacity
-      onPress={async () => {
-        await logEvent(getAnalytics(), 'sound', {
-          pause: soundStore.backgroundPlaying ? 'pause' : 'unpause',
-        });
-        await toggleBackgroundPlaying();
-      }}>
+    <RoundBtn
+      size={size}
+      bg={on ? prim : '#FFFFFF'}
+      deep={on ? shade(prim, -0.22) : undefined}
+      onPress={toggleBackgroundPlaying}
+      style={style}>
       <MaterialCommunityIcons
-        name={soundStore.backgroundPlaying ? 'music-off' : 'music'}
-        style={{
-          fontSize: FONT.SIZE.BIG,
-        }}
-        color={COLORS.ICON}
+        name={on ? 'music' : 'music-off'}
+        size={iconSize}
+        color={on ? '#fff' : NOL.inkSoft}
       />
-    </TouchableOpacity>
+    </RoundBtn>
   );
 }
