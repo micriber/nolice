@@ -2,7 +2,7 @@
   "expo": {
     "name": "Nolice",
     "slug": "nolice",
-    "version": "1.1.2",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -13,7 +13,7 @@
       },
       "googleServicesFile": "./google-services.json",
       "package": "com.micriber.nolice",
-      "versionCode": 8
+      "versionCode": 9
     },
     "extra": {
       "eas": {

@@ -45,3 +45,5 @@ google-services-prod.json
 todo.md
 
 .env
+
+output/
