@@ -1,19 +1,23 @@
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {useNavigation, useRoute} from '@react-navigation/core';
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {Animated, Easing, StyleSheet, Text, View} from 'react-native';
 
 import {ScoreScreenRouteProp} from './types';
 import BigButton from '../../components/BigButton';
 import Confetti from '../../components/Confetti';
-import Mascot from '../../components/Mascot';
+import DecorThumb from '../../components/DecorThumb';
+import {DECOR_LABELS} from '../../components/IceBg';
+import Mascot, {MASCOTS} from '../../components/Mascot';
 import Screen from '../../components/Screen';
 import {SOUNDS, useSoundStore} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
+import {useRewardsStore} from '../../store/rewards';
 import {useSettingsStore} from '../../store/settings';
-import {NOL, gameConfig} from '../../utils/color';
+import {NOL, gameConfig, shade} from '../../utils/color';
 import FONT from '../../utils/font';
+import {Reward, SUCCESS_SCORE} from '../../utils/rewards';
 import {NavigationProp} from '../types';
 
 // Étoile qui apparaît en « pop » avec un délai.
@@ -55,6 +59,57 @@ function Star({
   );
 }
 
+// Récompense gagnée avec cette partie, qui apparaît en « pop » après les étoiles.
+function RewardCard({reward}: {reward: Reward}) {
+  const pop = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.sequence([
+      Animated.delay(800),
+      Animated.timing(pop, {
+        toValue: 1,
+        duration: 500,
+        easing: Easing.out(Easing.back(1.6)),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+  const mascot = reward.kind === 'mascot';
+  const name = mascot
+    ? MASCOTS.find((m) => m.key === reward.key)?.label
+    : DECOR_LABELS[reward.key];
+  return (
+    <Animated.View
+      style={[
+        styles.reward,
+        {
+          opacity: pop,
+          transform: [
+            {
+              scale: pop.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0.6, 1],
+              }),
+            },
+          ],
+        },
+      ]}>
+      {mascot ? (
+        <Mascot size={58} who={reward.key} anim="none" />
+      ) : (
+        <View style={styles.rewardDecor}>
+          <DecorThumb scene={reward.key} unit={0.7} radius={10} />
+        </View>
+      )}
+      <View style={styles.rewardText}>
+        <Text style={styles.rewardTitle}>
+          {mascot ? 'Nouvelle mascotte !' : 'Nouveau décor !'}
+        </Text>
+        <Text style={styles.rewardName}>{name}</Text>
+      </View>
+    </Animated.View>
+  );
+}
+
 export default function ScoreScreen() {
   const route = useRoute<ScoreScreenRouteProp>();
   const navigation = useNavigation<NavigationProp>();
@@ -62,6 +117,8 @@ export default function ScoreScreen() {
   const playSound = useSoundStore((s) => s.play);
   const stopSound = useSoundStore((s) => s.stop);
   const decor = useSettingsStore((s) => s.decor);
+  const claimReward = useRewardsStore((s) => s.claim);
+  const [reward, setReward] = useState<Reward | null>(null);
   const maxQuestion = store.questions.length;
   const {gameId, gameType} = route.params;
   const game = gameConfig(gameType);
@@ -70,10 +127,10 @@ export default function ScoreScreen() {
   const isGood = results >= maxQuestion / 2;
   const isPerfect = results === maxQuestion;
 
-  // Étoiles alignées sur les humeurs de la mascotte :
-  // < 4 → 1★ (triste), 4–7 → 2★ (contente), ≥ 8 → 3★ (hyper contente)
-  const stars = results >= 8 ? 3 : results >= 4 ? 2 : 1;
-  const mood = results >= 8 ? 'happy' : results >= 4 ? 'content' : 'sad';
+  // Trois étoiles au score qui donne une récompense ; l'humeur de la mascotte suit les étoiles :
+  // < 5 → 1★ (triste), 5–8 → 2★ (contente), ≥ 9 → 3★ (hyper contente)
+  const stars = results >= SUCCESS_SCORE ? 3 : results >= 5 ? 2 : 1;
+  const mood = stars === 3 ? 'happy' : stars === 2 ? 'content' : 'sad';
 
   const headline =
     mood === 'happy'
@@ -87,6 +144,11 @@ export default function ScoreScreen() {
       : mood === 'content'
         ? 'Super travail, tu progresses vite !'
         : 'Pas grave, on apprend en essayant. On retente ?';
+
+  // Avant le premier affichage : la récompense prend la place du message sans qu'il clignote.
+  useLayoutEffect(() => {
+    setReward(claimReward(gameId, gameType, results));
+  }, []);
 
   useEffect(() => {
     void logEvent(getAnalytics(), 'score', {
@@ -123,7 +185,11 @@ export default function ScoreScreen() {
           <Text style={[styles.scoreValue, {color: game.deep}]}>{results}</Text>
           <Text style={styles.scoreTotal}>/ {maxQuestion}</Text>
         </View>
-        <Text style={styles.message}>{message}</Text>
+        {reward ? (
+          <RewardCard reward={reward} />
+        ) : (
+          <Text style={styles.message}>{message}</Text>
+        )}
         {/* « Rejouer » = choisir un nouveau jeu → retour à la liste des jeux */}
         <BigButton
           label="Rejouer"
@@ -198,6 +264,37 @@ const styles = StyleSheet.create({
     maxWidth: 280,
     lineHeight: 22,
     marginTop: 18,
+  },
+  reward: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    backgroundColor: '#fff',
+    borderRadius: 24,
+    borderWidth: 3,
+    borderColor: shade(NOL.star, 0.3),
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    marginTop: 18,
+    elevation: 6,
+  },
+  rewardDecor: {
+    width: 84,
+    height: 49,
+  },
+  rewardText: {
+    flexShrink: 1,
+  },
+  rewardTitle: {
+    fontFamily: FONT.UI_HEAVY,
+    fontSize: 14,
+    color: NOL.inkSoft,
+  },
+  rewardName: {
+    fontFamily: FONT.DISPLAY_BOLD,
+    fontSize: 24,
+    lineHeight: 28,
+    color: NOL.ink,
   },
   replay: {
     marginTop: 30,

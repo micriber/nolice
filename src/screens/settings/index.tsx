@@ -1,14 +1,16 @@
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {Defs, LinearGradient, Path, Rect, Stop} from 'react-native-svg';
 
-import FillSvg from '../../components/FillSvg';
+import UnlockPopup from './unlock-popup';
+import DecorThumb from '../../components/DecorThumb';
+import {DECOR_LABELS} from '../../components/IceBg';
 import Mascot, {MASCOTS} from '../../components/Mascot';
 import MusicButton from '../../components/MusicButton';
 import RoundBtn from '../../components/RoundBtn';
 import Screen from '../../components/Screen';
+import {useRewardsStore} from '../../store/rewards';
 import {
   DecorKey,
   MusicTrackKey,
@@ -17,6 +19,13 @@ import {
 } from '../../store/settings';
 import {NOL, shade} from '../../utils/color';
 import FONT from '../../utils/font';
+import {
+  UPCOMING_DECOR_UNLOCK,
+  UPCOMING_TRACK_UNLOCKS,
+  Unlock,
+  lockOf,
+  unlockHint,
+} from '../../utils/rewards';
 import {useScale} from '../../utils/scale';
 import {NavigationProp} from '../types';
 
@@ -24,19 +33,22 @@ type Props = {
   navigation: NavigationProp;
 };
 
-const DECORS: {key: DecorKey; label: string}[] = [
-  {key: 'nuages', label: 'Nuages'},
-  {key: 'bulles', label: 'Bulles'},
-  {key: 'banquise', label: 'Banquise'},
-];
+// 'mystery' : une récompense dont le contenu reste à créer.
+type DecorOption = DecorKey | 'mystery';
 
-const TRACKS: {key: MusicTrackKey; label: string}[] = [
+const DECORS: DecorOption[] = ['nuages', 'bulles', 'banquise', 'mystery'];
+
+const TRACKS: {key?: MusicTrackKey; label: string; unlock?: Unlock}[] = [
   {key: 'joyeuse', label: 'Joyeuse'},
   {key: 'calme', label: 'Calme'},
+  ...UPCOMING_TRACK_UNLOCKS.map((unlock) => ({label: 'Mystère', unlock})),
 ];
 
+const LOCKED_GREY = '#9FB4C2';
 const DESIGN_WIDTH = 412;
-const DESIGN_HEIGHT = 860;
+const DESIGN_HEIGHT = 1050;
+
+type LockedInfo = {title: string; unlock: Unlock; picture: React.ReactNode};
 
 function useScaledStyles() {
   const scale = useScale(DESIGN_HEIGHT);
@@ -66,6 +78,7 @@ function CheckBadge({small}: {small?: boolean}) {
   return (
     <View
       style={[
+        styles.badge,
         styles.checkBadge,
         {width: size, height: size, borderRadius: size / 2},
       ]}>
@@ -78,115 +91,38 @@ function CheckBadge({small}: {small?: boolean}) {
   );
 }
 
-// Vignette miniature d'un décor.
-function DecorThumb({scene}: {scene: DecorKey}) {
+// Cadenas et « i » posés sur une récompense verrouillée : la toucher ouvre l'explication.
+function LockBadges({small}: {small?: boolean}) {
   const {scale, styles} = useScaledStyles();
+  const size = (small ? 22 : 26) * scale;
+  const round = {width: size, height: size, borderRadius: size / 2};
   return (
-    <View style={styles.thumb}>
-      <FillSvg viewBox="0 0 120 70">
-        <Defs>
-          <LinearGradient id={`thumb-${scene}`} x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor={shade(NOL.sky, 0.78)} />
-            <Stop offset="1" stopColor={shade(NOL.sky, 0.64)} />
-          </LinearGradient>
-        </Defs>
-        <Rect width="120" height="70" fill={`url(#thumb-${scene})`} />
-        {scene === 'banquise' && (
-          <Path d="M0 42 Q30 28 60 40 T120 36 L120 70 L0 70 Z" fill="#FBFEFF" />
-        )}
-      </FillSvg>
-      {scene === 'banquise' && (
-        <>
-          <View
-            style={[
-              styles.thumbDot,
-              {
-                top: 12 * scale,
-                left: 14 * scale,
-                width: 4 * scale,
-                height: 4 * scale,
-              },
-            ]}
-          />
-          <View
-            style={[
-              styles.thumbDot,
-              {
-                top: 24 * scale,
-                left: 40 * scale,
-                width: 3 * scale,
-                height: 3 * scale,
-              },
-            ]}
-          />
-        </>
-      )}
-      {scene === 'bulles' &&
-        (
-          [
-            [12, 14, 14, NOL.coral],
-            [58, 10, 18, NOL.amber],
-            [30, 34, 12, NOL.teal],
-            [72, 36, 14, NOL.violet],
-          ] as [number, number, number, string][]
-        ).map((b, i) => (
-          <View
-            key={i}
-            style={{
-              position: 'absolute',
-              left: b[0] * scale,
-              top: b[1] * scale,
-              width: b[2] * scale,
-              height: b[2] * scale,
-              borderRadius: (b[2] * scale) / 2,
-              backgroundColor: b[3],
-              opacity: 0.35,
-            }}
-          />
-        ))}
-      {scene === 'nuages' && (
-        <>
-          <View
-            style={{
-              position: 'absolute',
-              top: 8 * scale,
-              left: 10 * scale,
-              width: 14 * scale,
-              height: 14 * scale,
-              borderRadius: 7 * scale,
-              backgroundColor: shade(NOL.star, 0.35),
-            }}
-          />
-          {(
-            [
-              [20, 30],
-              [52, 22],
-              [40, 46],
-            ] as [number, number][]
-          ).map((c, i) => (
-            <View
-              key={i}
-              style={{
-                position: 'absolute',
-                left: c[0] * scale,
-                top: c[1] * scale,
-                width: 26 * scale,
-                height: 10 * scale,
-                borderRadius: 8 * scale,
-                backgroundColor: '#fff',
-                opacity: 0.92,
-              }}
-            />
-          ))}
-        </>
-      )}
-    </View>
+    <>
+      <View style={[styles.badge, round, styles.lockBadge]}>
+        <MaterialCommunityIcons
+          name="lock"
+          size={(small ? 12 : 14) * scale}
+          color="#fff"
+        />
+      </View>
+      <View style={[styles.badge, round, styles.infoBadge]}>
+        <MaterialCommunityIcons
+          name="information-variant"
+          size={(small ? 15 : 18) * scale}
+          color="#fff"
+        />
+      </View>
+    </>
   );
 }
 
 export default function SettingsScreen({navigation}: Props) {
   const settings = useSettingsStore();
   const {scale, styles} = useScaledStyles();
+  const [locked, setLocked] = useState<LockedInfo | null>(null);
+  const mascots = useRewardsStore((s) => s.mascots);
+  const decors = useRewardsStore((s) => s.decors);
+  const owned = {mascots, decors};
 
   const setSetting = <K extends keyof Settings>(key: K, value: Settings[K]) => {
     settings.setSetting(key, value);
@@ -222,11 +158,22 @@ export default function SettingsScreen({navigation}: Props) {
             <View style={styles.mascotGrid}>
               {MASCOTS.map((m) => {
                 const sel = settings.mascot === m.key;
+                const unlock = lockOf({kind: 'mascot', key: m.key}, owned);
                 return (
                   <Pressable
                     key={m.key}
                     onPress={() => {
-                      setSetting('mascot', m.key);
+                      if (!unlock) {
+                        setSetting('mascot', m.key);
+                        return;
+                      }
+                      setLocked({
+                        title: m.label,
+                        unlock,
+                        picture: (
+                          <Mascot size={110 * scale} who={m.key} anim="none" />
+                        ),
+                      });
                     }}
                     style={styles.mascotCell}>
                     <View
@@ -238,10 +185,18 @@ export default function SettingsScreen({navigation}: Props) {
                           borderWidth: 3,
                         },
                       ]}>
-                      <Mascot size={54 * scale} who={m.key} anim="none" />
+                      <View style={unlock && styles.locked}>
+                        <Mascot size={54 * scale} who={m.key} anim="none" />
+                      </View>
                       {sel && <CheckBadge />}
+                      {unlock && <LockBadges />}
                     </View>
-                    <Text style={[styles.optionLabel, sel && {color: NOL.sky}]}>
+                    <Text
+                      style={[
+                        styles.optionLabel,
+                        sel && {color: NOL.sky},
+                        unlock && styles.lockedLabel,
+                      ]}>
                       {m.label}
                     </Text>
                   </Pressable>
@@ -253,13 +208,35 @@ export default function SettingsScreen({navigation}: Props) {
           {/* DÉCOR */}
           <SettingsCard title="Le décor">
             <View style={styles.decorRow}>
-              {DECORS.map((d) => {
-                const sel = settings.decor === d.key;
+              {DECORS.map((key) => {
+                const sel = settings.decor === key;
+                const label = key === 'mystery' ? 'Mystère' : DECOR_LABELS[key];
+                const unlock =
+                  key === 'mystery'
+                    ? UPCOMING_DECOR_UNLOCK
+                    : lockOf({kind: 'decor', key}, owned);
                 return (
                   <Pressable
-                    key={d.key}
+                    key={key}
                     onPress={() => {
-                      setSetting('decor', d.key);
+                      if (key !== 'mystery' && !unlock) {
+                        setSetting('decor', key);
+                        return;
+                      }
+                      if (!unlock) return;
+                      setLocked({
+                        title: label,
+                        unlock,
+                        picture: (
+                          <View style={styles.popupDecor}>
+                            <DecorThumb
+                              scene={key}
+                              unit={scale * 1.3}
+                              radius={16 * scale}
+                            />
+                          </View>
+                        ),
+                      });
                     }}
                     style={styles.decorCell}>
                     <View
@@ -267,11 +244,23 @@ export default function SettingsScreen({navigation}: Props) {
                         styles.decorFrame,
                         sel && {borderColor: NOL.sky, borderWidth: 3},
                       ]}>
-                      <DecorThumb scene={d.key} />
+                      <View style={[styles.decorFill, unlock && styles.locked]}>
+                        <DecorThumb
+                          scene={key}
+                          unit={scale * 0.72}
+                          radius={13 * scale}
+                        />
+                      </View>
                       {sel && <CheckBadge small />}
+                      {unlock && <LockBadges small />}
                     </View>
-                    <Text style={[styles.optionLabel, sel && {color: NOL.sky}]}>
-                      {d.label}
+                    <Text
+                      style={[
+                        styles.optionLabel,
+                        sel && {color: NOL.sky},
+                        unlock && styles.lockedLabel,
+                      ]}>
+                      {label}
                     </Text>
                   </Pressable>
                 );
@@ -282,13 +271,30 @@ export default function SettingsScreen({navigation}: Props) {
           {/* MUSIQUE */}
           <SettingsCard title="La musique">
             <View style={styles.trackRow}>
-              {TRACKS.map((tr) => {
+              {TRACKS.map((tr, i) => {
                 const sel = settings.musicTrack === tr.key;
+                const {key, unlock} = tr;
+                const color = sel ? '#fff' : unlock ? LOCKED_GREY : NOL.inkSoft;
                 return (
                   <Pressable
-                    key={tr.key}
+                    key={i}
                     onPress={() => {
-                      setSetting('musicTrack', tr.key);
+                      if (key) {
+                        setSetting('musicTrack', key);
+                        return;
+                      }
+                      if (!unlock) return;
+                      setLocked({
+                        title: tr.label,
+                        unlock,
+                        picture: (
+                          <MaterialCommunityIcons
+                            name="music"
+                            size={80 * scale}
+                            color={NOL.sky}
+                          />
+                        ),
+                      });
                     }}
                     style={[
                       styles.trackBtn,
@@ -301,17 +307,18 @@ export default function SettingsScreen({navigation}: Props) {
                           },
                     ]}>
                     <MaterialCommunityIcons
-                      name="music"
+                      name={unlock ? 'lock' : 'music'}
                       size={20 * scale}
-                      color={sel ? '#fff' : NOL.inkSoft}
+                      color={color}
                     />
-                    <Text
-                      style={[
-                        styles.trackLabel,
-                        {color: sel ? '#fff' : NOL.inkSoft},
-                      ]}>
-                      {tr.label}
-                    </Text>
+                    <Text style={[styles.trackLabel, {color}]}>{tr.label}</Text>
+                    {unlock && (
+                      <MaterialCommunityIcons
+                        name="information"
+                        size={20 * scale}
+                        color={NOL.sky}
+                      />
+                    )}
                   </Pressable>
                 );
               })}
@@ -319,6 +326,16 @@ export default function SettingsScreen({navigation}: Props) {
           </SettingsCard>
         </ScrollView>
       </View>
+      {locked && (
+        <UnlockPopup
+          title={locked.title}
+          hint={unlockHint(locked.unlock)}
+          picture={locked.picture}
+          onClose={() => {
+            setLocked(null);
+          }}
+        />
+      )}
     </Screen>
   );
 }
@@ -389,11 +406,9 @@ function makeStyles(scale: number) {
       alignItems: 'center',
       justifyContent: 'center',
     },
-    checkBadge: {
+    badge: {
       position: 'absolute',
       top: -7 * scale,
-      right: -7 * scale,
-      backgroundColor: NOL.mint,
       borderWidth: 3,
       borderColor: '#fff',
       alignItems: 'center',
@@ -404,6 +419,24 @@ function makeStyles(scale: number) {
       fontFamily: FONT.UI_HEAVY,
       fontSize: 12.5 * scale,
       color: NOL.inkSoft,
+    },
+    checkBadge: {
+      right: -7 * scale,
+      backgroundColor: NOL.mint,
+    },
+    lockBadge: {
+      right: -7 * scale,
+      backgroundColor: LOCKED_GREY,
+    },
+    infoBadge: {
+      left: -7 * scale,
+      backgroundColor: NOL.sky,
+    },
+    locked: {
+      opacity: 0.35,
+    },
+    lockedLabel: {
+      color: LOCKED_GREY,
     },
     decorRow: {
       flexDirection: 'row',
@@ -416,29 +449,27 @@ function makeStyles(scale: number) {
     },
     decorFrame: {
       width: '100%',
-      height: 70 * scale,
+      height: 56 * scale,
       borderRadius: 16 * scale,
       borderWidth: 2,
       borderColor: '#E4EFF5',
       overflow: 'visible',
     },
-    thumb: {
+    decorFill: {
       flex: 1,
-      borderRadius: 13 * scale,
-      overflow: 'hidden',
     },
-    thumbDot: {
-      position: 'absolute',
-      borderRadius: 4 * scale,
-      backgroundColor: '#fff',
-      opacity: 0.8,
+    popupDecor: {
+      width: 156 * scale,
+      height: 91 * scale,
     },
     trackRow: {
       flexDirection: 'row',
+      flexWrap: 'wrap',
       gap: 10 * scale,
     },
     trackBtn: {
-      flex: 1,
+      flexBasis: '45%',
+      flexGrow: 1,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',

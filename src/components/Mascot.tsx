@@ -8,11 +8,14 @@ import {NOL} from '../utils/color';
 
 export const MASCOTS: {key: MascotKey; label: string}[] = [
   {key: 'owl', label: 'Nolice'},
-  {key: 'rabbit', label: 'Lapin'},
   {key: 'cat', label: 'Chat'},
   {key: 'dog', label: 'Chien'},
+  {key: 'sheep', label: 'Mouton'},
   {key: 'duck', label: 'Canard'},
   {key: 'bird', label: 'Oiseau'},
+  {key: 'pig', label: 'Cochon'},
+  {key: 'rabbit', label: 'Lapin'},
+  {key: 'cow', label: 'Vache'},
 ];
 
 export type MascotMood = 'none' | 'happy' | 'content' | 'sad';

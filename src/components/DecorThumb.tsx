@@ -1,0 +1,146 @@
+import {MaterialCommunityIcons} from '@expo/vector-icons';
+import React from 'react';
+import {StyleSheet, View} from 'react-native';
+import {Defs, LinearGradient, Path, Rect, Stop} from 'react-native-svg';
+
+import FillSvg from './FillSvg';
+import {DecorKey} from '../store/settings';
+import {NOL, shade} from '../utils/color';
+
+type Props = {
+  // 'mystery' : un décor dont le contenu reste à créer.
+  scene: DecorKey | 'mystery';
+  unit: number;
+  radius: number;
+};
+
+// Vignette miniature d'un décor, qui remplit son conteneur. `unit` : taille d'un dp de sa maquette (120 × 70).
+export default function DecorThumb({scene, unit, radius}: Props) {
+  const scale = unit;
+  if (scene === 'mystery') {
+    return (
+      <View style={[styles.thumb, styles.mystery, {borderRadius: radius}]}>
+        <MaterialCommunityIcons name="help" size={30 * unit} color="#9FB4C2" />
+      </View>
+    );
+  }
+  return (
+    <View style={[styles.thumb, {borderRadius: radius}]}>
+      <FillSvg viewBox="0 0 120 70">
+        <Defs>
+          <LinearGradient id={`thumb-${scene}`} x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={shade(NOL.sky, 0.78)} />
+            <Stop offset="1" stopColor={shade(NOL.sky, 0.64)} />
+          </LinearGradient>
+        </Defs>
+        <Rect width="120" height="70" fill={`url(#thumb-${scene})`} />
+        {scene === 'banquise' && (
+          <Path d="M0 42 Q30 28 60 40 T120 36 L120 70 L0 70 Z" fill="#FBFEFF" />
+        )}
+      </FillSvg>
+      {scene === 'banquise' && (
+        <>
+          <View
+            style={[
+              styles.dot,
+              {
+                top: 12 * scale,
+                left: 14 * scale,
+                width: 4 * scale,
+                height: 4 * scale,
+              },
+            ]}
+          />
+          <View
+            style={[
+              styles.dot,
+              {
+                top: 24 * scale,
+                left: 40 * scale,
+                width: 3 * scale,
+                height: 3 * scale,
+              },
+            ]}
+          />
+        </>
+      )}
+      {scene === 'bulles' &&
+        (
+          [
+            [12, 14, 14, NOL.coral],
+            [58, 10, 18, NOL.amber],
+            [30, 34, 12, NOL.teal],
+            [72, 36, 14, NOL.violet],
+          ] as [number, number, number, string][]
+        ).map((b, i) => (
+          <View
+            key={i}
+            style={{
+              position: 'absolute',
+              left: b[0] * scale,
+              top: b[1] * scale,
+              width: b[2] * scale,
+              height: b[2] * scale,
+              borderRadius: (b[2] * scale) / 2,
+              backgroundColor: b[3],
+              opacity: 0.35,
+            }}
+          />
+        ))}
+      {scene === 'nuages' && (
+        <>
+          <View
+            style={{
+              position: 'absolute',
+              top: 8 * scale,
+              left: 10 * scale,
+              width: 14 * scale,
+              height: 14 * scale,
+              borderRadius: 7 * scale,
+              backgroundColor: shade(NOL.star, 0.35),
+            }}
+          />
+          {(
+            [
+              [20, 30],
+              [52, 22],
+              [40, 46],
+            ] as [number, number][]
+          ).map((c, i) => (
+            <View
+              key={i}
+              style={{
+                position: 'absolute',
+                left: c[0] * scale,
+                top: c[1] * scale,
+                width: 26 * scale,
+                height: 10 * scale,
+                borderRadius: 8 * scale,
+                backgroundColor: '#fff',
+                opacity: 0.92,
+              }}
+            />
+          ))}
+        </>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  thumb: {
+    flex: 1,
+    overflow: 'hidden',
+  },
+  mystery: {
+    backgroundColor: '#E4EFF5',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dot: {
+    position: 'absolute',
+    borderRadius: 4,
+    backgroundColor: '#fff',
+    opacity: 0.8,
+  },
+});

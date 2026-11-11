@@ -30,7 +30,8 @@ eas.json                 EAS build profiles: development/preview/production
 src/
   screens/
     home/index.tsx       Landing = brand header (mascot, gear → Settings, music) + 2-col grid of icon-led game cards
-    settings/index.tsx   Réglages: mascot choice (6), decor (banquise/bulles/nuages), music track — persisted via useSettingsStore
+    settings/index.tsx   Réglages: mascot (9), decor (4), music track (4) — persisted via useSettingsStore. Rewards not won yet are greyed with a lock and an « i »
+    settings/unlock-popup.tsx  Popup explaining how to win a locked reward
     game/
       NumberGame.tsx     "Combien de X ?" — count card + 4 number tiles
       FindGame.tsx       "Trouve X" — generic for animal/color/shape, 2×2 tiles
@@ -39,11 +40,12 @@ src/
       result-sheet.tsx   Bottom sheet after answering (mascot mood + Bravo!/Presque! + Continuer)
       {animal,color,shape}-picture.tsx  Picture components per type (animals are PNG, colors and shapes SVG), take a `size` dp prop
       question-config.ts FindGame item lists per game type (`QUESTION_CONFIGS`: key + French label), `FindGameKey`, `QuestionConfig`
-    score/index.tsx      Mascot mood + 3 stars + score pill + REJOUER → Home
+    score/index.tsx      Mascot mood + 3 stars + score pill + the reward won with this game, if any + REJOUER → Home
     types.ts             StackNavigatorParamList, NavigationProp, FindGameParams
   components/
     Screen.tsx           Screen root: full-screen IceBg + SafeAreaView around the content
     FillSvg.tsx          Svg stretched over its container (gradients, backgrounds)
+    DecorThumb.tsx       Miniature of a decor (Settings, unlock popup, reward card on Score)
     IceBg.tsx            Animated background, 3 scenes (banquise/bulles/nuages): snow, bubbles or clouds drifting across the screen over two hills, `tint` per game
     MascotVisit.tsx      The mascot showing up at the bottom of the screen now and then (game screens only): it hops across, or pops up from below and jumps on the spot
     BigButton.tsx        Chunky 3D button that presses down (Continuer, Rejouer)
@@ -58,7 +60,8 @@ src/
     audio.ts             useSoundStore — single foreground player + looping background player
     game.ts              useGameScoreStore — questions[], currentIndex, init/next/hasMore/getResults
     settings.ts          useSettingsStore — mascot/decor/musicTrack, persisted to a JSON file (expo-file-system)
-  utils/                 array.shuffle, random helpers, color (NOL palette + GAMES) / font constants, scale (tablet enlargement)
+    rewards.ts           useRewardsStore — mascots and decors won so far, persisted to a JSON file; `claim(gameId, game, score)` grants the reward of a finished game
+  utils/                 array.shuffle, random helpers, color (NOL palette + GAMES) / font constants, scale (tablet enlargement), rewards (what unlocks each locked mascot, decor and track)
 assets/audio/            ~77 mp3 files (questions, answers, bravo/dommage/congratulation/retry, music tracks)
 assets/animals/          PNG animals (game pictures and mascots)
 assets/branding/         nolice.png (default mascot « Nolice ») and the adaptive icon foreground
@@ -101,7 +104,7 @@ ResultSheet plays BRAVO/DOMMAGE → callback plays the correct-answer sound → 
 - Button/header text uses `numberOfLines={1}` + `adjustsFontSizeToFit` — fonts shrink to fit rather than wrapping/clipping. Multiline body text (score message) is left as-is.
 - `FONT` exposes font families only (`DISPLAY`/`DISPLAY_BOLD` = Fredoka, `UI`/`UI_HEAVY` = Nunito); sizes are inline dp values taken from the design.
 - "Chunky 3D" buttons (BigButton/RoundBtn/Tile/GameCard) fake depth with a darker edge layer: the press swaps `paddingBottom` and compensates with `marginTop` so total height stays constant.
-- Result feedback: stars/mood thresholds are aligned — score `<4` → 1★/sad, `4–7` → 2★/content, `≥8` → 3★/happy. Per-answer: green outline + check on the correct tile, red + cross on the picked wrong one, others dim.
+- Result feedback: stars/mood thresholds are aligned — score `<5` → 1★/sad, `5–8` → 2★/content, `≥9` → 3★/happy. Three stars is the score that wins a reward (`SUCCESS_SCORE`). Per-answer: green outline + check on the correct tile, red + cross on the picked wrong one, others dim.
 
 ## Game store (`useGameScoreStore`)
 
@@ -129,6 +132,8 @@ To run on a connected phone: enable USB debugging, `adb devices` should list it,
 Jest with the `jest-expo` preset, test files next to the code they cover (`*.test.ts`):
 - `src/store/game.test.ts`, `src/utils/random.test.ts` — question generation rules, checked over a few hundred random games each.
 - `src/screens/game/question-config.test.ts` — every FindGame item has its sounds and its picture.
+- `src/utils/rewards.test.ts` — the reward plan adds up (ten rewards, one mascot then one decor or track per game, two mascots for a perfect game), the popup sentences, and which reward a finished game wins.
+- `src/store/rewards.test.ts` — rewards are saved and reloaded, a game is claimed once, and saved settings drop a mascot or decor that was not won. Runs against an in-memory `expo-file-system`.
 - `src/store/audio.test.ts` — the audio contract above, against a fake `expo-audio` player whose seek and status events the test drives. It proves the store's logic, not the real player: audio changes still need a device check.
 
 ## Conventions / pitfalls
@@ -144,6 +149,7 @@ Jest with the `jest-expo` preset, test files next to the code they cover (`*.tes
 - **Tablet sizing**: every size a child sees goes through `useScale()` — 1 on a phone, up to 2 on a tablet, held back by the window height so a page never overflows. A page taller than 700dp in the design passes its own design height (`useScale(860)` in Settings). A raw dp value stays phone-sized on a tablet.
 - **Stretched SVGs go through `<FillSvg>`**: it measures its container and passes numeric sizes. A `width="100%"` Svg keeps its old drawing when the window is resized (a foldable being opened), and comes out too narrow inside a padded parent.
 - **Portrait lock on tablets**: Android may ignore it on screens ≥ 600dp and show the app in a portrait band inside a landscape screen (a narrow, short window — hence the height limit in `useScale()`). On Android 16 the lock is dropped entirely for apps targeting API 36; `plugins/withPortraitOnLargeScreens.js` declares the temporary opt-out, which stops working once the app targets API 37 — a landscape layout is needed before that bump.
+- **Rewards** (plan in `readme.md`, « Les récompenses à débloquer »): `src/utils/rewards.ts` holds the rules — what each locked mascot or decor needs (`MASCOT_UNLOCKS`, `DECOR_UNLOCKS`) and `rewardFor(game, score, owned)`, which gives at most one reward per game: a perfect-game mascot on 10/10 while one is left, otherwise from 9/10 the next reward of the game. Score claims it once per `gameId` through `useRewardsStore`; Settings greys what `lockOf()` still reports as locked, and `useSettingsStore` falls back to the default mascot or decor when the saved one was not won. The fourth decor and the two extra tracks do not exist yet: Settings shows them as « Mystère » and no game can win them. Unlocking a new mascot or decor = one entry in its `*_UNLOCKS` map.
 - **Adding a 5th/6th game**: append to `GAMES` in `src/utils/color.ts` — the Home grid auto-wraps to 3 rows of 2 (layout validated in the design).
 
 ## Things that are NOT in the codebase

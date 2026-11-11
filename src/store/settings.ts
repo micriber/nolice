@@ -2,7 +2,19 @@ import * as Sentry from '@sentry/react-native';
 import {File, Paths} from 'expo-file-system';
 import {create} from 'zustand';
 
-export type MascotKey = 'owl' | 'rabbit' | 'cat' | 'dog' | 'duck' | 'bird';
+import {useRewardsStore} from './rewards';
+import {lockOf} from '../utils/rewards';
+
+export type MascotKey =
+  | 'owl'
+  | 'cat'
+  | 'dog'
+  | 'sheep'
+  | 'duck'
+  | 'bird'
+  | 'pig'
+  | 'rabbit'
+  | 'cow';
 export type DecorKey = 'banquise' | 'bulles' | 'nuages';
 export type MusicTrackKey = 'joyeuse' | 'calme';
 
@@ -20,11 +32,24 @@ const DEFAULTS: Settings = {
 
 const settingsFile = () => new File(Paths.document, 'nolice-settings.json');
 
+// Un choix enregistré mais pas gagné retombe sur celui de base.
+function withoutLocked(settings: Settings): Settings {
+  const owned = useRewardsStore.getState();
+  const {mascot, decor} = settings;
+  return {
+    ...settings,
+    mascot: lockOf({kind: 'mascot', key: mascot}, owned)
+      ? DEFAULTS.mascot
+      : mascot,
+    decor: lockOf({kind: 'decor', key: decor}, owned) ? DEFAULTS.decor : decor,
+  };
+}
+
 function loadSettings(): Settings {
   try {
     const file = settingsFile();
     if (!file.exists) return DEFAULTS;
-    return {...DEFAULTS, ...JSON.parse(file.textSync())};
+    return withoutLocked({...DEFAULTS, ...JSON.parse(file.textSync())});
   } catch (err: any) {
     Sentry.logger.error('Settings error: load', {
       error: err?.message ?? String(err),

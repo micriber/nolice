@@ -26,6 +26,12 @@ type Props = {
   scene?: DecorKey;
 };
 
+export const DECOR_LABELS: Record<DecorKey, string> = {
+  nuages: 'Nuages',
+  bulles: 'Bulles',
+  banquise: 'Banquise',
+};
+
 // Répartition fixe et régulière : le même décor à chaque rendu, sans paquet ni couloir vide.
 const spread = (i: number) => ({
   across: ((i * 0.7549) % 1) * 100,
