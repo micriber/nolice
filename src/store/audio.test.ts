@@ -345,6 +345,92 @@ describe('playBackground', () => {
   });
 });
 
+// La baisse de la musique traverse play, stop, replay et playBackground.
+describe('music volume', () => {
+  const music = () => mockPlayers[0];
+  const voice = () => mockPlayers[1];
+
+  // Lance un son par-dessus la musique : le lecteur de musique est créé en premier.
+  async function startOverMusic(src: number, callback?: () => void) {
+    const pending = store().play(src, callback);
+    voice().finishSeek();
+    await pending;
+  }
+
+  beforeEach(async () => {
+    await store().playBackground(TRACK_A);
+  });
+
+  it('drops while a sound plays and comes back when it finishes', async () => {
+    const pending = store().play(SOUND_A);
+    expect(music().volume).toBe(0.2);
+
+    voice().finishSeek();
+    await pending;
+    expect(music().volume).toBe(0.06);
+
+    voice().emit({didJustFinish: true});
+    expect(music().volume).toBe(0.2);
+  });
+
+  it('stays low between two chained sounds', async () => {
+    const volumes: number[] = [];
+    await startOverMusic(SOUND_A, () => {
+      void store().play(SOUND_B);
+      volumes.push(music().volume);
+    });
+
+    voice().emit({didJustFinish: true});
+    volumes.push(music().volume);
+    voice().finishSeek();
+    await Promise.resolve();
+    volumes.push(music().volume);
+
+    expect(volumes).toEqual([0.06, 0.06, 0.06]);
+
+    voice().emit({didJustFinish: true});
+    expect(music().volume).toBe(0.2);
+  });
+
+  it('comes back when the sound is stopped', async () => {
+    await startOverMusic(SOUND_A);
+
+    store().stop();
+
+    expect(music().volume).toBe(0.2);
+  });
+
+  it('drops again on replay', async () => {
+    await startOverMusic(SOUND_A);
+    voice().emit({didJustFinish: true});
+
+    const pending = store().replay();
+    voice().finishSeek();
+    await pending;
+
+    expect(music().volume).toBe(0.06);
+  });
+
+  it('keeps the lowered volume when the track changes mid-sound', async () => {
+    await startOverMusic(SOUND_A);
+
+    await store().playBackground(TRACK_B);
+
+    expect(music().volume).toBe(0.06);
+  });
+
+  it('comes back when the sound fails to start', async () => {
+    await startOverMusic(SOUND_A);
+    voice().replace.mockImplementationOnce(() => {
+      throw new Error('unreadable');
+    });
+
+    await store().play(SOUND_B);
+
+    expect(music().volume).toBe(0.2);
+  });
+});
+
 describe('toggleBackground', () => {
   it('turns the music off, then on again', async () => {
     await store().playBackground(TRACK_A);

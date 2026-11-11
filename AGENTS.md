@@ -76,7 +76,7 @@ assets/svg/              SVG color splashes and shapes
 - `play(src, callback?)` — foreground sound, one at a time. Calls `callback` when the sound finishes.
 - `replay()` — `seekTo(0) + play()` on the foreground player; `SpeakerOrb` uses it to repeat the question without re-decoding.
 - `stop()` — pauses the foreground sound and drops its pending callback. Game and Score screens call it on unmount so nothing keeps playing on the next screen.
-- `playBackground(src)` — looping music at 20% volume; a new source swaps the track and keeps the current on/off state.
+- `playBackground(src)` — looping music at 20% volume, lowered to 6% while a foreground sound plays; a new source swaps the track and keeps the current on/off state.
 - `toggleBackground()` — music on/off, returns the new state. It reads the real player state, so one tap restarts music the system paused behind the store's back (audio focus loss).
 
 Key contract:
@@ -135,7 +135,7 @@ Jest with the `jest-expo` preset, test files next to the code they cover (`*.tes
 - **Zustand subscriptions**: read `useSoundStore` through selectors (`useSoundStore((s) => s.play)`), one per field, so a component re-renders only for the state it shows.
 - **Firebase analytics**: use the modular API (`logEvent(getAnalytics(), 'event_name', {...})`). `logScreenView` is deprecated — use `logEvent(analytics, 'screen_view', {screen_name, screen_class})`. Analytics is fire-and-forget (`void logEvent(...)`), so navigation and audio never wait on Firebase.
 - **Don't create a fresh player for each component re-render** — always go through `useSoundStore.play()`.
-- **Background music volume is 0.2** — don't change without checking the mix with question audio.
+- **Background music volume is 0.2, 0.06 under a foreground sound** (`MUSIC_VOLUME`, `DUCKED_MUSIC_VOLUME` in `src/store/audio.ts`) — don't change without checking the mix with question audio. The music comes back on `didJustFinish` or `stop()`, and stays low when the finish callback chains another sound.
 - **Question order** — `init()` deals answers in shuffled rounds, so every answer comes up before one repeats, and it reverses a round that would open on the answer closing the previous one, so two consecutive questions never share an answer. Keep both rules if editing the generator.
 - **Adding/renaming a FindGame item** touches three places: its list in `QUESTION_CONFIGS`, the audio entry in `SOUNDS_QUESTION[gameType.toUpperCase()]` and the picture map in its `*-picture.tsx`. `question-config.test.ts` fails while one is missing.
 - **Settings persistence** goes through `useSettingsStore` (JSON file via the sync `expo-file-system` v55 `File` API) — no AsyncStorage in this project.

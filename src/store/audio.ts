@@ -290,6 +290,20 @@ let foregroundCallback: (() => void) | null = null;
 let foregroundCallbackFired = false;
 let playToken = 0;
 
+const MUSIC_VOLUME = 0.2;
+const DUCKED_MUSIC_VOLUME = 0.06;
+let musicDucked = false;
+
+// La musique s'efface pendant une consigne, pour que la voix reste nette.
+function duckMusic(ducked: boolean) {
+  musicDucked = ducked;
+  try {
+    if (backgroundPlayer) {
+      backgroundPlayer.volume = ducked ? DUCKED_MUSIC_VOLUME : MUSIC_VOLUME;
+    }
+  } catch {}
+}
+
 const resolvedUris = new Map<number, string>();
 
 function resolveSource(src: AudioSource): AudioSource {
@@ -403,12 +417,15 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
             if (get().audioLoading) {
               set({audioLoading: false});
             }
+            const token = playToken;
             if (!foregroundCallbackFired && foregroundCallback) {
               foregroundCallbackFired = true;
               const cb = foregroundCallback;
               foregroundCallback = null;
               cb();
             }
+            // Si le callback a enchaîné sur un autre son, la musique reste baissée.
+            if (token === playToken) duckMusic(false);
           }
         });
       } else {
@@ -429,6 +446,7 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
       if (token !== playToken) return;
       // Armé seulement ici : un didJustFinish tardif du son précédent arrive avant la fin du seekTo.
       foregroundCallback = callback ?? null;
+      duckMusic(true);
       foregroundPlayer.play();
     } catch (err: any) {
       Sentry.logger.error('Audio error: play', {
@@ -436,6 +454,7 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
       });
       Sentry.captureException(err);
       set({audioLoading: false});
+      if (token === playToken) duckMusic(false);
     }
   },
   stop: () => {
@@ -444,6 +463,7 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
     try {
       foregroundPlayer?.pause();
     } catch {}
+    duckMusic(false);
     set({audioLoading: false});
   },
   replay: async () => {
@@ -451,12 +471,14 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
     if (!player) return;
     try {
       await player.seekTo(0);
+      duckMusic(true);
       player.play();
     } catch (err: any) {
       Sentry.logger.error('Audio error: replay', {
         error: err?.message ?? String(err),
       });
       Sentry.captureException(err);
+      duckMusic(false);
     }
   },
   playBackground: async (src: AudioSource) => {
@@ -472,7 +494,9 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
       }
       backgroundSource = src;
       backgroundPlayer.loop = true;
-      backgroundPlayer.volume = 0.2;
+      backgroundPlayer.volume = musicDucked
+        ? DUCKED_MUSIC_VOLUME
+        : MUSIC_VOLUME;
       if (shouldPlay) backgroundPlayer.play();
       set({backgroundLoaded: true, backgroundPlaying: shouldPlay});
     }, 'Audio error: playBackground');
