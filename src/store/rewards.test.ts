@@ -66,6 +66,15 @@ describe('claim', () => {
     expect(rewards().getState().decors).toEqual(['banquise']);
   });
 
+  it('wins a track and keeps it across launches', () => {
+    rewards().getState().claim('game-1', 'number', 9);
+    rewards().getState().claim('game-2', 'number', 9);
+
+    jest.resetModules();
+
+    expect(rewards().getState().tracks).toEqual(['aventure']);
+  });
+
   it('wins nothing below 9', () => {
     expect(rewards().getState().claim('game-1', 'shape', 8)).toBeNull();
     expect(mockFiles[REWARDS_FILE]).toBeUndefined();
@@ -77,11 +86,13 @@ describe('saved rewards', () => {
     mockFiles[REWARDS_FILE] = JSON.stringify({
       mascots: ['sheep', 'owl', 'dragon'],
       decors: 'banquise',
+      tracks: ['festive', 'calme'],
     });
 
     expect(rewards().getState()).toMatchObject({
       mascots: ['sheep'],
       decors: [],
+      tracks: ['festive'],
     });
   });
 
@@ -94,33 +105,36 @@ describe('saved rewards', () => {
 
 // Les réglages s'appuient sur les récompenses gagnées pour écarter un choix verrouillé.
 describe('saved settings', () => {
-  it('fall back to the base mascot and decor when the saved ones are locked', () => {
+  it('fall back to the base mascot, decor and track when the saved ones are locked', () => {
     mockFiles[SETTINGS_FILE] = JSON.stringify({
       mascot: 'rabbit',
       decor: 'banquise',
-      musicTrack: 'calme',
+      musicTrack: 'festive',
     });
 
     expect(settings().getState()).toMatchObject({
       mascot: 'owl',
       decor: 'nuages',
-      musicTrack: 'calme',
+      musicTrack: 'joyeuse',
     });
   });
 
-  it('keep a mascot and a decor that were won', () => {
+  it('keep a mascot, a decor and a track that were won', () => {
     mockFiles[REWARDS_FILE] = JSON.stringify({
       mascots: ['rabbit'],
       decors: ['banquise'],
+      tracks: ['festive'],
     });
     mockFiles[SETTINGS_FILE] = JSON.stringify({
       mascot: 'rabbit',
       decor: 'banquise',
+      musicTrack: 'festive',
     });
 
     expect(settings().getState()).toMatchObject({
       mascot: 'rabbit',
       decor: 'banquise',
+      musicTrack: 'festive',
     });
   });
 

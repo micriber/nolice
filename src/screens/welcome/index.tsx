@@ -15,7 +15,11 @@ import {MUSIC_TRACKS, useSoundStore} from '../../store/audio';
 import {DecorKey, useSettingsStore} from '../../store/settings';
 import {NOL, shade} from '../../utils/color';
 import FONT from '../../utils/font';
-import {DECOR_UNLOCKS, MASCOT_UNLOCKS} from '../../utils/rewards';
+import {
+  DECOR_UNLOCKS,
+  MASCOT_UNLOCKS,
+  TRACK_UNLOCKS,
+} from '../../utils/rewards';
 import {useScale} from '../../utils/scale';
 import {TRACK_CHOICES} from '../../utils/tracks';
 import {NavigationProp} from '../types';
@@ -35,6 +39,7 @@ const BASE_MASCOTS = MASCOTS.filter((mascot) => !MASCOT_UNLOCKS[mascot.key]);
 const BASE_DECORS = (Object.keys(DECOR_LABELS) as DecorKey[]).filter(
   (decor) => !DECOR_UNLOCKS[decor],
 );
+const BASE_TRACKS = TRACK_CHOICES.filter((track) => !TRACK_UNLOCKS[track.key]);
 
 function Choice({
   selected,
@@ -201,7 +206,7 @@ export default function WelcomeScreen({navigation}: Props) {
                 </Choice>
               ))}
             {step === 2 &&
-              TRACK_CHOICES.map((track) => {
+              BASE_TRACKS.map((track) => {
                 const selected = settings.musicTrack === track.key;
                 return (
                   <Choice

@@ -16,7 +16,7 @@ export type MascotKey =
   | 'rabbit'
   | 'cow';
 export type DecorKey = 'banquise' | 'bulles' | 'nuages' | 'automne';
-export type MusicTrackKey = 'joyeuse' | 'calme';
+export type MusicTrackKey = 'joyeuse' | 'calme' | 'aventure' | 'festive';
 
 export type Settings = {
   mascot: MascotKey;
@@ -38,13 +38,16 @@ const settingsFile = () => new File(Paths.document, 'nolice-settings.json');
 // Un choix enregistré mais pas gagné retombe sur celui de base.
 function withoutLocked(settings: Settings): Settings {
   const owned = useRewardsStore.getState();
-  const {mascot, decor} = settings;
+  const {mascot, decor, musicTrack} = settings;
   return {
     ...settings,
     mascot: lockOf({kind: 'mascot', key: mascot}, owned)
       ? DEFAULTS.mascot
       : mascot,
     decor: lockOf({kind: 'decor', key: decor}, owned) ? DEFAULTS.decor : decor,
+    musicTrack: lockOf({kind: 'track', key: musicTrack}, owned)
+      ? DEFAULTS.musicTrack
+      : musicTrack,
   };
 }
 

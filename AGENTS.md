@@ -62,7 +62,7 @@ src/
     audio.ts             useSoundStore — single foreground player + looping background player
     game.ts              useGameScoreStore — questions[], currentIndex, init/next/hasMore/getResults
     settings.ts          useSettingsStore — mascot/decor/musicTrack and `welcomed` (welcome tour done), persisted to a JSON file (expo-file-system)
-    rewards.ts           useRewardsStore — mascots and decors won so far, persisted to a JSON file; `claim(gameId, game, score)` grants the reward of a finished game
+    rewards.ts           useRewardsStore — mascots, decors and tracks won so far, persisted to a JSON file; `claim(gameId, game, score)` grants the reward of a finished game
   utils/                 array.shuffle, random helpers, color (NOL palette + GAMES) / font constants, scale (tablet enlargement), rewards (what unlocks each locked mascot, decor and track), tracks (label and pictogram of each music track)
 assets/audio/            ~77 mp3 files (questions, answers, bravo/dommage/congratulation/retry, music tracks)
 assets/animals/          PNG animals (game pictures and mascots)
@@ -95,7 +95,7 @@ Key contract:
 
 Audio file mapping (`src/store/audio.ts`):
 - `SOUNDS` — global one-offs: `BRAVO`, `DOMMAGE`, `CONGRATULATION`, `RETRY`
-- `MUSIC_TRACKS` — background tracks keyed by the `musicTrack` setting (`joyeuse`, `calme`); `App.tsx` calls `playBackground(MUSIC_TRACKS[musicTrack])` each time the setting changes
+- `MUSIC_TRACKS` — background tracks keyed by the `musicTrack` setting (`joyeuse`, `calme`, `aventure`, `festive`); `App.tsx` calls `playBackground(MUSIC_TRACKS[musicTrack])` each time the setting changes
 - `SOUNDS_COUNT_QUESTION` — count questions per animal + spoken numbers 1–9
 - `SOUNDS_QUESTION[gameType.toUpperCase()][key.toUpperCase()].{QUESTION,ANSWER}` — find/identify per game type per item
 
@@ -136,7 +136,7 @@ Jest with the `jest-expo` preset, test files next to the code they cover (`*.tes
 - `src/store/game.test.ts`, `src/utils/random.test.ts` — question generation rules, checked over a few hundred random games each.
 - `src/screens/game/question-config.test.ts` — every FindGame item has its sounds and its picture.
 - `src/utils/rewards.test.ts` — the reward plan adds up (ten rewards, one mascot then one decor or track per game, two mascots for a perfect game), the popup sentences, and which reward a finished game wins.
-- `src/store/rewards.test.ts` — rewards are saved and reloaded, a game is claimed once, and saved settings drop a mascot or decor that was not won. Runs against an in-memory `expo-file-system`.
+- `src/store/rewards.test.ts` — rewards are saved and reloaded, a game is claimed once, and saved settings drop a mascot, decor or track that was not won. Runs against an in-memory `expo-file-system`.
 - `src/store/audio.test.ts` — the audio contract above, against a fake `expo-audio` player whose seek and status events the test drives. It proves the store's logic, not the real player: audio changes still need a device check.
 
 ## Conventions / pitfalls
@@ -148,11 +148,11 @@ Jest with the `jest-expo` preset, test files next to the code they cover (`*.tes
 - **Question order** — `init()` deals answers in shuffled rounds, so every answer comes up before one repeats, and it reverses a round that would open on the answer closing the previous one, so two consecutive questions never share an answer. Keep both rules if editing the generator.
 - **Adding/renaming a FindGame item** touches three places: its list in `QUESTION_CONFIGS`, the audio entry in `SOUNDS_QUESTION[gameType.toUpperCase()]` and the picture map in its `*-picture.tsx`. `question-config.test.ts` fails while one is missing.
 - **Settings persistence** goes through `useSettingsStore` (JSON file via the sync `expo-file-system` v55 `File` API) — no AsyncStorage in this project.
-- **Adding a music track**: add the key to `MusicTrackKey` (`src/store/settings.ts`), the mp3 to `MUSIC_TRACKS` (`src/store/audio.ts`) and its label and pictogram to `TRACK_CHOICES` (`src/utils/tracks.ts`), a pictogram a child can tell apart without reading. Picking a track in Settings turns the music on, and dancing bars mark the one being heard.
+- **Adding a music track**: add the key to `MusicTrackKey` (`src/store/settings.ts`), the mp3 to `MUSIC_TRACKS` (`src/store/audio.ts`) and its label and pictogram to `TRACK_CHOICES` (`src/utils/tracks.ts`), a pictogram a child can tell apart without reading; a track to win also gets an entry in `TRACK_UNLOCKS`. Picking a track in Settings turns the music on, and dancing bars mark the one being heard.
 - **Tablet sizing**: every size a child sees goes through `useScale()` — 1 on a phone, up to 2 on a tablet, held back by the window height so a page never overflows. A page taller than 700dp in the design passes its own design height (`useScale(860)` in Settings). A raw dp value stays phone-sized on a tablet.
 - **Stretched SVGs go through `<FillSvg>`**: it measures its container and passes numeric sizes. A `width="100%"` Svg keeps its old drawing when the window is resized (a foldable being opened), and comes out too narrow inside a padded parent.
 - **Portrait lock on tablets**: Android may ignore it on screens ≥ 600dp and show the app in a portrait band inside a landscape screen (a narrow, short window — hence the height limit in `useScale()`). On Android 16 the lock is dropped entirely for apps targeting API 36; `plugins/withPortraitOnLargeScreens.js` declares the temporary opt-out, which stops working once the app targets API 37 — a landscape layout is needed before that bump.
-- **Rewards** (plan in `readme.md`, « Les récompenses à débloquer »): `src/utils/rewards.ts` holds the rules — what each locked mascot or decor needs (`MASCOT_UNLOCKS`, `DECOR_UNLOCKS`) and `rewardFor(game, score, owned)`, which gives at most one reward per game: a perfect-game mascot on 10/10 while one is left, otherwise from 9/10 the next reward of the game. Score claims it once per `gameId` through `useRewardsStore` and shows it on a card the child taps to select it; Settings greys what `lockOf()` still reports as locked, and `useSettingsStore` falls back to the default mascot or decor when the saved one was not won. The two extra tracks do not exist yet: Settings shows them as « Mystère » and no game can win them. Unlocking a new mascot or decor = one entry in its `*_UNLOCKS` map.
+- **Rewards** (plan in `readme.md`, « Les récompenses à débloquer »): `src/utils/rewards.ts` holds the rules — what each locked mascot, decor or track needs (`MASCOT_UNLOCKS`, `DECOR_UNLOCKS`, `TRACK_UNLOCKS`) and `rewardFor(game, score, owned)`, which gives at most one reward per game: a perfect-game mascot on 10/10 while one is left, otherwise from 9/10 the next reward of the game. Score claims it once per `gameId` through `useRewardsStore` and shows it on a card the child taps to select it; Settings greys what `lockOf()` still reports as locked, and `useSettingsStore` falls back to the default mascot, decor or track when the saved one was not won. Unlocking a new mascot, decor or track = one entry in its `*_UNLOCKS` map.
 - **Adding a 5th/6th game**: append to `GAMES` in `src/utils/color.ts` — the Home grid auto-wraps to 3 rows of 2 (layout validated in the design).
 
 ## Things that are NOT in the codebase

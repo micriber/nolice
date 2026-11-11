@@ -18,13 +18,14 @@ import DecorThumb from '../../components/DecorThumb';
 import {DECOR_LABELS} from '../../components/IceBg';
 import Mascot, {MASCOTS} from '../../components/Mascot';
 import Screen from '../../components/Screen';
-import {SOUNDS, useSoundStore} from '../../store/audio';
+import {MUSIC_TRACKS, SOUNDS, useSoundStore} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
 import {useRewardsStore} from '../../store/rewards';
 import {useSettingsStore} from '../../store/settings';
 import {NOL, gameConfig, shade} from '../../utils/color';
 import FONT from '../../utils/font';
 import {Reward, SUCCESS_SCORE} from '../../utils/rewards';
+import {TRACK_CHOICES} from '../../utils/tracks';
 import {NavigationProp} from '../types';
 
 // Étoile qui apparaît en « pop » avec un délai.
@@ -66,11 +67,67 @@ function Star({
   );
 }
 
+function rewardLook(reward: Reward) {
+  switch (reward.kind) {
+    case 'mascot':
+      return {
+        title: 'Nouvelle mascotte !',
+        name: MASCOTS.find((m) => m.key === reward.key)?.label,
+        picture: <Mascot size={58} who={reward.key} anim="none" />,
+      };
+    case 'decor':
+      return {
+        title: 'Nouveau décor !',
+        name: DECOR_LABELS[reward.key],
+        picture: (
+          <View style={styles.rewardDecor}>
+            <DecorThumb scene={reward.key} unit={0.7} radius={10} />
+          </View>
+        ),
+      };
+    case 'track': {
+      const track = TRACK_CHOICES.find((t) => t.key === reward.key);
+      return {
+        title: 'Nouvelle musique !',
+        name: track?.label,
+        picture: (
+          <MaterialCommunityIcons
+            name={track?.icon ?? 'music'}
+            size={52}
+            color={track?.color ?? NOL.sky}
+          />
+        ),
+      };
+    }
+  }
+}
+
 // Récompense gagnée avec cette partie, qui apparaît en « pop » après les étoiles : la toucher la choisit.
 function RewardCard({reward}: {reward: Reward}) {
   const pop = useRef(new Animated.Value(0)).current;
-  const chosen = useSettingsStore((s) => s[reward.kind] === reward.key);
+  const chosen = useSettingsStore(
+    (s) =>
+      (reward.kind === 'mascot'
+        ? s.mascot
+        : reward.kind === 'decor'
+          ? s.decor
+          : s.musicTrack) === reward.key,
+  );
   const setSetting = useSettingsStore((s) => s.setSetting);
+  const startBackground = useSoundStore((s) => s.startBackground);
+  const choose = () => {
+    switch (reward.kind) {
+      case 'mascot':
+        setSetting('mascot', reward.key);
+        break;
+      case 'decor':
+        setSetting('decor', reward.key);
+        break;
+      case 'track':
+        setSetting('musicTrack', reward.key);
+        void startBackground(MUSIC_TRACKS[reward.key]);
+    }
+  };
   useEffect(() => {
     Animated.sequence([
       Animated.delay(800),
@@ -82,10 +139,7 @@ function RewardCard({reward}: {reward: Reward}) {
       }),
     ]).start();
   }, []);
-  const mascot = reward.kind === 'mascot';
-  const name = mascot
-    ? MASCOTS.find((m) => m.key === reward.key)?.label
-    : DECOR_LABELS[reward.key];
+  const {title, name, picture} = rewardLook(reward);
   return (
     <Animated.View
       style={[
@@ -102,22 +156,10 @@ function RewardCard({reward}: {reward: Reward}) {
           ],
         },
       ]}>
-      <Pressable
-        style={styles.reward}
-        onPress={() => {
-          setSetting(reward.kind, reward.key);
-        }}>
-        {mascot ? (
-          <Mascot size={58} who={reward.key} anim="none" />
-        ) : (
-          <View style={styles.rewardDecor}>
-            <DecorThumb scene={reward.key} unit={0.7} radius={10} />
-          </View>
-        )}
+      <Pressable style={styles.reward} onPress={choose}>
+        {picture}
         <View style={styles.rewardText}>
-          <Text style={styles.rewardTitle}>
-            {mascot ? 'Nouvelle mascotte !' : 'Nouveau décor !'}
-          </Text>
+          <Text style={styles.rewardTitle}>{title}</Text>
           <Text style={styles.rewardName}>{name}</Text>
         </View>
         {chosen && (

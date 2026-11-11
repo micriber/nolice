@@ -20,4 +20,6 @@ export const TRACK_CHOICES: {
     color: NOL.amber,
   },
   {key: 'calme', label: 'Calme', icon: 'weather-night', color: NOL.violet},
+  {key: 'aventure', label: 'Aventure', icon: 'rocket-launch', color: NOL.teal},
+  {key: 'festive', label: 'Festive', icon: 'party-popper', color: NOL.coral},
 ];

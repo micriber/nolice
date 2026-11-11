@@ -1,5 +1,5 @@
 import {GameKey, gameConfig} from './color';
-import type {DecorKey, MascotKey} from '../store/settings';
+import type {DecorKey, MascotKey, MusicTrackKey} from '../store/settings';
 
 // Ce qu'il faut réussir pour gagner une récompense : une ou deux parties d'un jeu
 // avec au moins 9 sur 10, ou un sans-faute dans n'importe quel jeu.
@@ -19,35 +19,41 @@ export const DECOR_UNLOCKS: Partial<Record<DecorKey, Unlock>> = {
   automne: {game: 'animal', successes: 2},
 };
 
-// Récompenses dont le contenu reste à créer : deux musiques.
-export const UPCOMING_TRACK_UNLOCKS: Unlock[] = [
-  {game: 'number', successes: 2},
-  {game: 'color', successes: 2},
-];
+export const TRACK_UNLOCKS: Partial<Record<MusicTrackKey, Unlock>> = {
+  aventure: {game: 'number', successes: 2},
+  festive: {game: 'color', successes: 2},
+};
 
 export const SUCCESS_SCORE = 9;
 export const PERFECT_SCORE = 10;
 
 export type Reward =
   | {kind: 'mascot'; key: MascotKey}
-  | {kind: 'decor'; key: DecorKey};
+  | {kind: 'decor'; key: DecorKey}
+  | {kind: 'track'; key: MusicTrackKey};
 
 export type Owned = {
   mascots: readonly MascotKey[];
   decors: readonly DecorKey[];
+  tracks: readonly MusicTrackKey[];
 };
 
-const owns = (owned: Owned, reward: Reward) =>
-  reward.kind === 'mascot'
-    ? owned.mascots.includes(reward.key)
-    : owned.decors.includes(reward.key);
-
-// La règle qui verrouille encore cette mascotte ou ce décor ; rien s'il est de base ou déjà gagné.
+// La règle qui verrouille encore cette récompense ; rien si elle est de base ou déjà gagnée.
 export function lockOf(reward: Reward, owned: Owned): Unlock | undefined {
-  if (owns(owned, reward)) return undefined;
-  return reward.kind === 'mascot'
-    ? MASCOT_UNLOCKS[reward.key]
-    : DECOR_UNLOCKS[reward.key];
+  switch (reward.kind) {
+    case 'mascot':
+      return owned.mascots.includes(reward.key)
+        ? undefined
+        : MASCOT_UNLOCKS[reward.key];
+    case 'decor':
+      return owned.decors.includes(reward.key)
+        ? undefined
+        : DECOR_UNLOCKS[reward.key];
+    case 'track':
+      return owned.tracks.includes(reward.key)
+        ? undefined
+        : TRACK_UNLOCKS[reward.key];
+  }
 }
 
 const REWARDS: Reward[] = [
@@ -57,10 +63,13 @@ const REWARDS: Reward[] = [
   ...(Object.keys(DECOR_UNLOCKS) as DecorKey[]).map(
     (key): Reward => ({kind: 'decor', key}),
   ),
+  ...(Object.keys(TRACK_UNLOCKS) as MusicTrackKey[]).map(
+    (key): Reward => ({kind: 'track', key}),
+  ),
 ];
 
 // Une partie donne au plus une récompense : au sans-faute, une mascotte du sans-faute tant qu'il en
-// reste ; sinon, à partir de 9 sur 10, la récompense suivante du jeu (sa mascotte, puis son décor).
+// reste ; sinon, à partir de 9 sur 10, la récompense suivante du jeu (sa mascotte, puis son décor ou sa musique).
 export function rewardFor(
   game: GameKey,
   score: number,

@@ -38,15 +38,15 @@ Dix récompenses se gagnent en jouant : six mascottes, deux décors et deux musi
 |---|---|---|
 | Mascottes | Nolice, le chat et le chien | Les six autres animaux du jeu : lapin, canard, oiseau, cochon, vache et mouton |
 | Décors | Nuages et bulles | La banquise et l’automne |
-| Musiques | Joyeuse et calme | Deux musiques, à créer |
+| Musiques | Joyeuse et calme | Aventure et festive |
 
 Chaque jeu est lié à une mascotte, puis à un décor ou une musique :
 
 | Jeu | Première réussite | Deuxième réussite |
 |---|---|---|
-| Les nombres | Le mouton | La troisième musique |
+| Les nombres | Le mouton | La musique aventure |
 | Les animaux | Le canard | L’automne |
-| Les couleurs | L’oiseau | La quatrième musique |
+| Les couleurs | L’oiseau | La musique festive |
 | Les formes | Le cochon | La banquise |
 
 Une réussite est une partie terminée avec au moins 9 sur 10. Le lapin et la vache sont les deux mascottes du sans-faute.

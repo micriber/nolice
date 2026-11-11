@@ -2,7 +2,7 @@ import {GAMES} from './color';
 import {
   DECOR_UNLOCKS,
   MASCOT_UNLOCKS,
-  UPCOMING_TRACK_UNLOCKS,
+  TRACK_UNLOCKS,
   Owned,
   Unlock,
   rewardFor,
@@ -10,7 +10,10 @@ import {
 } from './rewards';
 
 const mascots = Object.values(MASCOT_UNLOCKS);
-const others = [...Object.values(DECOR_UNLOCKS), ...UPCOMING_TRACK_UNLOCKS];
+const others = [
+  ...Object.values(DECOR_UNLOCKS),
+  ...Object.values(TRACK_UNLOCKS),
+];
 
 const gamesAt = (unlocks: Unlock[], successes: number) =>
   unlocks
@@ -60,7 +63,8 @@ describe('unlockHint', () => {
 });
 
 describe('rewardFor', () => {
-  const nothing: Owned = {mascots: [], decors: []};
+  const nothing: Owned = {mascots: [], decors: [], tracks: []};
+  const owning = (owned: Partial<Owned>): Owned => ({...nothing, ...owned});
 
   it('gives nothing below 9', () => {
     expect(rewardFor('shape', 8, nothing)).toBeNull();
@@ -74,20 +78,23 @@ describe('rewardFor', () => {
   });
 
   it('gives the decor of the game on its second success', () => {
-    expect(rewardFor('shape', 9, {mascots: ['pig'], decors: []})).toEqual({
+    expect(rewardFor('shape', 9, owning({mascots: ['pig']}))).toEqual({
       kind: 'decor',
       key: 'banquise',
     });
   });
 
-  it('gives nothing once the game has no reward left', () => {
-    const owned: Owned = {mascots: ['pig'], decors: ['banquise']};
-
-    expect(rewardFor('shape', 9, owned)).toBeNull();
+  it('gives the track of the game on its second success', () => {
+    expect(rewardFor('number', 9, owning({mascots: ['sheep']}))).toEqual({
+      kind: 'track',
+      key: 'aventure',
+    });
   });
 
-  it('gives nothing for a second reward that does not exist yet', () => {
-    expect(rewardFor('number', 9, {mascots: ['sheep'], decors: []})).toBeNull();
+  it('gives nothing once the game has no reward left', () => {
+    const owned = owning({mascots: ['pig'], decors: ['banquise']});
+
+    expect(rewardFor('shape', 9, owned)).toBeNull();
   });
 
   it('gives a perfect-game mascot first, one per perfect game', () => {
@@ -95,14 +102,14 @@ describe('rewardFor', () => {
       kind: 'mascot',
       key: 'rabbit',
     });
-    expect(rewardFor('color', 10, {mascots: ['rabbit'], decors: []})).toEqual({
+    expect(rewardFor('color', 10, owning({mascots: ['rabbit']}))).toEqual({
       kind: 'mascot',
       key: 'cow',
     });
   });
 
   it('falls back to the reward of the game once both perfect-game mascots are won', () => {
-    const owned: Owned = {mascots: ['rabbit', 'cow'], decors: []};
+    const owned = owning({mascots: ['rabbit', 'cow']});
 
     expect(rewardFor('color', 10, owned)).toEqual({
       kind: 'mascot',
@@ -111,19 +118,26 @@ describe('rewardFor', () => {
   });
 
   it('hands out every existing reward, one per winning game', () => {
-    const owned = {mascots: [] as string[], decors: [] as string[]};
+    const owned = {
+      mascot: [] as string[],
+      decor: [] as string[],
+      track: [] as string[],
+    };
     let games = 0;
     for (const game of [...allGames, ...allGames, ...allGames]) {
-      const reward = rewardFor(game, 10, owned as Owned);
+      const reward = rewardFor(game, 10, {
+        mascots: owned.mascot,
+        decors: owned.decor,
+        tracks: owned.track,
+      } as Owned);
       if (!reward) continue;
       games++;
-      (reward.kind === 'mascot' ? owned.mascots : owned.decors).push(
-        reward.key,
-      );
+      owned[reward.kind].push(reward.key);
     }
 
-    expect(owned.mascots).toHaveLength(6);
-    expect(owned.decors.sort()).toEqual(['automne', 'banquise']);
-    expect(games).toBe(8);
+    expect(owned.mascot).toHaveLength(6);
+    expect(owned.decor.sort()).toEqual(['automne', 'banquise']);
+    expect(owned.track.sort()).toEqual(['aventure', 'festive']);
+    expect(games).toBe(10);
   });
 });

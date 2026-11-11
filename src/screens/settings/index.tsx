@@ -21,14 +21,9 @@ import {
 } from '../../store/settings';
 import {NOL, shade} from '../../utils/color';
 import FONT from '../../utils/font';
-import {
-  UPCOMING_TRACK_UNLOCKS,
-  Unlock,
-  lockOf,
-  unlockHint,
-} from '../../utils/rewards';
+import {Unlock, lockOf, unlockHint} from '../../utils/rewards';
 import {useScale} from '../../utils/scale';
-import {IconName, TRACK_CHOICES} from '../../utils/tracks';
+import {TRACK_CHOICES} from '../../utils/tracks';
 import {NavigationProp} from '../types';
 
 type Props = {
@@ -38,22 +33,6 @@ type Props = {
 const DECORS: DecorKey[] = ['nuages', 'bulles', 'banquise', 'automne'];
 
 const LOCKED_GREY = '#9FB4C2';
-
-const TRACKS: {
-  key?: MusicTrackKey;
-  label: string;
-  icon: IconName;
-  color: string;
-  unlock?: Unlock;
-}[] = [
-  ...TRACK_CHOICES,
-  ...UPCOMING_TRACK_UNLOCKS.map((unlock) => ({
-    label: 'Mystère',
-    icon: 'help' as const,
-    color: LOCKED_GREY,
-    unlock,
-  })),
-];
 
 const DESIGN_WIDTH = 412;
 const DESIGN_HEIGHT = 1035;
@@ -132,7 +111,8 @@ export default function SettingsScreen({navigation}: Props) {
   const [locked, setLocked] = useState<LockedInfo | null>(null);
   const mascots = useRewardsStore((s) => s.mascots);
   const decors = useRewardsStore((s) => s.decors);
-  const owned = {mascots, decors};
+  const tracks = useRewardsStore((s) => s.tracks);
+  const owned = {mascots, decors, tracks};
   const musicOn = useSoundStore((s) => s.backgroundPlaying);
   const startBackground = useSoundStore((s) => s.startBackground);
 
@@ -284,26 +264,26 @@ export default function SettingsScreen({navigation}: Props) {
           {/* MUSIQUE */}
           <SettingsCard title="La musique">
             <View style={styles.decorRow}>
-              {TRACKS.map((tr, i) => {
-                const sel = settings.musicTrack === tr.key;
-                const {key, unlock} = tr;
+              {TRACK_CHOICES.map((tr) => {
+                const {key} = tr;
+                const sel = settings.musicTrack === key;
+                const unlock = lockOf({kind: 'track', key}, owned);
                 return (
                   <Pressable
-                    key={i}
+                    key={key}
                     onPress={() => {
-                      if (key) {
+                      if (!unlock) {
                         chooseTrack(key);
                         return;
                       }
-                      if (!unlock) return;
                       setLocked({
                         title: tr.label,
                         unlock,
                         picture: (
                           <MaterialCommunityIcons
-                            name="music"
+                            name={tr.icon}
                             size={80 * scale}
-                            color={NOL.sky}
+                            color={tr.color}
                           />
                         ),
                       });

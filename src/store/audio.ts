@@ -95,6 +95,8 @@ const CONGRATULATION_SOUND_PATH = '../../assets/audio/congratulation.mp3';
 const RETRY_SOUND_PATH = '../../assets/audio/retry.mp3';
 const JOYEUSE_MUSIC_PATH = '../../assets/audio/joyeux.mp3';
 const CALME_MUSIC_PATH = '../../assets/audio/calme.mp3';
+const AVENTURE_MUSIC_PATH = '../../assets/audio/aventure.mp3';
+const FESTIVE_MUSIC_PATH = '../../assets/audio/festive.mp3';
 const ANSWER_ONE_SOUND_PATH = '../../assets/audio/response-one.mp3';
 const ANSWER_TWO_SOUND_PATH = '../../assets/audio/response-two.mp3';
 const ANSWER_THREE_SOUND_PATH = '../../assets/audio/response-three.mp3';
@@ -133,6 +135,8 @@ export const SOUNDS: SoundsType = {
 export const MUSIC_TRACKS: Record<MusicTrackKey, AudioSource> = {
   joyeuse: require(JOYEUSE_MUSIC_PATH),
   calme: require(CALME_MUSIC_PATH),
+  aventure: require(AVENTURE_MUSIC_PATH),
+  festive: require(FESTIVE_MUSIC_PATH),
 };
 
 export interface SoundCountType {
