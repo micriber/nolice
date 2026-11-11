@@ -74,10 +74,6 @@ L’écran de score suit la même règle, trois étoiles pour une récompense. L
 
 Au lancement du jeu, l’enfant suit un petit parcours pour choisir sa mascotte, son décor et sa musique avant d’arriver sur l’accueil. Il choisit parmi ce qui est disponible au départ.
 
-### Le choix de la musique
-
-Revoir le choix de la musique dans les réglages pour qu’un enfant le comprenne. Aujourd’hui, ce sont deux boutons qui portent un nom écrit, « Joyeuse » et « Calme », alors que l’enfant ne sait pas encore lire.
-
 ### Requirements
 
 Make sure you have the following installed:
