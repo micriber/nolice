@@ -30,6 +30,54 @@ Conserver la même illustration pour que seule la taille varie, avec des écarts
 
 Une version **Nolice – Élémentaire** est également envisagée ensuite, avec des jeux adaptés à ce niveau ; les premières pistes sont un jeu de calcul et un jeu où il faut deviner des mots.
 
+### Les récompenses à débloquer
+
+Dix récompenses se gagnent en jouant : six mascottes, deux décors et deux musiques.
+
+| | Disponible au départ | À débloquer |
+|---|---|---|
+| Mascottes | Nolice, le chat et le chien | Les six autres animaux du jeu : lapin, canard, oiseau, cochon, vache et mouton |
+| Décors | Nuages et bulles | La banquise et un quatrième décor, à créer |
+| Musiques | Joyeuse et calme | Deux musiques, à créer |
+
+Le cochon, la vache et le mouton ne sont pas encore proposés comme mascottes.
+
+Chaque jeu est lié à une mascotte, puis à un décor ou une musique :
+
+| Jeu | Première réussite | Deuxième réussite |
+|---|---|---|
+| Les nombres | Le mouton | La troisième musique |
+| Les animaux | Le canard | Le quatrième décor |
+| Les couleurs | L’oiseau | La quatrième musique |
+| Les formes | Le cochon | La banquise |
+
+Une réussite est une partie terminée avec au moins 9 sur 10. Le lapin et la vache sont les deux mascottes du sans-faute.
+
+Une partie ne donne jamais plus d’une récompense :
+
+- Un sans-faute (10 sur 10), dans n’importe quel jeu, donne une mascotte du sans-faute tant qu’il en reste.
+- Sinon, une réussite donne la récompense suivante du jeu : sa mascotte, puis son décor ou sa musique.
+
+Les dix récompenses demandent donc au moins dix parties réussies.
+
+Les récompenses sont à publier dans la même version que le choix de la mascotte et du décor, absent de la version aujourd’hui en ligne : aucun joueur ne perd alors quelque chose qu’il avait déjà.
+
+L’écran de score suit la même règle, trois étoiles pour une récompense. Les titres et l’humeur de la mascotte restent ceux d’aujourd’hui, seuls les seuils changent :
+
+| Score | Étoiles | Titre | Aujourd’hui |
+|---|---|---|---|
+| 9 ou 10 | 3 | « Bravo ! » | À partir de 8 |
+| 5 à 8 | 2 | « Bien joué ! » | De 4 à 7 |
+| 0 à 4 | 1 | « Bien essayé ! » | De 0 à 3 |
+
+### Le parcours de bienvenue
+
+Au lancement du jeu, l’enfant suit un petit parcours pour choisir sa mascotte, son décor et sa musique avant d’arriver sur l’accueil. Il choisit parmi ce qui est disponible au départ.
+
+### Le choix de la musique
+
+Revoir le choix de la musique dans les réglages pour qu’un enfant le comprenne. Aujourd’hui, ce sont deux boutons qui portent un nom écrit, « Joyeuse » et « Calme », alors que l’enfant ne sait pas encore lire.
+
 ### Requirements
 
 Make sure you have the following installed:
