@@ -13,7 +13,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import * as Sentry from '@sentry/react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import {StatusBar} from 'expo-status-bar';
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 import {NumberGame, FindGame} from './src/screens/game';
@@ -21,6 +21,7 @@ import {Home} from './src/screens/home';
 import ScoreScreen from './src/screens/score';
 import SettingsScreen from './src/screens/settings';
 import {StackNavigatorParamList} from './src/screens/types';
+import WelcomeScreen from './src/screens/welcome';
 import {MUSIC_TRACKS, useSoundStore} from './src/store/audio';
 import {useSettingsStore} from './src/store/settings';
 
@@ -53,6 +54,10 @@ function App() {
   const backgroundLoaded = useSoundStore((s) => s.backgroundLoaded);
   const assetsLoaded = useSoundStore((s) => s.assetsLoaded);
   const musicTrack = useSettingsStore((state) => state.musicTrack);
+  // Lu une seule fois : finir le parcours ne doit pas changer la route de départ en cours de route.
+  const [firstRoute] = useState<keyof StackNavigatorParamList>(() =>
+    useSettingsStore.getState().welcomed ? 'Home' : 'Welcome',
+  );
   useEffect(() => {
     playBackground(MUSIC_TRACKS[musicTrack]).catch((err: any) => {
       Sentry.logger.error('Audio error: background music init', {
@@ -103,10 +108,15 @@ function App() {
         }}
         ref={navigationRef}>
         <Stack.Navigator
-          initialRouteName="Home"
+          initialRouteName={firstRoute}
           screenOptions={{
             headerShown: false,
           }}>
+          <Stack.Screen
+            name="Welcome"
+            component={WelcomeScreen}
+            options={{animation: 'fade'}}
+          />
           <Stack.Screen
             name="Home"
             component={Home}

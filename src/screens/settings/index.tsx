@@ -1,18 +1,11 @@
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {
-  Animated,
-  Easing,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import React, {useMemo, useState} from 'react';
+import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
 
 import UnlockPopup from './unlock-popup';
 import DecorThumb from '../../components/DecorThumb';
+import Equalizer from '../../components/Equalizer';
 import {DECOR_LABELS} from '../../components/IceBg';
 import Mascot, {MASCOTS} from '../../components/Mascot';
 import MusicButton from '../../components/MusicButton';
@@ -36,6 +29,7 @@ import {
   unlockHint,
 } from '../../utils/rewards';
 import {useScale} from '../../utils/scale';
+import {IconName, TRACK_CHOICES} from '../../utils/tracks';
 import {NavigationProp} from '../types';
 
 type Props = {
@@ -49,9 +43,6 @@ const DECORS: DecorOption[] = ['nuages', 'bulles', 'banquise', 'mystery'];
 
 const LOCKED_GREY = '#9FB4C2';
 
-type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
-
-// Un pictogramme par musique : l'enfant la reconnaît sans lire son nom.
 const TRACKS: {
   key?: MusicTrackKey;
   label: string;
@@ -59,13 +50,7 @@ const TRACKS: {
   color: string;
   unlock?: Unlock;
 }[] = [
-  {
-    key: 'joyeuse',
-    label: 'Joyeuse',
-    icon: 'white-balance-sunny',
-    color: NOL.amber,
-  },
-  {key: 'calme', label: 'Calme', icon: 'weather-night', color: NOL.violet},
+  ...TRACK_CHOICES,
   ...UPCOMING_TRACK_UNLOCKS.map((unlock) => ({
     label: 'Mystère',
     icon: 'help' as const,
@@ -120,63 +105,6 @@ function CheckBadge({small}: {small?: boolean}) {
   );
 }
 
-const BEATS = [0, 1, 2, 3];
-
-// Barres qui dansent sur la musique en cours : c'est celle-ci qu'on entend. À plat si la musique est coupée.
-function Equalizer({playing, unit}: {playing: boolean; unit: number}) {
-  const beats = useRef(BEATS.map(() => new Animated.Value(0))).current;
-  useEffect(() => {
-    if (!playing) return;
-    const loops = beats.map((beat, i) => {
-      const half = {
-        duration: 240 + i * 85,
-        easing: Easing.inOut(Easing.ease),
-        useNativeDriver: true,
-      };
-      return Animated.loop(
-        Animated.sequence([
-          Animated.timing(beat, {toValue: 1, ...half}),
-          Animated.timing(beat, {toValue: 0, ...half}),
-        ]),
-      );
-    });
-    loops.forEach((loop) => {
-      loop.start();
-    });
-    return () => {
-      loops.forEach((loop) => {
-        loop.stop();
-      });
-      beats.forEach((beat) => {
-        beat.setValue(0);
-      });
-    };
-  }, [playing]);
-  return (
-    <View style={{flexDirection: 'row', gap: 3 * unit}}>
-      {beats.map((beat, i) => (
-        <Animated.View
-          key={i}
-          style={{
-            width: 4 * unit,
-            height: 14 * unit,
-            borderRadius: 2 * unit,
-            backgroundColor: NOL.sky,
-            transform: [
-              {
-                scaleY: beat.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0.25, 1],
-                }),
-              },
-            ],
-          }}
-        />
-      ))}
-    </View>
-  );
-}
-
 // Cadenas et « i » posés sur une récompense verrouillée : la toucher ouvre l'explication.
 function LockBadges({small}: {small?: boolean}) {
   const {scale, styles} = useScaledStyles();
@@ -210,19 +138,16 @@ export default function SettingsScreen({navigation}: Props) {
   const decors = useRewardsStore((s) => s.decors);
   const owned = {mascots, decors};
   const musicOn = useSoundStore((s) => s.backgroundPlaying);
-  const playBackground = useSoundStore((s) => s.playBackground);
-  const toggleBackground = useSoundStore((s) => s.toggleBackground);
+  const startBackground = useSoundStore((s) => s.startBackground);
 
   const setSetting = <K extends keyof Settings>(key: K, value: Settings[K]) => {
     settings.setSetting(key, value);
     void logEvent(getAnalytics(), 'settings_change', {key, value});
   };
 
-  // Choisir une musique, c'est vouloir l'entendre : elle démarre même si la musique était coupée.
-  const chooseTrack = async (key: MusicTrackKey) => {
+  const chooseTrack = (key: MusicTrackKey) => {
     setSetting('musicTrack', key);
-    await playBackground(MUSIC_TRACKS[key]);
-    if (!useSoundStore.getState().backgroundPlaying) toggleBackground();
+    void startBackground(MUSIC_TRACKS[key]);
   };
 
   return (
@@ -375,7 +300,7 @@ export default function SettingsScreen({navigation}: Props) {
                     key={i}
                     onPress={() => {
                       if (key) {
-                        void chooseTrack(key);
+                        chooseTrack(key);
                         return;
                       }
                       if (!unlock) return;

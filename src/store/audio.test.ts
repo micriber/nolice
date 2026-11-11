@@ -345,6 +345,29 @@ describe('playBackground', () => {
   });
 });
 
+describe('startBackground', () => {
+  it('swaps the track and turns the music back on', async () => {
+    await store().playBackground(TRACK_A);
+    store().toggleBackground();
+
+    await store().startBackground(TRACK_B);
+
+    expect(player().replace).toHaveBeenCalledWith(TRACK_B);
+    expect(player().playing).toBe(true);
+    expect(store().backgroundPlaying).toBe(true);
+  });
+
+  it('leaves music that is already on playing', async () => {
+    await store().playBackground(TRACK_A);
+
+    await store().startBackground(TRACK_B);
+
+    expect(player().pause).toHaveBeenCalledTimes(1);
+    expect(player().playing).toBe(true);
+    expect(store().backgroundPlaying).toBe(true);
+  });
+});
+
 // La baisse de la musique traverse play, stop, replay et playBackground.
 describe('music volume', () => {
   const music = () => mockPlayers[0];

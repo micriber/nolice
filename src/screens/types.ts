@@ -10,6 +10,7 @@ export type FindGameParams = {
 };
 
 export type StackNavigatorParamList = {
+  Welcome: undefined;
   Home: undefined;
   Settings: undefined;
   NumberGame: undefined;

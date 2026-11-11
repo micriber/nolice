@@ -22,12 +22,15 @@ export type Settings = {
   mascot: MascotKey;
   decor: DecorKey;
   musicTrack: MusicTrackKey;
+  // Le parcours de bienvenue a été suivi jusqu'au bout.
+  welcomed: boolean;
 };
 
 const DEFAULTS: Settings = {
   mascot: 'owl',
   decor: 'nuages',
   musicTrack: 'joyeuse',
+  welcomed: false,
 };
 
 const settingsFile = () => new File(Paths.document, 'nolice-settings.json');
@@ -77,7 +80,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   ...loadSettings(),
   setSetting: (key, value) => {
     set({[key]: value});
-    const {mascot, decor, musicTrack} = get();
-    saveSettings({mascot, decor, musicTrack});
+    const {mascot, decor, musicTrack, welcomed} = get();
+    saveSettings({mascot, decor, musicTrack, welcomed});
   },
 }));

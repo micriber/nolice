@@ -70,10 +70,6 @@ L’écran de score suit la même règle, trois étoiles pour une récompense. L
 | 5 à 8 | 2 | « Bien joué ! » | De 4 à 7 |
 | 0 à 4 | 1 | « Bien essayé ! » | De 0 à 3 |
 
-### Le parcours de bienvenue
-
-Au lancement du jeu, l’enfant suit un petit parcours pour choisir sa mascotte, son décor et sa musique avant d’arriver sur l’accueil. Il choisit parmi ce qui est disponible au départ.
-
 ### Requirements
 
 Make sure you have the following installed:

@@ -20,6 +20,7 @@ interface AudioStoreState {
   assetsLoaded: boolean;
   toggleBackground: () => boolean;
   playBackground: (src: AudioSource) => Promise<void>;
+  startBackground: (src: AudioSource) => Promise<void>;
   play: (src: AudioSource, callback?: () => void) => Promise<void>;
   replay: () => Promise<void>;
   stop: () => void;
@@ -502,6 +503,11 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
     }, 'Audio error: playBackground');
     // Le splash attend backgroundLoaded : il doit passer à true même si la lecture échoue.
     if (!get().backgroundLoaded) set({backgroundLoaded: true});
+  },
+  // L'enfant vient de choisir cette musique : elle joue même si la musique était coupée.
+  startBackground: async (src: AudioSource) => {
+    await get().playBackground(src);
+    if (!get().backgroundPlaying) get().toggleBackground();
   },
   toggleBackground: () => {
     let playing = get().backgroundPlaying;

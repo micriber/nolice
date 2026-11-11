@@ -29,6 +29,7 @@ plugins/                 Local Expo config plugins (withPortraitOnLargeScreens)
 eas.json                 EAS build profiles: development/preview/production
 src/
   screens/
+    welcome/index.tsx    First launch only: three steps to pick a mascot, a decor and a track among the base ones, then Home
     home/index.tsx       Landing = brand header (mascot, gear → Settings, music) + 2-col grid of icon-led game cards
     settings/index.tsx   Réglages: mascot (9), decor (4), music track (4) — persisted via useSettingsStore. Rewards not won yet are greyed with a lock and an « i »
     settings/unlock-popup.tsx  Popup explaining how to win a locked reward
@@ -45,7 +46,8 @@ src/
   components/
     Screen.tsx           Screen root: full-screen IceBg + SafeAreaView around the content
     FillSvg.tsx          Svg stretched over its container (gradients, backgrounds)
-    DecorThumb.tsx       Miniature of a decor (Settings, unlock popup, reward card on Score)
+    DecorThumb.tsx       Miniature of a decor (Settings, Welcome, unlock popup, reward card on Score)
+    Equalizer.tsx        Dancing bars marking the track being heard (Settings, Welcome)
     IceBg.tsx            Animated background, 3 scenes (banquise/bulles/nuages): snow, bubbles or clouds drifting across the screen over two hills, `tint` per game
     MascotVisit.tsx      The mascot showing up at the bottom of the screen now and then (game screens only): it hops across, or pops up from below and jumps on the spot
     BigButton.tsx        Chunky 3D button that presses down (Continuer, Rejouer)
@@ -59,9 +61,9 @@ src/
   store/
     audio.ts             useSoundStore — single foreground player + looping background player
     game.ts              useGameScoreStore — questions[], currentIndex, init/next/hasMore/getResults
-    settings.ts          useSettingsStore — mascot/decor/musicTrack, persisted to a JSON file (expo-file-system)
+    settings.ts          useSettingsStore — mascot/decor/musicTrack and `welcomed` (welcome tour done), persisted to a JSON file (expo-file-system)
     rewards.ts           useRewardsStore — mascots and decors won so far, persisted to a JSON file; `claim(gameId, game, score)` grants the reward of a finished game
-  utils/                 array.shuffle, random helpers, color (NOL palette + GAMES) / font constants, scale (tablet enlargement), rewards (what unlocks each locked mascot, decor and track)
+  utils/                 array.shuffle, random helpers, color (NOL palette + GAMES) / font constants, scale (tablet enlargement), rewards (what unlocks each locked mascot, decor and track), tracks (label and pictogram of each music track)
 assets/audio/            ~77 mp3 files (questions, answers, bravo/dommage/congratulation/retry, music tracks)
 assets/animals/          PNG animals (game pictures and mascots)
 assets/branding/         nolice.png (default mascot « Nolice ») and the adaptive icon foreground
@@ -70,7 +72,7 @@ assets/svg/              SVG color splashes and shapes
 
 ## Navigation flow
 
-`Home` (landing = game selection) → (`NumberGame` | `FindGame`) → `Score` → back to `Home`. The game screen `replace`s itself with `Score`, so Android back from Score lands on Home. `Settings` is reachable from Home's gear button. There is no separate "JOUER" menu anymore — it was merged into Home during the redesign.
+`Home` (landing = game selection) → (`NumberGame` | `FindGame`) → `Score` → back to `Home`. On the very first launch the stack starts on `Welcome` instead, which `replace`s itself with `Home` once the tour is finished and sets `welcomed`; `App.tsx` reads that flag once to choose the first route. The game screen `replace`s itself with `Score`, so Android back from Score lands on Home. `Settings` is reachable from Home's gear button. There is no separate "JOUER" menu anymore — it was merged into Home during the redesign.
 
 `FindGame` is parameterized at navigation time with `{questionConfig, gameType}` — the same screen handles animal/color/shape, just a different list from `QUESTION_CONFIGS` (`src/screens/game/question-config.ts`). `Score` receives `{gameId, gameType}` (gameType colors the score number).
 
@@ -81,6 +83,7 @@ assets/svg/              SVG color splashes and shapes
 - `replay()` — `seekTo(0) + play()` on the foreground player; `SpeakerOrb` uses it to repeat the question without re-decoding.
 - `stop()` — pauses the foreground sound and drops its pending callback. Game and Score screens call it on unmount so nothing keeps playing on the next screen.
 - `playBackground(src)` — looping music at 20% volume, lowered to 6% while a foreground sound plays; a new source swaps the track and keeps the current on/off state.
+- `startBackground(src)` — `playBackground(src)`, then turns the music on if it was off: used when the child picks a track (Settings, Welcome).
 - `toggleBackground()` — music on/off, returns the new state. It reads the real player state, so one tap restarts music the system paused behind the store's back (audio focus loss).
 
 Key contract:
@@ -145,7 +148,7 @@ Jest with the `jest-expo` preset, test files next to the code they cover (`*.tes
 - **Question order** — `init()` deals answers in shuffled rounds, so every answer comes up before one repeats, and it reverses a round that would open on the answer closing the previous one, so two consecutive questions never share an answer. Keep both rules if editing the generator.
 - **Adding/renaming a FindGame item** touches three places: its list in `QUESTION_CONFIGS`, the audio entry in `SOUNDS_QUESTION[gameType.toUpperCase()]` and the picture map in its `*-picture.tsx`. `question-config.test.ts` fails while one is missing.
 - **Settings persistence** goes through `useSettingsStore` (JSON file via the sync `expo-file-system` v55 `File` API) — no AsyncStorage in this project.
-- **Adding a music track**: add the key to `MusicTrackKey` (`src/store/settings.ts`), the mp3 to `MUSIC_TRACKS` (`src/store/audio.ts`) and its tile to `TRACKS` in `src/screens/settings/index.tsx`, with a pictogram a child can tell apart without reading. Picking a track in Settings turns the music on, and dancing bars mark the one being heard.
+- **Adding a music track**: add the key to `MusicTrackKey` (`src/store/settings.ts`), the mp3 to `MUSIC_TRACKS` (`src/store/audio.ts`) and its label and pictogram to `TRACK_CHOICES` (`src/utils/tracks.ts`), a pictogram a child can tell apart without reading. Picking a track in Settings turns the music on, and dancing bars mark the one being heard.
 - **Tablet sizing**: every size a child sees goes through `useScale()` — 1 on a phone, up to 2 on a tablet, held back by the window height so a page never overflows. A page taller than 700dp in the design passes its own design height (`useScale(860)` in Settings). A raw dp value stays phone-sized on a tablet.
 - **Stretched SVGs go through `<FillSvg>`**: it measures its container and passes numeric sizes. A `width="100%"` Svg keeps its old drawing when the window is resized (a foldable being opened), and comes out too narrow inside a padded parent.
 - **Portrait lock on tablets**: Android may ignore it on screens ≥ 600dp and show the app in a portrait band inside a landscape screen (a narrow, short window — hence the height limit in `useScale()`). On Android 16 the lock is dropped entirely for apps targeting API 36; `plugins/withPortraitOnLargeScreens.js` declares the temporary opt-out, which stops working once the app targets API 37 — a landscape layout is needed before that bump.

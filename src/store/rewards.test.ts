@@ -123,4 +123,13 @@ describe('saved settings', () => {
       decor: 'banquise',
     });
   });
+
+  it('remember that the welcome tour was followed', () => {
+    expect(settings().getState().welcomed).toBe(false);
+
+    settings().getState().setSetting('welcomed', true);
+    jest.resetModules();
+
+    expect(settings().getState().welcomed).toBe(true);
+  });
 });
