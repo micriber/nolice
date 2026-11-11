@@ -178,6 +178,12 @@ export function Home({navigation}: Props) {
     go();
   };
 
+  const openSettings = () => {
+    leave(() => {
+      navigation.navigate('Settings');
+    });
+  };
+
   const handleGame = (game: GameConfig) => {
     if (game.key === 'number') {
       void logEvent(getAnalytics(), 'NumberGame');
@@ -208,7 +214,10 @@ export function Home({navigation}: Props) {
             paddingTop: 10 * scale,
           },
         ]}>
-        <Mascot size={56 * scale} anim="bob" />
+        {/* la mascotte mène aux réglages, comme le pinceau : un enfant touche ce qu'il veut changer */}
+        <Pressable onPress={openSettings} hitSlop={8 * scale}>
+          <Mascot size={56 * scale} anim="bob" />
+        </Pressable>
         <View style={styles.brand}>
           <Text
             style={[
@@ -229,15 +238,9 @@ export function Home({navigation}: Props) {
             </Text>
           </View>
         </View>
-        <RoundBtn
-          size={52 * scale}
-          onPress={() => {
-            leave(() => {
-              navigation.navigate('Settings');
-            });
-          }}>
+        <RoundBtn size={52 * scale} onPress={openSettings}>
           <MaterialCommunityIcons
-            name="cog"
+            name="brush"
             size={24 * scale}
             color={NOL.sky}
           />

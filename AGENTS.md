@@ -30,7 +30,7 @@ eas.json                 EAS build profiles: development/preview/production
 src/
   screens/
     welcome/index.tsx    First launch only: three steps to pick a mascot, a decor and a track among the base ones, then Home
-    home/index.tsx       Landing = brand header (mascot, gear → Settings, music) + 2-col grid of icon-led game cards
+    home/index.tsx       Landing = brand header (mascot and brush button, both → Settings, music) + 2-col grid of icon-led game cards
     settings/index.tsx   Réglages: mascot (9), decor (4), music track (4) — persisted via useSettingsStore. Rewards not won yet are greyed with a lock and an « i »
     settings/unlock-popup.tsx  Popup explaining how to win a locked reward
     game/
@@ -41,7 +41,7 @@ src/
       result-sheet.tsx   Bottom sheet after answering (mascot mood + Bravo!/Presque! + Continuer)
       {animal,color,shape}-picture.tsx  Picture components per type (animals are PNG, colors and shapes SVG), take a `size` dp prop
       question-config.ts FindGame item lists per game type (`QUESTION_CONFIGS`: key + French label), `FindGameKey`, `QuestionConfig`
-    score/index.tsx      Mascot mood + 3 stars + score pill + the reward won with this game, if any + REJOUER → Home
+    score/index.tsx      Mascot mood + 3 stars + score pill + the reward won with this game, if any (tapping it selects it) + REJOUER → Home
     types.ts             StackNavigatorParamList, NavigationProp, FindGameParams
   components/
     Screen.tsx           Screen root: full-screen IceBg + SafeAreaView around the content
@@ -51,7 +51,7 @@ src/
     IceBg.tsx            Animated background, 3 scenes (banquise/bulles/nuages): snow, bubbles or clouds drifting across the screen over two hills, `tint` per game
     MascotVisit.tsx      The mascot showing up at the bottom of the screen now and then (game screens only): it hops across, or pops up from below and jumps on the spot
     BigButton.tsx        Chunky 3D button that presses down (Continuer, Rejouer)
-    RoundBtn.tsx         Chunky round button (home, gear, music)
+    RoundBtn.tsx         Chunky round button (home, brush, music)
     Mascot.tsx           Mascot w/ moods (happy/content/sad) + anims (float/bob/jump) + MASCOTS list
     MusicButton.tsx      Music toggle pill: colored+note = on, white+slashed = off
     Progress.tsx         10 question dots (green/red/current/upcoming)
@@ -72,7 +72,7 @@ assets/svg/              SVG color splashes and shapes
 
 ## Navigation flow
 
-`Home` (landing = game selection) → (`NumberGame` | `FindGame`) → `Score` → back to `Home`. On the very first launch the stack starts on `Welcome` instead, which `replace`s itself with `Home` once the tour is finished and sets `welcomed`; `App.tsx` reads that flag once to choose the first route. The game screen `replace`s itself with `Score`, so Android back from Score lands on Home. `Settings` is reachable from Home's gear button. There is no separate "JOUER" menu anymore — it was merged into Home during the redesign.
+`Home` (landing = game selection) → (`NumberGame` | `FindGame`) → `Score` → back to `Home`. On the very first launch the stack starts on `Welcome` instead, which `replace`s itself with `Home` once the tour is finished and sets `welcomed`; `App.tsx` reads that flag once to choose the first route. The game screen `replace`s itself with `Score`, so Android back from Score lands on Home. `Settings` is reachable from Home's brush button and from the mascot next to it. There is no separate "JOUER" menu anymore — it was merged into Home during the redesign.
 
 `FindGame` is parameterized at navigation time with `{questionConfig, gameType}` — the same screen handles animal/color/shape, just a different list from `QUESTION_CONFIGS` (`src/screens/game/question-config.ts`). `Score` receives `{gameId, gameType}` (gameType colors the score number).
 
@@ -152,7 +152,7 @@ Jest with the `jest-expo` preset, test files next to the code they cover (`*.tes
 - **Tablet sizing**: every size a child sees goes through `useScale()` — 1 on a phone, up to 2 on a tablet, held back by the window height so a page never overflows. A page taller than 700dp in the design passes its own design height (`useScale(860)` in Settings). A raw dp value stays phone-sized on a tablet.
 - **Stretched SVGs go through `<FillSvg>`**: it measures its container and passes numeric sizes. A `width="100%"` Svg keeps its old drawing when the window is resized (a foldable being opened), and comes out too narrow inside a padded parent.
 - **Portrait lock on tablets**: Android may ignore it on screens ≥ 600dp and show the app in a portrait band inside a landscape screen (a narrow, short window — hence the height limit in `useScale()`). On Android 16 the lock is dropped entirely for apps targeting API 36; `plugins/withPortraitOnLargeScreens.js` declares the temporary opt-out, which stops working once the app targets API 37 — a landscape layout is needed before that bump.
-- **Rewards** (plan in `readme.md`, « Les récompenses à débloquer »): `src/utils/rewards.ts` holds the rules — what each locked mascot or decor needs (`MASCOT_UNLOCKS`, `DECOR_UNLOCKS`) and `rewardFor(game, score, owned)`, which gives at most one reward per game: a perfect-game mascot on 10/10 while one is left, otherwise from 9/10 the next reward of the game. Score claims it once per `gameId` through `useRewardsStore`; Settings greys what `lockOf()` still reports as locked, and `useSettingsStore` falls back to the default mascot or decor when the saved one was not won. The fourth decor and the two extra tracks do not exist yet: Settings shows them as « Mystère » and no game can win them. Unlocking a new mascot or decor = one entry in its `*_UNLOCKS` map.
+- **Rewards** (plan in `readme.md`, « Les récompenses à débloquer »): `src/utils/rewards.ts` holds the rules — what each locked mascot or decor needs (`MASCOT_UNLOCKS`, `DECOR_UNLOCKS`) and `rewardFor(game, score, owned)`, which gives at most one reward per game: a perfect-game mascot on 10/10 while one is left, otherwise from 9/10 the next reward of the game. Score claims it once per `gameId` through `useRewardsStore` and shows it on a card the child taps to select it; Settings greys what `lockOf()` still reports as locked, and `useSettingsStore` falls back to the default mascot or decor when the saved one was not won. The fourth decor and the two extra tracks do not exist yet: Settings shows them as « Mystère » and no game can win them. Unlocking a new mascot or decor = one entry in its `*_UNLOCKS` map.
 - **Adding a 5th/6th game**: append to `GAMES` in `src/utils/color.ts` — the Home grid auto-wraps to 3 rows of 2 (layout validated in the design).
 
 ## Things that are NOT in the codebase

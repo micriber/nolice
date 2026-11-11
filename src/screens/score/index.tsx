@@ -2,7 +2,14 @@ import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {getAnalytics, logEvent} from '@react-native-firebase/analytics';
 import {useNavigation, useRoute} from '@react-navigation/core';
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {Animated, Easing, StyleSheet, Text, View} from 'react-native';
+import {
+  Animated,
+  Easing,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
 import {ScoreScreenRouteProp} from './types';
 import BigButton from '../../components/BigButton';
@@ -59,9 +66,11 @@ function Star({
   );
 }
 
-// Récompense gagnée avec cette partie, qui apparaît en « pop » après les étoiles.
+// Récompense gagnée avec cette partie, qui apparaît en « pop » après les étoiles : la toucher la choisit.
 function RewardCard({reward}: {reward: Reward}) {
   const pop = useRef(new Animated.Value(0)).current;
+  const chosen = useSettingsStore((s) => s[reward.kind] === reward.key);
+  const setSetting = useSettingsStore((s) => s.setSetting);
   useEffect(() => {
     Animated.sequence([
       Animated.delay(800),
@@ -80,7 +89,7 @@ function RewardCard({reward}: {reward: Reward}) {
   return (
     <Animated.View
       style={[
-        styles.reward,
+        styles.rewardPop,
         {
           opacity: pop,
           transform: [
@@ -93,19 +102,30 @@ function RewardCard({reward}: {reward: Reward}) {
           ],
         },
       ]}>
-      {mascot ? (
-        <Mascot size={58} who={reward.key} anim="none" />
-      ) : (
-        <View style={styles.rewardDecor}>
-          <DecorThumb scene={reward.key} unit={0.7} radius={10} />
+      <Pressable
+        style={styles.reward}
+        onPress={() => {
+          setSetting(reward.kind, reward.key);
+        }}>
+        {mascot ? (
+          <Mascot size={58} who={reward.key} anim="none" />
+        ) : (
+          <View style={styles.rewardDecor}>
+            <DecorThumb scene={reward.key} unit={0.7} radius={10} />
+          </View>
+        )}
+        <View style={styles.rewardText}>
+          <Text style={styles.rewardTitle}>
+            {mascot ? 'Nouvelle mascotte !' : 'Nouveau décor !'}
+          </Text>
+          <Text style={styles.rewardName}>{name}</Text>
         </View>
-      )}
-      <View style={styles.rewardText}>
-        <Text style={styles.rewardTitle}>
-          {mascot ? 'Nouvelle mascotte !' : 'Nouveau décor !'}
-        </Text>
-        <Text style={styles.rewardName}>{name}</Text>
-      </View>
+        {chosen && (
+          <View style={styles.rewardCheck}>
+            <MaterialCommunityIcons name="check-bold" size={15} color="#fff" />
+          </View>
+        )}
+      </Pressable>
     </Animated.View>
   );
 }
@@ -265,6 +285,9 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginTop: 18,
   },
+  rewardPop: {
+    marginTop: 18,
+  },
   reward: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -275,8 +298,21 @@ const styles = StyleSheet.create({
     borderColor: shade(NOL.star, 0.3),
     paddingVertical: 10,
     paddingHorizontal: 18,
-    marginTop: 18,
     elevation: 6,
+  },
+  rewardCheck: {
+    position: 'absolute',
+    top: -10,
+    right: -10,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    borderWidth: 3,
+    borderColor: '#fff',
+    backgroundColor: NOL.mint,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 7,
   },
   rewardDecor: {
     width: 84,
