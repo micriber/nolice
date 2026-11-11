@@ -1,5 +1,12 @@
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 import React, {useEffect, useRef} from 'react';
-import {Animated, Easing, StyleSheet, View} from 'react-native';
+import {
+  Animated,
+  Easing,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import Svg, {
   Circle,
   Defs,
@@ -19,124 +26,118 @@ type Props = {
   scene?: DecorKey;
 };
 
-// Boucle douce de flottement vertical (décors bulles/nuages).
-function FloatLoop({
+// Répartition fixe et régulière : le même décor à chaque rendu, sans paquet ni couloir vide.
+const spread = (i: number) => ({
+  across: ((i * 0.7549) % 1) * 100,
+  phase: 0.02 + ((i * 0.5698) % 1) * 0.96,
+});
+
+const SNOW = Array.from({length: 20}, (_, i) => {
+  const star = i % 4 === 0;
+  return {
+    ...spread(i),
+    size: star ? 20 + (i % 3) * 6 : 6 + (i % 4) * 3,
+    opacity: star ? 0.8 : 0.7 + (i % 3) * 0.15,
+    duration: (star ? 22000 : 15000) + (i % 6) * 2100,
+    sway: 6 + (i % 4) * 3,
+    star,
+  };
+});
+
+const BUBBLE_COLORS = [NOL.coral, NOL.amber, NOL.teal, NOL.violet, NOL.mint];
+
+const BUBBLES = Array.from({length: 20}, (_, i) => ({
+  ...spread(i),
+  size: 14 + (i % 4) * 12,
+  color: BUBBLE_COLORS[i % BUBBLE_COLORS.length],
+  duration: 15000 + (i % 6) * 2100,
+  sway: 6 + (i % 4) * 3,
+}));
+
+const CLOUD_WIDTH = 96;
+
+// Un couloir par nuage, du haut au bas de l'écran : deux nuages ne se croisent jamais.
+const CLOUDS = Array.from({length: 12}, (_, i) => ({
+  top: ((i + 0.3) / 12) * 100,
+  phase: spread(i).phase,
+  scale: 0.7 + (i % 4) * 0.25,
+  opacity: 0.85 + (i % 3) * 0.05,
+  duration: 45000 + (i % 5) * 7000,
+}));
+
+// Élément qui traverse l'écran en boucle, de `from` à `to` sur l'axe donné, en se balançant sur l'autre.
+// `phase` le place déjà en route au premier rendu.
+function Drift({
+  axis,
+  from,
+  to,
+  phase,
   duration,
-  delay,
-  distance = 10,
-  children,
+  sway,
+  spin,
   style,
+  children,
 }: {
+  axis: 'x' | 'y';
+  from: number;
+  to: number;
+  phase: number;
   duration: number;
-  delay: number;
-  distance?: number;
+  sway: number;
+  spin?: boolean;
+  style: object;
   children: React.ReactNode;
-  style?: object;
 }) {
   const v = useRef(new Animated.Value(0)).current;
   useEffect(() => {
-    const anim = Animated.sequence([
-      Animated.delay(delay),
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(v, {
-            toValue: 1,
-            duration: duration / 2,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-          Animated.timing(v, {
-            toValue: 0,
-            duration: duration / 2,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-        ]),
-      ),
-    ]);
+    const anim = Animated.loop(
+      Animated.timing(v, {
+        toValue: 1,
+        duration,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    );
     anim.start();
     return () => {
       anim.stop();
     };
   }, []);
-  const translateY = v.interpolate({
+  const wrap = 1 - phase;
+  const here = from + phase * (to - from);
+  const travel = v.interpolate({
+    inputRange: [0, wrap, wrap + 0.0001, 1],
+    outputRange: [here, to, from, here],
+  });
+  const swing = v.interpolate({
+    inputRange: [0, 0.25, 0.5, 0.75, 1],
+    outputRange: [0, sway, 0, -sway, 0],
+  });
+  // Un flocon a six branches : un tiers de tour le ramène à l'identique, la boucle ne saute pas.
+  const turn = v.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, -distance],
+    outputRange: ['0deg', spin ? '120deg' : '0deg'],
   });
   return (
-    <Animated.View style={[style, {transform: [{translateY}]}]}>
+    <Animated.View
+      style={[
+        {position: 'absolute', left: 0, top: 0},
+        style,
+        {
+          transform:
+            axis === 'y'
+              ? [{translateY: travel}, {translateX: swing}, {rotate: turn}]
+              : [{translateX: travel}, {translateY: swing}, {rotate: turn}],
+        },
+      ]}>
       {children}
     </Animated.View>
   );
 }
 
-// Flocon qui scintille (décor banquise).
-function Twinkle({
-  left,
-  top,
-  size,
-  opacity,
-  duration,
-  delay,
-}: {
-  left: number;
-  top: number;
-  size: number;
-  opacity: number;
-  duration: number;
-  delay: number;
-}) {
-  const v = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    const anim = Animated.sequence([
-      Animated.delay(delay),
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(v, {
-            toValue: 1,
-            duration: duration / 2,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-          Animated.timing(v, {
-            toValue: 0,
-            duration: duration / 2,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-        ]),
-      ),
-    ]);
-    anim.start();
-    return () => {
-      anim.stop();
-    };
-  }, []);
-  return (
-    <Animated.View
-      style={{
-        position: 'absolute',
-        left: `${(left / 412) * 100}%`,
-        top,
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        backgroundColor: '#fff',
-        opacity: v.interpolate({
-          inputRange: [0, 1],
-          outputRange: [opacity * 0.55, opacity],
-        }),
-        transform: [
-          {scale: v.interpolate({inputRange: [0, 1], outputRange: [1, 1.25]})},
-        ],
-      }}
-    />
-  );
-}
-
 function Cloud({opacity}: {opacity: number}) {
   return (
-    <Svg width={96} height={38} viewBox="0 0 96 38">
+    <Svg width={CLOUD_WIDTH} height={38} viewBox="0 0 96 38">
       <Path
         d="M14 35 C-3 35 -3 15 14 15 H25 C23 5 31 0 43 2 H61 C73 2 78 10 74 16 H81 C100 16 100 35 81 35 Z"
         fill="#fff"
@@ -146,35 +147,8 @@ function Cloud({opacity}: {opacity: number}) {
   );
 }
 
-const FLAKES: [number, number, number, number][] = [
-  [40, 120, 7, 0.5],
-  [330, 180, 5, 0.4],
-  [70, 300, 5, 0.35],
-  [300, 360, 8, 0.5],
-  [200, 90, 4, 0.4],
-  [360, 470, 6, 0.4],
-  [30, 520, 5, 0.3],
-];
-
-const BUBBLES: [number, number, number, string][] = [
-  [44, 150, 56, NOL.coral],
-  [320, 210, 70, NOL.amber],
-  [76, 360, 48, NOL.teal],
-  [300, 430, 60, NOL.violet],
-  [186, 110, 34, NOL.mint],
-  [350, 540, 44, NOL.coral],
-  [24, 540, 38, NOL.amber],
-];
-
-const CLOUDS: [number, number, number, number][] = [
-  [20, 150, 1.1, 0.95],
-  [250, 225, 1.4, 0.9],
-  [90, 340, 0.9, 0.85],
-  [285, 430, 1.15, 0.9],
-  [140, 540, 0.75, 0.85],
-];
-
 export default function IceBg({tint = NOL.sky, scene = 'nuages'}: Props) {
+  const {width, height} = useWindowDimensions();
   return (
     <View
       style={[StyleSheet.absoluteFill, {backgroundColor: shade(tint, 0.68)}]}
@@ -205,85 +179,74 @@ export default function IceBg({tint = NOL.sky, scene = 'nuages'}: Props) {
 
       {scene === 'banquise' && (
         <>
-          {FLAKES.map((f, i) => (
-            <Twinkle
-              key={i}
-              left={f[0]}
-              top={f[1]}
-              size={f[2]}
-              opacity={f[3]}
-              duration={2400 + i * 400}
-              delay={i * 300}
-            />
-          ))}
           {/* collines de neige */}
           <FillSvg viewBox="0 0 412 260" style={styles.bottomSvg}>
             <Path
               d="M0 120 Q110 60 230 110 T412 90 L412 260 L0 260 Z"
-              fill={shade(tint, 0.86)}
-              opacity={0.7}
+              fill="#fff"
+              opacity={0.55}
             />
             <Path
               d="M0 170 Q140 110 270 160 T412 150 L412 260 L0 260 Z"
-              fill={shade(tint, 0.86)}
+              fill="#FBFEFF"
             />
           </FillSvg>
+          {SNOW.map((flake, i) => (
+            <Drift
+              key={i}
+              axis="y"
+              from={-flake.size}
+              to={height + 120 - flake.size}
+              phase={flake.phase}
+              duration={flake.duration}
+              sway={flake.sway}
+              spin
+              style={{left: `${flake.across}%`, opacity: flake.opacity}}>
+              {flake.star ? (
+                <MaterialCommunityIcons
+                  name="snowflake"
+                  size={flake.size}
+                  color="#fff"
+                />
+              ) : (
+                <View
+                  style={{
+                    width: flake.size,
+                    height: flake.size,
+                    borderRadius: flake.size / 2,
+                    backgroundColor: '#fff',
+                  }}
+                />
+              )}
+            </Drift>
+          ))}
         </>
       )}
 
       {scene === 'bulles' && (
         <>
-          {BUBBLES.map((b, i) => (
-            <FloatLoop
+          {BUBBLES.map((bubble, i) => (
+            <Drift
               key={i}
-              duration={3600 + i * 500}
-              delay={i * 350}
-              style={{
-                position: 'absolute',
-                left: `${(b[0] / 412) * 100}%`,
-                top: b[1],
-              }}>
+              axis="y"
+              from={height + 60}
+              to={-bubble.size}
+              phase={bubble.phase}
+              duration={bubble.duration}
+              sway={bubble.sway}
+              style={{left: `${bubble.across}%`, opacity: 0.2}}>
               <View
                 style={{
-                  width: b[2],
-                  height: b[2],
-                  borderRadius: b[2] / 2,
-                  backgroundColor: b[3],
-                  opacity: 0.2,
+                  width: bubble.size,
+                  height: bubble.size,
+                  borderRadius: bubble.size / 2,
+                  backgroundColor: bubble.color,
                 }}
               />
-            </FloatLoop>
+            </Drift>
           ))}
         </>
       )}
-
-      {scene === 'bulles' &&
-        [
-          {left: '7%', bottom: '7%', size: 54, color: NOL.teal},
-          {left: '46%', bottom: '15%', size: 30, color: NOL.violet},
-          {left: '83%', bottom: '4%', size: 72, color: NOL.amber},
-        ].map((bubble, i) => (
-          <FloatLoop
-            key={`bottom-bubble-${i}`}
-            duration={5200 + i * 600}
-            delay={i * 300}
-            distance={6}
-            style={{
-              position: 'absolute',
-              left: bubble.left,
-              bottom: bubble.bottom,
-            }}>
-            <View
-              style={{
-                width: bubble.size,
-                height: bubble.size,
-                borderRadius: bubble.size / 2,
-                backgroundColor: bubble.color,
-                opacity: 0.16,
-              }}
-            />
-          </FloatLoop>
-        ))}
 
       {scene === 'nuages' && (
         <>
@@ -302,40 +265,20 @@ export default function IceBg({tint = NOL.sky, scene = 'nuages'}: Props) {
             />
             <Circle cx={52} cy={52} r={28} fill={shade(NOL.star, 0.35)} />
           </Svg>
-          {[
-            {left: '2%', bottom: '7%', scale: 1.5, opacity: 0.55},
-            {left: '49%', bottom: '15%', scale: 0.85, opacity: 0.4},
-            {left: '81%', bottom: '3%', scale: 1.8, opacity: 0.5},
-          ].map((cloud, i) => (
-            <FloatLoop
-              key={`bottom-cloud-${i}`}
-              duration={6500 + i * 700}
-              delay={i * 450}
-              distance={5}
-              style={{
-                position: 'absolute',
-                left: cloud.left,
-                bottom: cloud.bottom,
-              }}>
+          {CLOUDS.map((cloud, i) => (
+            <Drift
+              key={i}
+              axis="x"
+              from={-CLOUD_WIDTH * cloud.scale * 1.5}
+              to={width + CLOUD_WIDTH * cloud.scale}
+              phase={cloud.phase}
+              duration={cloud.duration}
+              sway={4}
+              style={{top: `${cloud.top}%`}}>
               <View style={{transform: [{scale: cloud.scale}]}}>
                 <Cloud opacity={cloud.opacity} />
               </View>
-            </FloatLoop>
-          ))}
-          {CLOUDS.map((c, i) => (
-            <FloatLoop
-              key={i}
-              duration={5000 + i * 700}
-              delay={i * 450}
-              style={{
-                position: 'absolute',
-                left: `${(c[0] / 412) * 100}%`,
-                top: c[1],
-              }}>
-              <View style={{transform: [{scale: c[2]}]}}>
-                <Cloud opacity={c[3]} />
-              </View>
-            </FloatLoop>
+            </Drift>
           ))}
         </>
       )}
@@ -349,6 +292,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 150,
+    height: 180,
   },
 });
