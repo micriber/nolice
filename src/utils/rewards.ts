@@ -16,10 +16,10 @@ export const MASCOT_UNLOCKS: Partial<Record<MascotKey, Unlock>> = {
 
 export const DECOR_UNLOCKS: Partial<Record<DecorKey, Unlock>> = {
   banquise: {game: 'shape', successes: 2},
+  automne: {game: 'animal', successes: 2},
 };
 
-// Récompenses dont le contenu reste à créer : un décor et deux musiques.
-export const UPCOMING_DECOR_UNLOCK: Unlock = {game: 'animal', successes: 2};
+// Récompenses dont le contenu reste à créer : deux musiques.
 export const UPCOMING_TRACK_UNLOCKS: Unlock[] = [
   {game: 'number', successes: 2},
   {game: 'color', successes: 2},

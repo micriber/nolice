@@ -15,7 +15,7 @@ export type MascotKey =
   | 'pig'
   | 'rabbit'
   | 'cow';
-export type DecorKey = 'banquise' | 'bulles' | 'nuages';
+export type DecorKey = 'banquise' | 'bulles' | 'nuages' | 'automne';
 export type MusicTrackKey = 'joyeuse' | 'calme';
 
 export type Settings = {

@@ -30,6 +30,7 @@ export const DECOR_LABELS: Record<DecorKey, string> = {
   nuages: 'Nuages',
   bulles: 'Bulles',
   banquise: 'Banquise',
+  automne: 'Automne',
 };
 
 // Répartition fixe et régulière : le même décor à chaque rendu, sans paquet ni couloir vide.
@@ -58,6 +59,18 @@ const BUBBLES = Array.from({length: 20}, (_, i) => ({
   color: BUBBLE_COLORS[i % BUBBLE_COLORS.length],
   duration: 15000 + (i % 6) * 2100,
   sway: 6 + (i % 4) * 3,
+}));
+
+const LEAF_COLORS = [NOL.coral, NOL.amberDeep, NOL.star, NOL.coralDeep];
+
+const LEAVES = Array.from({length: 20}, (_, i) => ({
+  across: ((i * 0.618) % 1) * 100,
+  phase: spread(i).phase,
+  size: 20 + (i % 4) * 5,
+  color: LEAF_COLORS[i % LEAF_COLORS.length],
+  tilt: (i * 67) % 360,
+  duration: 17000 + (i % 6) * 2100,
+  sway: 10 + (i % 4) * 4,
 }));
 
 const CLOUD_WIDTH = 96;
@@ -90,7 +103,8 @@ function Drift({
   phase: number;
   duration: number;
   sway: number;
-  spin?: boolean;
+  // Degrés parcourus par boucle : la forme doit se retrouver à l'identique, la boucle ne saute pas.
+  spin?: number;
   style: object;
   children: React.ReactNode;
 }) {
@@ -119,10 +133,9 @@ function Drift({
     inputRange: [0, 0.25, 0.5, 0.75, 1],
     outputRange: [0, sway, 0, -sway, 0],
   });
-  // Un flocon a six branches : un tiers de tour le ramène à l'identique, la boucle ne saute pas.
   const turn = v.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', spin ? '120deg' : '0deg'],
+    outputRange: ['0deg', `${spin ?? 0}deg`],
   });
   return (
     <Animated.View
@@ -212,7 +225,7 @@ export default function IceBg({tint = NOL.sky, scene = 'nuages'}: Props) {
               phase={flake.phase}
               duration={flake.duration}
               sway={flake.sway}
-              spin
+              spin={120}
               style={{left: `${flake.across}%`, opacity: flake.opacity}}>
               {flake.star ? (
                 <MaterialCommunityIcons
@@ -230,6 +243,31 @@ export default function IceBg({tint = NOL.sky, scene = 'nuages'}: Props) {
                   }}
                 />
               )}
+            </Drift>
+          ))}
+        </>
+      )}
+
+      {scene === 'automne' && (
+        <>
+          <Hills color={shade(NOL.amberDeep, 0.35)} />
+          {LEAVES.map((leaf, i) => (
+            <Drift
+              key={i}
+              axis="y"
+              from={-leaf.size}
+              to={height + 120 - leaf.size}
+              phase={leaf.phase}
+              duration={leaf.duration}
+              sway={leaf.sway}
+              spin={360}
+              style={{left: `${leaf.across}%`, opacity: 0.85}}>
+              <MaterialCommunityIcons
+                name="leaf"
+                size={leaf.size}
+                color={leaf.color}
+                style={{transform: [{rotate: `${leaf.tilt}deg`}]}}
+              />
             </Drift>
           ))}
         </>

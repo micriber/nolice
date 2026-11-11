@@ -8,8 +8,7 @@ import {DecorKey} from '../store/settings';
 import {NOL, shade} from '../utils/color';
 
 type Props = {
-  // 'mystery' : un décor dont le contenu reste à créer.
-  scene: DecorKey | 'mystery';
+  scene: DecorKey;
   unit: number;
   radius: number;
 };
@@ -17,13 +16,6 @@ type Props = {
 // Vignette miniature d'un décor, qui remplit son conteneur. `unit` : taille d'un dp de sa maquette (120 × 70).
 export default function DecorThumb({scene, unit, radius}: Props) {
   const scale = unit;
-  if (scene === 'mystery') {
-    return (
-      <View style={[styles.thumb, styles.mystery, {borderRadius: radius}]}>
-        <MaterialCommunityIcons name="help" size={30 * unit} color="#9FB4C2" />
-      </View>
-    );
-  }
   return (
     <View style={[styles.thumb, {borderRadius: radius}]}>
       <FillSvg viewBox="0 0 120 70">
@@ -36,6 +28,12 @@ export default function DecorThumb({scene, unit, radius}: Props) {
         <Rect width="120" height="70" fill={`url(#thumb-${scene})`} />
         {scene === 'banquise' && (
           <Path d="M0 42 Q30 28 60 40 T120 36 L120 70 L0 70 Z" fill="#FBFEFF" />
+        )}
+        {scene === 'automne' && (
+          <Path
+            d="M0 42 Q30 28 60 40 T120 36 L120 70 L0 70 Z"
+            fill={shade(NOL.amberDeep, 0.35)}
+          />
         )}
       </FillSvg>
       {scene === 'banquise' && (
@@ -64,6 +62,27 @@ export default function DecorThumb({scene, unit, radius}: Props) {
           />
         </>
       )}
+      {scene === 'automne' &&
+        (
+          [
+            [14, 8, 16, NOL.coral, 20],
+            [50, 18, 20, NOL.star, 140],
+            [84, 6, 15, NOL.coralDeep, 250],
+          ] as [number, number, number, string, number][]
+        ).map((leaf, i) => (
+          <MaterialCommunityIcons
+            key={i}
+            name="leaf"
+            size={leaf[2] * scale}
+            color={leaf[3]}
+            style={{
+              position: 'absolute',
+              left: leaf[0] * scale,
+              top: leaf[1] * scale,
+              transform: [{rotate: `${leaf[4]}deg`}],
+            }}
+          />
+        ))}
       {scene === 'bulles' &&
         (
           [
@@ -131,11 +150,6 @@ const styles = StyleSheet.create({
   thumb: {
     flex: 1,
     overflow: 'hidden',
-  },
-  mystery: {
-    backgroundColor: '#E4EFF5',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   dot: {
     position: 'absolute',

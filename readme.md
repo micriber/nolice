@@ -37,17 +37,15 @@ Dix récompenses se gagnent en jouant : six mascottes, deux décors et deux musi
 | | Disponible au départ | À débloquer |
 |---|---|---|
 | Mascottes | Nolice, le chat et le chien | Les six autres animaux du jeu : lapin, canard, oiseau, cochon, vache et mouton |
-| Décors | Nuages et bulles | La banquise et un quatrième décor, à créer |
+| Décors | Nuages et bulles | La banquise et l’automne |
 | Musiques | Joyeuse et calme | Deux musiques, à créer |
-
-Le cochon, la vache et le mouton ne sont pas encore proposés comme mascottes.
 
 Chaque jeu est lié à une mascotte, puis à un décor ou une musique :
 
 | Jeu | Première réussite | Deuxième réussite |
 |---|---|---|
 | Les nombres | Le mouton | La troisième musique |
-| Les animaux | Le canard | Le quatrième décor |
+| Les animaux | Le canard | L’automne |
 | Les couleurs | L’oiseau | La quatrième musique |
 | Les formes | Le cochon | La banquise |
 

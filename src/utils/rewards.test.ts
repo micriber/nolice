@@ -2,7 +2,6 @@ import {GAMES} from './color';
 import {
   DECOR_UNLOCKS,
   MASCOT_UNLOCKS,
-  UPCOMING_DECOR_UNLOCK,
   UPCOMING_TRACK_UNLOCKS,
   Owned,
   Unlock,
@@ -11,11 +10,7 @@ import {
 } from './rewards';
 
 const mascots = Object.values(MASCOT_UNLOCKS);
-const others = [
-  ...Object.values(DECOR_UNLOCKS),
-  UPCOMING_DECOR_UNLOCK,
-  ...UPCOMING_TRACK_UNLOCKS,
-];
+const others = [...Object.values(DECOR_UNLOCKS), ...UPCOMING_TRACK_UNLOCKS];
 
 const gamesAt = (unlocks: Unlock[], successes: number) =>
   unlocks
@@ -128,7 +123,7 @@ describe('rewardFor', () => {
     }
 
     expect(owned.mascots).toHaveLength(6);
-    expect(owned.decors).toEqual(['banquise']);
-    expect(games).toBe(7);
+    expect(owned.decors.sort()).toEqual(['automne', 'banquise']);
+    expect(games).toBe(8);
   });
 });

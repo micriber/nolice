@@ -22,7 +22,6 @@ import {
 import {NOL, shade} from '../../utils/color';
 import FONT from '../../utils/font';
 import {
-  UPCOMING_DECOR_UNLOCK,
   UPCOMING_TRACK_UNLOCKS,
   Unlock,
   lockOf,
@@ -36,10 +35,7 @@ type Props = {
   navigation: NavigationProp;
 };
 
-// 'mystery' : une récompense dont le contenu reste à créer.
-type DecorOption = DecorKey | 'mystery';
-
-const DECORS: DecorOption[] = ['nuages', 'bulles', 'banquise', 'mystery'];
+const DECORS: DecorKey[] = ['nuages', 'bulles', 'banquise', 'automne'];
 
 const LOCKED_GREY = '#9FB4C2';
 
@@ -231,20 +227,16 @@ export default function SettingsScreen({navigation}: Props) {
             <View style={styles.decorRow}>
               {DECORS.map((key) => {
                 const sel = settings.decor === key;
-                const label = key === 'mystery' ? 'Mystère' : DECOR_LABELS[key];
-                const unlock =
-                  key === 'mystery'
-                    ? UPCOMING_DECOR_UNLOCK
-                    : lockOf({kind: 'decor', key}, owned);
+                const label = DECOR_LABELS[key];
+                const unlock = lockOf({kind: 'decor', key}, owned);
                 return (
                   <Pressable
                     key={key}
                     onPress={() => {
-                      if (key !== 'mystery' && !unlock) {
+                      if (!unlock) {
                         setSetting('decor', key);
                         return;
                       }
-                      if (!unlock) return;
                       setLocked({
                         title: label,
                         unlock,
