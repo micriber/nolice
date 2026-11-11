@@ -165,7 +165,7 @@ export function NumberGame({navigation}: Props) {
   );
 
   return (
-    <Screen tint={game.color} scene={decor}>
+    <Screen tint={game.color} scene={decor} mascotVisit={!answered}>
       <GameHeader
         game={game}
         total={maxQuestion}
@@ -179,6 +179,7 @@ export function NumberGame({navigation}: Props) {
         }}
       />
       <View
+        pointerEvents="box-none"
         style={[
           styles.content,
           {gap: 22 * scale},

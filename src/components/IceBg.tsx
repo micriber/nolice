@@ -135,6 +135,23 @@ function Drift({
   );
 }
 
+// Sol du décor : deux collines, celle du fond en transparence.
+function Hills({color}: {color: string}) {
+  return (
+    <FillSvg viewBox="0 0 412 260" style={styles.hills}>
+      <Path
+        d="M0 120 Q110 60 230 110 T412 90 L412 260 L0 260 Z"
+        fill={color}
+        opacity={0.55}
+      />
+      <Path
+        d="M0 170 Q140 110 270 160 T412 150 L412 260 L0 260 Z"
+        fill={color}
+      />
+    </FillSvg>
+  );
+}
+
 function Cloud({opacity}: {opacity: number}) {
   return (
     <Svg width={CLOUD_WIDTH} height={38} viewBox="0 0 96 38">
@@ -179,18 +196,7 @@ export default function IceBg({tint = NOL.sky, scene = 'nuages'}: Props) {
 
       {scene === 'banquise' && (
         <>
-          {/* collines de neige */}
-          <FillSvg viewBox="0 0 412 260" style={styles.bottomSvg}>
-            <Path
-              d="M0 120 Q110 60 230 110 T412 90 L412 260 L0 260 Z"
-              fill="#fff"
-              opacity={0.55}
-            />
-            <Path
-              d="M0 170 Q140 110 270 160 T412 150 L412 260 L0 260 Z"
-              fill="#FBFEFF"
-            />
-          </FillSvg>
+          <Hills color="#FBFEFF" />
           {SNOW.map((flake, i) => (
             <Drift
               key={i}
@@ -245,6 +251,8 @@ export default function IceBg({tint = NOL.sky, scene = 'nuages'}: Props) {
               />
             </Drift>
           ))}
+          {/* après les bulles : elles sortent de derrière le sol */}
+          <Hills color={shade(tint, 0.38)} />
         </>
       )}
 
@@ -280,6 +288,8 @@ export default function IceBg({tint = NOL.sky, scene = 'nuages'}: Props) {
               </View>
             </Drift>
           ))}
+          {/* après les nuages : ceux du bas passent derrière les collines */}
+          <Hills color={shade(NOL.mint, 0.35)} />
         </>
       )}
     </View>
@@ -287,7 +297,7 @@ export default function IceBg({tint = NOL.sky, scene = 'nuages'}: Props) {
 }
 
 const styles = StyleSheet.create({
-  bottomSvg: {
+  hills: {
     position: 'absolute',
     bottom: 0,
     left: 0,

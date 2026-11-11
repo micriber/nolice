@@ -89,7 +89,7 @@ export function FindGame() {
   );
 
   return (
-    <Screen tint={game.color} scene={decor}>
+    <Screen tint={game.color} scene={decor} mascotVisit={!answered}>
       <GameHeader
         game={game}
         total={maxQuestion}
@@ -101,7 +101,9 @@ export function FindGame() {
           navigation.popTo('Home');
         }}
       />
-      <View style={[styles.content, answered && {paddingBottom: 210 * scale}]}>
+      <View
+        pointerEvents="box-none"
+        style={[styles.content, answered && {paddingBottom: 210 * scale}]}>
         <View style={[styles.choices, {gap: 16 * scale}]}>
           {question?.possibilities?.map((possibility) => (
             <View key={possibility.value} style={styles.choiceCell}>

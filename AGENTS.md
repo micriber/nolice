@@ -44,7 +44,8 @@ src/
   components/
     Screen.tsx           Screen root: full-screen IceBg + SafeAreaView around the content
     FillSvg.tsx          Svg stretched over its container (gradients, backgrounds)
-    IceBg.tsx            Animated background, 3 scenes (banquise/bulles/nuages), `tint` per game
+    IceBg.tsx            Animated background, 3 scenes (banquise/bulles/nuages): snow, bubbles or clouds drifting across the screen over two hills, `tint` per game
+    MascotVisit.tsx      The mascot showing up at the bottom of the screen now and then (game screens only): it hops across, or pops up from below and jumps on the spot
     BigButton.tsx        Chunky 3D button that presses down (Continuer, Rejouer)
     RoundBtn.tsx         Chunky round button (home, gear, music)
     Mascot.tsx           Mascot w/ moods (happy/content/sad) + anims (float/bob/jump) + MASCOTS list
@@ -96,7 +97,7 @@ ResultSheet plays BRAVO/DOMMAGE → callback plays the correct-answer sound → 
 
 ## Layout conventions
 
-- Each screen's root is `<Screen>` (`src/components/Screen.tsx`): `<IceBg>` covers the whole screen, status bar included, and the content sits in a `<SafeAreaView>` from `react-native-safe-area-context`, which already handles the status bar inset. Pass `scene` (decor from settings) and, in games, `tint` (game color).
+- Each screen's root is `<Screen>` (`src/components/Screen.tsx`): `<IceBg>` covers the whole screen, status bar included, and the content sits in a `<SafeAreaView>` from `react-native-safe-area-context`, which already handles the status bar inset. Pass `scene` (decor from settings) and, in games, `tint` (game color) and `mascotVisit={!answered}`: the mascot shows up at the bottom of the screen 10–20s into the game, then every 30–60s of question time, with a visit drawn at random, and freezes (visit and wait) while the result sheet hides it. Tapping it sends hearts up. It sits behind the content, so the touch only reaches it through views marked `pointerEvents="box-none"` (the `SafeAreaView` in `Screen`, the content `View` of both game screens): a new wrapper around the game content needs it too.
 - Button/header text uses `numberOfLines={1}` + `adjustsFontSizeToFit` — fonts shrink to fit rather than wrapping/clipping. Multiline body text (score message) is left as-is.
 - `FONT` exposes font families only (`DISPLAY`/`DISPLAY_BOLD` = Fredoka, `UI`/`UI_HEAVY` = Nunito); sizes are inline dp values taken from the design.
 - "Chunky 3D" buttons (BigButton/RoundBtn/Tile/GameCard) fake depth with a darker edge layer: the press swaps `paddingBottom` and compensates with `marginTop` so total height stays constant.
