@@ -25,6 +25,7 @@ type Props = {
   disabled?: boolean;
   onPress: () => void;
   contentSize: number;
+  shapeColor?: string;
 };
 
 const EDGE = 6;
@@ -40,6 +41,7 @@ export default function Tile({
   disabled,
   onPress,
   contentSize,
+  shapeColor,
 }: Props) {
   const [down, setDown] = useState(false);
   const anim = useRef(new Animated.Value(0)).current;
@@ -118,7 +120,9 @@ export default function Tile({
       content = <ColorImage type={value} size={contentSize} />;
       break;
     case 'shape':
-      content = <ShapeImage type={value} size={contentSize} />;
+      content = (
+        <ShapeImage type={value} size={contentSize} color={shapeColor} />
+      );
       break;
     default:
       content = null;

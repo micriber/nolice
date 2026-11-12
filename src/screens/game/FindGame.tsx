@@ -9,6 +9,7 @@ import GameHeader from './GameHeader';
 import Tile from './Tile';
 import {COLOR_HEX} from './color-picture';
 import {ResultSheet} from './result-sheet';
+import {SHAPE_COLORS} from './shape-picture';
 import Confetti from '../../components/Confetti';
 import Screen from '../../components/Screen';
 import {useSoundStore, SOUNDS_QUESTION} from '../../store/audio';
@@ -32,6 +33,9 @@ export function FindGame() {
   const [picked, setPicked] = useState<number | null>(null);
   const [questionId, setQuestionId] = useState(uuid.v4());
   const [gameId] = useState(uuid.v4());
+  const [shapeColor, setShapeColor] = useState(
+    () => SHAPE_COLORS[Math.floor(Math.random() * SHAPE_COLORS.length)],
+  );
 
   const game = gameConfig(gameType);
   const maxQuestion = 10;
@@ -112,6 +116,7 @@ export function FindGame() {
                 value={questionConfig[possibility.value].key}
                 deepColor={game.deep}
                 contentSize={96 * scale}
+                shapeColor={gameType === 'shape' ? shapeColor : undefined}
                 state={
                   !answered
                     ? 'idle'
@@ -149,6 +154,10 @@ export function FindGame() {
             return;
           }
           setQuestionId(uuid.v4());
+          if (gameType === 'shape') {
+            const colors = SHAPE_COLORS.filter((color) => color !== shapeColor);
+            setShapeColor(colors[Math.floor(Math.random() * colors.length)]);
+          }
           store.nextQuestion();
           setPicked(null);
         }}
