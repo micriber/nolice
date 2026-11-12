@@ -16,6 +16,9 @@ const {values: options} = parseArgs({
     colors: {type: 'boolean'},
     feedback: {type: 'boolean'},
     responses: {type: 'boolean'},
+    unlocks: {type: 'boolean'},
+    welcome: {type: 'boolean'},
+    rewards: {type: 'boolean'},
     file: {type: 'string'},
     generate: {type: 'boolean'},
   },
@@ -26,11 +29,14 @@ if (
     options.colors,
     options.feedback,
     options.responses,
+    options.unlocks,
+    options.welcome,
+    options.rewards,
     options.file !== undefined,
   ].filter(Boolean).length > 1
 ) {
   throw new Error(
-    'Choisir un seul filtre : --all, --colors, --feedback, --responses ou --file.',
+    'Choisir un seul filtre : --all, --colors, --feedback, --responses, --unlocks, --welcome, --rewards ou --file.',
   );
 }
 if (options.file !== undefined && !/^[a-z-]+(?:\.mp3)?$/.test(options.file)) {
@@ -69,15 +75,27 @@ const selected = options.file
         ? dialogues.filter(({section}) => section === '[COULEURS]')
         : options.feedback
           ? dialogues.filter(({section}) => section === '[RETOURS ET SCORE]')
-          : dialogues.filter(({name}) =>
-              [
-                'bird',
-                'count-rabbit',
-                'shape-rectangle',
-                'bravo',
-                'response-black',
-              ].includes(name),
-            );
+          : options.unlocks
+            ? dialogues.filter(
+                ({section}) => section === '[RÉCOMPENSES À DÉBLOQUER]',
+              )
+            : options.welcome
+              ? dialogues.filter(
+                  ({section}) => section === '[PARCOURS DE BIENVENUE]',
+                )
+              : options.rewards
+                ? dialogues.filter(
+                    ({section}) => section === '[RÉCOMPENSES GAGNÉES]',
+                  )
+                : dialogues.filter(({name}) =>
+                    [
+                      'bird',
+                      'count-rabbit',
+                      'shape-rectangle',
+                      'bravo',
+                      'response-black',
+                    ].includes(name),
+                  );
 if (!selected.length) throw new Error('Aucun dialogue sélectionné.');
 const samples = selected.map(({name, text}) => [name, text]);
 const characters = samples.reduce((total, [, text]) => total + text.length, 0);

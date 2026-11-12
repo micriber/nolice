@@ -1,6 +1,6 @@
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {useFocusEffect} from '@react-navigation/native';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {BackHandler, Pressable, StyleSheet, Text, View} from 'react-native';
 
 import BigButton from '../../components/BigButton';
@@ -8,10 +8,11 @@ import DecorThumb from '../../components/DecorThumb';
 import Equalizer from '../../components/Equalizer';
 import {DECOR_LABELS} from '../../components/IceBg';
 import Mascot, {MASCOTS} from '../../components/Mascot';
+import MusicButton from '../../components/MusicButton';
 import Progress from '../../components/Progress';
 import RoundBtn from '../../components/RoundBtn';
 import Screen from '../../components/Screen';
-import {MUSIC_TRACKS, useSoundStore} from '../../store/audio';
+import {MUSIC_TRACKS, SOUNDS_WELCOME, useSoundStore} from '../../store/audio';
 import {DecorKey, useSettingsStore} from '../../store/settings';
 import {NOL, shade} from '../../utils/color';
 import FONT from '../../utils/font';
@@ -28,10 +29,10 @@ type Props = {
   navigation: NavigationProp;
 };
 
-const TITLES = [
-  'Choisis ta mascotte',
-  'Choisis ton décor',
-  'Choisis ta musique',
+const STEPS = [
+  {title: 'Choisis ta mascotte', voice: SOUNDS_WELCOME.MASCOT},
+  {title: 'Choisis ton décor', voice: SOUNDS_WELCOME.DECOR},
+  {title: 'Choisis ta musique', voice: SOUNDS_WELCOME.TRACK},
 ];
 
 // Le parcours ne propose que ce qui est disponible sans rien avoir gagné.
@@ -103,7 +104,14 @@ export default function WelcomeScreen({navigation}: Props) {
   const musicOn = useSoundStore((s) => s.backgroundPlaying);
   const startBackground = useSoundStore((s) => s.startBackground);
   const [step, setStep] = useState(0);
-  const last = step === TITLES.length - 1;
+  const last = step === STEPS.length - 1;
+  const play = useSoundStore((s) => s.play);
+  const stop = useSoundStore((s) => s.stop);
+
+  useEffect(() => {
+    void play(STEPS[step].voice);
+  }, [step]);
+  useEffect(() => stop, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -156,12 +164,12 @@ export default function WelcomeScreen({navigation}: Props) {
             )}
           </View>
           <Progress
-            total={TITLES.length}
-            results={TITLES.map((_, i) => (i < step ? true : undefined))}
+            total={STEPS.length}
+            results={STEPS.map((_, i) => (i < step ? true : undefined))}
             current={step}
             dotSize={11 * scale}
           />
-          <View style={{width: 46 * scale}} />
+          <MusicButton size={46 * scale} />
         </View>
 
         <View style={[styles.body, {gap: 22 * scale}]}>
@@ -170,7 +178,7 @@ export default function WelcomeScreen({navigation}: Props) {
             style={[styles.title, {fontSize: 28 * scale}]}
             numberOfLines={1}
             adjustsFontSizeToFit>
-            {TITLES[step]}
+            {STEPS[step].title}
           </Text>
           <View style={[styles.choices, {gap: 12 * scale}]}>
             {step === 0 &&

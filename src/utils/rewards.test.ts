@@ -1,3 +1,6 @@
+import {readFileSync} from 'fs';
+import {join} from 'path';
+
 import {GAMES} from './color';
 import {
   DECOR_UNLOCKS,
@@ -59,6 +62,31 @@ describe('unlockHint', () => {
     ['perfect', 'Fais un sans-faute, 10 sur 10, dans n’importe quel jeu.'],
   ])('explains %j', (unlock, hint) => {
     expect(unlockHint(unlock)).toBe(hint);
+  });
+});
+
+// La phrase dite dans la fenêtre d'une récompense verrouillée nomme ce que sa règle débloque : à régénérer si le plan change.
+describe('unlock voices', () => {
+  const dialogues = readFileSync(
+    join(__dirname, '../../assets/audio/dialogues.fr.txt'),
+    'utf8',
+  );
+  const spoken = (unlock: Unlock) => {
+    const name =
+      unlock === 'perfect'
+        ? 'unlock-perfect'
+        : `unlock-${unlock.game}${unlock.successes === 2 ? '-twice' : ''}`;
+    return dialogues.match(new RegExp(`^${name}\\.mp3 \\| (.+)$`, 'm'))?.[1];
+  };
+
+  it.each<[string, Unlock[]]>([
+    ['mascotte', mascots],
+    ['décor', Object.values(DECOR_UNLOCKS)],
+    ['musique', Object.values(TRACK_UNLOCKS)],
+  ])('name the %s they unlock', (word, unlocks) => {
+    for (const unlock of unlocks) {
+      expect(spoken(unlock)).toContain(word);
+    }
   });
 });
 

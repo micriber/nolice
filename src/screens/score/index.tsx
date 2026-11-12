@@ -18,7 +18,12 @@ import DecorThumb from '../../components/DecorThumb';
 import {DECOR_LABELS} from '../../components/IceBg';
 import Mascot, {MASCOTS} from '../../components/Mascot';
 import Screen from '../../components/Screen';
-import {MUSIC_TRACKS, SOUNDS, useSoundStore} from '../../store/audio';
+import {
+  MUSIC_TRACKS,
+  SOUNDS,
+  SOUNDS_REWARD,
+  useSoundStore,
+} from '../../store/audio';
 import {useGameScoreStore} from '../../store/game';
 import {useRewardsStore} from '../../store/rewards';
 import {useSettingsStore} from '../../store/settings';
@@ -181,6 +186,7 @@ export default function ScoreScreen() {
   const decor = useSettingsStore((s) => s.decor);
   const claimReward = useRewardsStore((s) => s.claim);
   const [reward, setReward] = useState<Reward | null>(null);
+  const won = useRef<Reward | null>(null);
   const maxQuestion = store.questions.length;
   const {gameId, gameType} = route.params;
   const game = gameConfig(gameType);
@@ -211,9 +217,11 @@ export default function ScoreScreen() {
 
   // Avant le premier affichage : la récompense prend la place du message sans qu'il clignote.
   useLayoutEffect(() => {
-    setReward(claimReward(gameId, gameType, results));
+    won.current = claimReward(gameId, gameType, results);
+    setReward(won.current);
   }, []);
 
+  // Pas plus tôt : l'écran de jeu coupe le son en se démontant, après les layout effects de celui-ci.
   useEffect(() => {
     void logEvent(getAnalytics(), 'score', {
       game_id: gameId,
@@ -221,6 +229,7 @@ export default function ScoreScreen() {
       isGood,
       isPerfect,
     });
+    const prize = won.current;
     void playSound(
       isPerfect
         ? SOUNDS.PERFECT
@@ -229,6 +238,11 @@ export default function ScoreScreen() {
           : mood === 'content'
             ? SOUNDS.CONGRATULATION
             : SOUNDS.RETRY,
+      prize
+        ? () => {
+            void playSound(SOUNDS_REWARD[prize.kind]);
+          }
+        : undefined,
     );
     return () => {
       stopSound();

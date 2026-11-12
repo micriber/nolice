@@ -11,6 +11,8 @@ import {File, Paths} from 'expo-file-system';
 import {create} from 'zustand';
 
 import type {MusicTrackKey} from './settings';
+import type {GameKey} from '../utils/color';
+import type {Reward, Unlock} from '../utils/rewards';
 
 interface AudioStoreState {
   backgroundPlaying: boolean;
@@ -108,6 +110,25 @@ const ANSWER_SIX_SOUND_PATH = '../../assets/audio/response-six.mp3';
 const ANSWER_SEVEN_SOUND_PATH = '../../assets/audio/response-seven.mp3';
 const ANSWER_EIGHT_SOUND_PATH = '../../assets/audio/response-eight.mp3';
 const ANSWER_NINE_SOUND_PATH = '../../assets/audio/response-nine.mp3';
+const UNLOCK_NUMBER_SOUND_PATH = '../../assets/audio/unlock-number.mp3';
+const UNLOCK_NUMBER_TWICE_SOUND_PATH =
+  '../../assets/audio/unlock-number-twice.mp3';
+const UNLOCK_ANIMAL_SOUND_PATH = '../../assets/audio/unlock-animal.mp3';
+const UNLOCK_ANIMAL_TWICE_SOUND_PATH =
+  '../../assets/audio/unlock-animal-twice.mp3';
+const UNLOCK_COLOR_SOUND_PATH = '../../assets/audio/unlock-color.mp3';
+const UNLOCK_COLOR_TWICE_SOUND_PATH =
+  '../../assets/audio/unlock-color-twice.mp3';
+const UNLOCK_SHAPE_SOUND_PATH = '../../assets/audio/unlock-shape.mp3';
+const UNLOCK_SHAPE_TWICE_SOUND_PATH =
+  '../../assets/audio/unlock-shape-twice.mp3';
+const UNLOCK_PERFECT_SOUND_PATH = '../../assets/audio/unlock-perfect.mp3';
+const WELCOME_MASCOT_SOUND_PATH = '../../assets/audio/welcome-mascot.mp3';
+const WELCOME_DECOR_SOUND_PATH = '../../assets/audio/welcome-decor.mp3';
+const WELCOME_TRACK_SOUND_PATH = '../../assets/audio/welcome-track.mp3';
+const REWARD_MASCOT_SOUND_PATH = '../../assets/audio/reward-mascot.mp3';
+const REWARD_DECOR_SOUND_PATH = '../../assets/audio/reward-decor.mp3';
+const REWARD_TRACK_SOUND_PATH = '../../assets/audio/reward-track.mp3';
 
 type SoundsTypeQuestion = {
   [gameType: string]: SoundQuestionType;
@@ -143,6 +164,45 @@ export const MUSIC_TRACKS: Record<MusicTrackKey, AudioSource> = {
   calme: require(CALME_MUSIC_PATH),
   aventure: require(AVENTURE_MUSIC_PATH),
   festive: require(FESTIVE_MUSIC_PATH),
+};
+
+const SOUNDS_UNLOCK: Record<GameKey, Record<1 | 2, AudioSource>> = {
+  number: {
+    1: require(UNLOCK_NUMBER_SOUND_PATH),
+    2: require(UNLOCK_NUMBER_TWICE_SOUND_PATH),
+  },
+  animal: {
+    1: require(UNLOCK_ANIMAL_SOUND_PATH),
+    2: require(UNLOCK_ANIMAL_TWICE_SOUND_PATH),
+  },
+  color: {
+    1: require(UNLOCK_COLOR_SOUND_PATH),
+    2: require(UNLOCK_COLOR_TWICE_SOUND_PATH),
+  },
+  shape: {
+    1: require(UNLOCK_SHAPE_SOUND_PATH),
+    2: require(UNLOCK_SHAPE_TWICE_SOUND_PATH),
+  },
+};
+const UNLOCK_PERFECT_SOUND: AudioSource = require(UNLOCK_PERFECT_SOUND_PATH);
+
+// La phrase qui dit comment gagner une récompense encore verrouillée.
+export function unlockSound(unlock: Unlock): AudioSource {
+  return unlock === 'perfect'
+    ? UNLOCK_PERFECT_SOUND
+    : SOUNDS_UNLOCK[unlock.game][unlock.successes];
+}
+
+export const SOUNDS_WELCOME = {
+  MASCOT: require(WELCOME_MASCOT_SOUND_PATH) as AudioSource,
+  DECOR: require(WELCOME_DECOR_SOUND_PATH) as AudioSource,
+  TRACK: require(WELCOME_TRACK_SOUND_PATH) as AudioSource,
+};
+
+export const SOUNDS_REWARD: Record<Reward['kind'], AudioSource> = {
+  mascot: require(REWARD_MASCOT_SOUND_PATH),
+  decor: require(REWARD_DECOR_SOUND_PATH),
+  track: require(REWARD_TRACK_SOUND_PATH),
 };
 
 export interface SoundCountType {
@@ -381,6 +441,12 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
       SOUNDS.PERFECT,
       SOUNDS.RETRY,
       ...Object.values(SOUNDS_COUNT_QUESTION),
+      UNLOCK_PERFECT_SOUND,
+      ...Object.values(SOUNDS_WELCOME),
+      ...Object.values(SOUNDS_REWARD),
+      ...Object.values(SOUNDS_UNLOCK).flatMap((sounds) =>
+        Object.values(sounds),
+      ),
     ];
     for (const gameType of Object.keys(SOUNDS_QUESTION)) {
       for (const key of Object.keys(SOUNDS_QUESTION[gameType])) {

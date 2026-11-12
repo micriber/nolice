@@ -1,8 +1,10 @@
 import {MaterialCommunityIcons} from '@expo/vector-icons';
-import React from 'react';
+import {AudioSource} from 'expo-audio';
+import React, {useEffect} from 'react';
 import {Modal, Pressable, StyleSheet, Text, View} from 'react-native';
 
 import BigButton from '../../components/BigButton';
+import {useSoundStore} from '../../store/audio';
 import {NOL} from '../../utils/color';
 import FONT from '../../utils/font';
 import {useScale} from '../../utils/scale';
@@ -10,13 +12,26 @@ import {useScale} from '../../utils/scale';
 type Props = {
   title: string;
   hint: string;
+  sound: AudioSource;
   picture: React.ReactNode;
   onClose: () => void;
 };
 
-// Fenêtre qui explique comment gagner une récompense encore verrouillée.
-export default function UnlockPopup({title, hint, picture, onClose}: Props) {
+// Fenêtre qui explique, par écrit et à voix haute, comment gagner une récompense encore verrouillée.
+export default function UnlockPopup({
+  title,
+  hint,
+  sound,
+  picture,
+  onClose,
+}: Props) {
   const scale = useScale();
+  const play = useSoundStore((s) => s.play);
+  const stop = useSoundStore((s) => s.stop);
+  useEffect(() => {
+    void play(sound);
+    return stop;
+  }, []);
   return (
     <Modal
       transparent

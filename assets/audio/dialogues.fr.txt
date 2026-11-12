@@ -16,6 +16,9 @@ Le script conserve les nouvelles prises et leurs réglages dans output/audio, sa
 Aperçu sans génération : npm run audio:samples -- --file response-losange.mp3
 Nouvelle prise : npm run audio:samples -- --file response-losange.mp3 --generate
 Les 27 réponses animaux, formes et couleurs : npm run audio:samples -- --responses --generate
+Les 9 phrases des récompenses à débloquer : npm run audio:samples -- --unlocks --generate
+Les 3 phrases du parcours de bienvenue : npm run audio:samples -- --welcome --generate
+Les 3 phrases des récompenses gagnées : npm run audio:samples -- --rewards --generate
 
 AFFICHAGE ET AUDIO
 Les consignes restent courtes à l’écran, plus complètes à l’oral.
@@ -23,6 +26,7 @@ Couleurs : « Trouve le noir » affiché / « Trouve la couleur noire. » pronon
 Comptage : « Combien de lapins ? » affiché / « Combien comptes-tu de lapins ? » prononcé.
 Les résultats affichent « La réponse : … », même si la voix dit « Voici… ».
 « Dommage ! » est affiché et prononcé après une mauvaise réponse.
+Récompense verrouillée : la fenêtre affiche la règle exacte (« au moins 9 bonnes réponses sur 10 ») / « Pour avoir cette mascotte, gagne le jeu… » prononcé.
 
 ENCHAÎNEMENTS
 Après chaque réponse : bravo.mp3 ou dommage.mp3, puis le fichier response-*.mp3.
@@ -32,6 +36,10 @@ Score 0 à 4 : retry.mp3 ; titre « Bien essayé ! ».
 Score 5 à 8 : congratulation.mp3 ; titre « Bien joué ! ».
 Score 9 : score-almost.mp3 ; titre « Bravo ! ».
 Score 10 : score-perfect.mp3 ; titre « Bravo ! ».
+Récompense gagnée (score 9 ou 10) : après la phrase de score, le fichier reward-*.mp3 de sa sorte ; la carte affiche « Nouvelle mascotte ! ».
+Fenêtre d’une récompense verrouillée (Réglages) : le fichier unlock-*.mp3 de sa règle, à l’ouverture.
+Parcours de bienvenue : le fichier welcome-*.mp3 de l’étape, à l’arrivée sur l’étape (retour en arrière compris).
+Chaque phrase unlock-* nomme la sorte de récompense que sa règle débloque : la régénérer si le plan des récompenses change.
 
 [COULEURS]
 yellow.mp3 | Trouve la couleur jaune.
@@ -119,3 +127,24 @@ congratulation.mp3 | Bien joué ! Tu as eu plein de bonnes réponses !
 score-almost.mp3 | Bravo ! Tu as eu presque toutes les bonnes réponses !
 score-perfect.mp3 | Bravo ! Tu as eu toutes les bonnes réponses !
 retry.mp3 | Bien essayé ! On recommence ?
+
+[RÉCOMPENSES À DÉBLOQUER]
+unlock-number.mp3 | Pour avoir cette mascotte, gagne le jeu des nombres.
+unlock-number-twice.mp3 | Pour avoir cette musique, gagne deux fois le jeu des nombres.
+unlock-animal.mp3 | Pour avoir cette mascotte, gagne le jeu des animaux.
+unlock-animal-twice.mp3 | Pour avoir ce décor, gagne deux fois le jeu des animaux.
+unlock-color.mp3 | Pour avoir cette mascotte, gagne le jeu des couleurs.
+unlock-color-twice.mp3 | Pour avoir cette musique, gagne deux fois le jeu des couleurs.
+unlock-shape.mp3 | Pour avoir cette mascotte, gagne le jeu des formes.
+unlock-shape-twice.mp3 | Pour avoir ce décor, gagne deux fois le jeu des formes.
+unlock-perfect.mp3 | Pour avoir cette mascotte, trouve toutes les bonnes réponses dans un jeu.
+
+[PARCOURS DE BIENVENUE]
+welcome-mascot.mp3 | Bienvenue ! Choisis ta mascotte.
+welcome-decor.mp3 | Choisis ton décor.
+welcome-track.mp3 | Choisis ta musique.
+
+[RÉCOMPENSES GAGNÉES]
+reward-mascot.mp3 | Tu as gagné une nouvelle mascotte !
+reward-decor.mp3 | Tu as gagné un nouveau décor !
+reward-track.mp3 | Tu as gagné une nouvelle musique !

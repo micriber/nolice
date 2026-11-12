@@ -11,7 +11,7 @@ import Mascot, {MASCOTS} from '../../components/Mascot';
 import MusicButton from '../../components/MusicButton';
 import RoundBtn from '../../components/RoundBtn';
 import Screen from '../../components/Screen';
-import {MUSIC_TRACKS, useSoundStore} from '../../store/audio';
+import {MUSIC_TRACKS, unlockSound, useSoundStore} from '../../store/audio';
 import {useRewardsStore} from '../../store/rewards';
 import {
   DecorKey,
@@ -328,6 +328,7 @@ export default function SettingsScreen({navigation}: Props) {
         <UnlockPopup
           title={locked.title}
           hint={unlockHint(locked.unlock)}
+          sound={unlockSound(locked.unlock)}
           picture={locked.picture}
           onClose={() => {
             setLocked(null);
