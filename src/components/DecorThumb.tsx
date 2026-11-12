@@ -29,6 +29,15 @@ export default function DecorThumb({scene, unit, radius}: Props) {
         {scene === 'banquise' && (
           <Path d="M0 42 Q30 28 60 40 T120 36 L120 70 L0 70 Z" fill="#FBFEFF" />
         )}
+        {scene === 'etoiles' && (
+          <>
+            <Rect width="120" height="70" fill={NOL.violet} opacity={0.14} />
+            <Path
+              d="M0 42 Q30 28 60 40 T120 36 L120 70 L0 70 Z"
+              fill={shade(NOL.violet, 0.5)}
+            />
+          </>
+        )}
         {scene === 'automne' && (
           <Path
             d="M0 42 Q30 28 60 40 T120 36 L120 70 L0 70 Z"
@@ -80,6 +89,27 @@ export default function DecorThumb({scene, unit, radius}: Props) {
               left: leaf[0] * scale,
               top: leaf[1] * scale,
               transform: [{rotate: `${leaf[4]}deg`}],
+            }}
+          />
+        ))}
+      {scene === 'etoiles' &&
+        (
+          [
+            [12, 8, 14],
+            [44, 18, 10],
+            [70, 6, 12],
+            [96, 20, 16],
+          ] as [number, number, number][]
+        ).map((star, i) => (
+          <MaterialCommunityIcons
+            key={i}
+            name="star-four-points"
+            size={star[2] * scale}
+            color="#fff"
+            style={{
+              position: 'absolute',
+              left: star[0] * scale,
+              top: star[1] * scale,
             }}
           />
         ))}

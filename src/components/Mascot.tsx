@@ -16,6 +16,7 @@ export const MASCOTS: {key: MascotKey; label: string}[] = [
   {key: 'pig', label: 'Cochon'},
   {key: 'rabbit', label: 'Lapin'},
   {key: 'cow', label: 'Vache'},
+  {key: 'hibou', label: 'Hibou'},
 ];
 
 export type MascotMood = 'none' | 'happy' | 'content' | 'sad';
@@ -30,6 +31,8 @@ type Props = {
 };
 
 function MascotFace({who, size}: {who: MascotKey; size: number}) {
+  // « owl » est la clé de Nolice : le hibou, dessiné par l'animal « owl », a la clé « hibou ».
+  if (who === 'hibou') return <AnimalImage type="owl" size={size} />;
   if (who !== 'owl') return <AnimalImage type={who} size={size} />;
   return (
     <Image

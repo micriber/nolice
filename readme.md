@@ -2,7 +2,7 @@
 
 ## Idées d’évolution — Nolice – Maternelle
 
-L’objectif à terme est de proposer six jeux sous le nom **Nolice – Maternelle**. Aux quatre jeux actuels (nombres, animaux, couleurs et formes) s’ajouterait un jeu de lettres : « Trouve la lettre A », avec quatre choix comme A, S, L et F, en commençant par les majuscules.
+L’objectif à terme est de proposer six jeux sous le nom **Nolice – Maternelle**. Cinq existent : les nombres, les animaux, les couleurs, les formes et les lettres (« Trouve la lettre A », avec quatre choix comme A, S, L et F, en majuscules pour commencer).
 
 Les deux pistes suivantes sont à explorer pour le sixième jeu ; le choix reste ouvert.
 
@@ -32,12 +32,12 @@ Une version **Nolice – Élémentaire** est également envisagée ensuite, avec
 
 ### Les récompenses à débloquer
 
-Dix récompenses se gagnent en jouant : six mascottes, deux décors et deux musiques.
+Douze récompenses se gagnent en jouant : sept mascottes, trois décors et deux musiques.
 
 | | Disponible au départ | À débloquer |
 |---|---|---|
-| Mascottes | Nolice, le chat et le chien | Les six autres animaux du jeu : lapin, canard, oiseau, cochon, vache et mouton |
-| Décors | Nuages et bulles | La banquise et l’automne |
+| Mascottes | Nolice, le chat et le chien | Les sept autres animaux du jeu : lapin, canard, oiseau, cochon, vache, mouton et hibou |
+| Décors | Nuages et bulles | La banquise, l’automne et les étoiles |
 | Musiques | Joyeuse et calme | Aventure et festive |
 
 Chaque jeu est lié à une mascotte, puis à un décor ou une musique :
@@ -48,6 +48,7 @@ Chaque jeu est lié à une mascotte, puis à un décor ou une musique :
 | Les animaux | Le canard | L’automne |
 | Les couleurs | L’oiseau | La musique festive |
 | Les formes | Le cochon | La banquise |
+| Les lettres | Le hibou | Les étoiles |
 
 Une réussite est une partie terminée avec au moins 9 sur 10. Le lapin et la vache sont les deux mascottes du sans-faute.
 
@@ -56,7 +57,7 @@ Une partie ne donne jamais plus d’une récompense :
 - Un sans-faute (10 sur 10), dans n’importe quel jeu, donne une mascotte du sans-faute tant qu’il en reste.
 - Sinon, une réussite donne la récompense suivante du jeu : sa mascotte, puis son décor ou sa musique.
 
-Les dix récompenses demandent donc au moins dix parties réussies.
+Les douze récompenses demandent donc au moins douze parties réussies.
 
 Les récompenses sont à publier dans la même version que le choix de la mascotte et du décor, absent de la version aujourd’hui en ligne : aucun joueur ne perd alors quelque chose qu’il avait déjà.
 

@@ -22,6 +22,7 @@ const Bird = rasterAnimal(require('../../../assets/animals/bird.png'));
 const Cat = rasterAnimal(require('../../../assets/animals/cat.png'));
 const Duck = rasterAnimal(require('../../../assets/animals/duck.png'));
 const Sheep = rasterAnimal(require('../../../assets/animals/sheep.png'));
+const Owl = rasterAnimal(require('../../../assets/animals/owl.png'));
 
 export const ANIMALS: {[key: string]: React.ComponentType<any>} = {
   duck: Duck,
@@ -32,6 +33,7 @@ export const ANIMALS: {[key: string]: React.ComponentType<any>} = {
   cat: Cat,
   bird: Bird,
   sheep: Sheep,
+  owl: Owl,
 };
 
 export function AnimalImage({

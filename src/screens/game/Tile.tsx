@@ -11,6 +11,7 @@ import {
 
 import {AnimalImage} from './animal-picture';
 import {ColorImage} from './color-picture';
+import {LetterImage} from './letter-picture';
 import {ShapeImage} from './shape-picture';
 import {GameKey, NOL} from '../../utils/color';
 import FONT from '../../utils/font';
@@ -25,7 +26,7 @@ type Props = {
   disabled?: boolean;
   onPress: () => void;
   contentSize: number;
-  shapeColor?: string;
+  pictureColor?: string;
 };
 
 const EDGE = 6;
@@ -41,7 +42,7 @@ export default function Tile({
   disabled,
   onPress,
   contentSize,
-  shapeColor,
+  pictureColor,
 }: Props) {
   const [down, setDown] = useState(false);
   const anim = useRef(new Animated.Value(0)).current;
@@ -121,7 +122,16 @@ export default function Tile({
       break;
     case 'shape':
       content = (
-        <ShapeImage type={value} size={contentSize} color={shapeColor} />
+        <ShapeImage type={value} size={contentSize} color={pictureColor} />
+      );
+      break;
+    case 'letter':
+      content = (
+        <LetterImage
+          type={value}
+          size={contentSize}
+          color={pictureColor ?? deepColor}
+        />
       );
       break;
     default:

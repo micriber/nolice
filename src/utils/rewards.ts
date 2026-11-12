@@ -10,6 +10,7 @@ export const MASCOT_UNLOCKS: Partial<Record<MascotKey, Unlock>> = {
   duck: {game: 'animal', successes: 1},
   bird: {game: 'color', successes: 1},
   pig: {game: 'shape', successes: 1},
+  hibou: {game: 'letter', successes: 1},
   rabbit: 'perfect',
   cow: 'perfect',
 };
@@ -17,6 +18,7 @@ export const MASCOT_UNLOCKS: Partial<Record<MascotKey, Unlock>> = {
 export const DECOR_UNLOCKS: Partial<Record<DecorKey, Unlock>> = {
   banquise: {game: 'shape', successes: 2},
   automne: {game: 'animal', successes: 2},
+  etoiles: {game: 'letter', successes: 2},
 };
 
 export const TRACK_UNLOCKS: Partial<Record<MusicTrackKey, Unlock>> = {

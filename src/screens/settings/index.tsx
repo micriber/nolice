@@ -30,7 +30,13 @@ type Props = {
   navigation: NavigationProp;
 };
 
-const DECORS: DecorKey[] = ['nuages', 'bulles', 'banquise', 'automne'];
+const DECORS: DecorKey[] = [
+  'nuages',
+  'bulles',
+  'banquise',
+  'automne',
+  'etoiles',
+];
 
 const LOCKED_GREY = '#9FB4C2';
 
@@ -199,12 +205,16 @@ export default function SettingsScreen({navigation}: Props) {
                   </Pressable>
                 );
               })}
+              {/* Cases vides : une dernière rangée incomplète garde des cases de la même largeur */}
+              {Array.from({length: (3 - (MASCOTS.length % 3)) % 3}, (_, i) => (
+                <View key={i} style={styles.mascotCell} />
+              ))}
             </View>
           </SettingsCard>
 
           {/* DÉCOR */}
           <SettingsCard title="Le décor">
-            <View style={styles.decorRow}>
+            <View style={styles.decorGrid}>
               {DECORS.map((key) => {
                 const sel = settings.decor === key;
                 const label = DECOR_LABELS[key];
@@ -231,7 +241,7 @@ export default function SettingsScreen({navigation}: Props) {
                         ),
                       });
                     }}
-                    style={styles.decorCell}>
+                    style={styles.decorGridCell}>
                     <View
                       style={[
                         styles.decorFrame,
@@ -258,6 +268,9 @@ export default function SettingsScreen({navigation}: Props) {
                   </Pressable>
                 );
               })}
+              {Array.from({length: (4 - (DECORS.length % 4)) % 4}, (_, i) => (
+                <View key={i} style={styles.decorGridCell} />
+              ))}
             </View>
           </SettingsCard>
 
@@ -440,6 +453,17 @@ function makeStyles(scale: number) {
     decorRow: {
       flexDirection: 'row',
       gap: 12 * scale,
+    },
+    decorGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 12 * scale,
+    },
+    decorGridCell: {
+      width: '21%',
+      flexGrow: 1,
+      alignItems: 'center',
+      gap: 6 * scale,
     },
     decorCell: {
       flex: 1,

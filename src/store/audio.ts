@@ -39,6 +39,7 @@ const COUNT_COW_SOUND_PATH = '../../assets/audio/count-cow.mp3';
 const COUNT_RABBIT_SOUND_PATH = '../../assets/audio/count-rabbit.mp3';
 const COUNT_BIRD_SOUND_PATH = '../../assets/audio/count-bird.mp3';
 const COUNT_SHEEP_SOUND_PATH = '../../assets/audio/count-sheep.mp3';
+const COUNT_OWL_SOUND_PATH = '../../assets/audio/count-owl.mp3';
 const DUCK_QUESTION_SOUND_PATH = '../../assets/audio/duck.mp3';
 const DUCK_ANSWER_SOUND_PATH = '../../assets/audio/response-duck.mp3';
 const CAT_QUESTION_SOUND_PATH = '../../assets/audio/cat.mp3';
@@ -55,6 +56,8 @@ const BIRD_QUESTION_SOUND_PATH = '../../assets/audio/bird.mp3';
 const BIRD_ANSWER_SOUND_PATH = '../../assets/audio/response-bird.mp3';
 const SHEEP_QUESTION_SOUND_PATH = '../../assets/audio/sheep.mp3';
 const SHEEP_ANSWER_SOUND_PATH = '../../assets/audio/response-sheep.mp3';
+const OWL_QUESTION_SOUND_PATH = '../../assets/audio/owl.mp3';
+const OWL_ANSWER_SOUND_PATH = '../../assets/audio/response-owl.mp3';
 const CIRCLE_QUESTION_SOUND_PATH = '../../assets/audio/shape-circle.mp3';
 const CIRCLE_ANSWER_SOUND_PATH = '../../assets/audio/response-circle.mp3';
 const CROSS_QUESTION_SOUND_PATH = '../../assets/audio/shape-cross.mp3';
@@ -122,6 +125,9 @@ const UNLOCK_COLOR_TWICE_SOUND_PATH =
 const UNLOCK_SHAPE_SOUND_PATH = '../../assets/audio/unlock-shape.mp3';
 const UNLOCK_SHAPE_TWICE_SOUND_PATH =
   '../../assets/audio/unlock-shape-twice.mp3';
+const UNLOCK_LETTER_SOUND_PATH = '../../assets/audio/unlock-letter.mp3';
+const UNLOCK_LETTER_TWICE_SOUND_PATH =
+  '../../assets/audio/unlock-letter-twice.mp3';
 const UNLOCK_PERFECT_SOUND_PATH = '../../assets/audio/unlock-perfect.mp3';
 const WELCOME_MASCOT_SOUND_PATH = '../../assets/audio/welcome-mascot.mp3';
 const WELCOME_DECOR_SOUND_PATH = '../../assets/audio/welcome-decor.mp3';
@@ -183,6 +189,10 @@ const SOUNDS_UNLOCK: Record<GameKey, Record<1 | 2, AudioSource>> = {
     1: require(UNLOCK_SHAPE_SOUND_PATH),
     2: require(UNLOCK_SHAPE_TWICE_SOUND_PATH),
   },
+  letter: {
+    1: require(UNLOCK_LETTER_SOUND_PATH),
+    2: require(UNLOCK_LETTER_TWICE_SOUND_PATH),
+  },
 };
 const UNLOCK_PERFECT_SOUND: AudioSource = require(UNLOCK_PERFECT_SOUND_PATH);
 
@@ -217,6 +227,7 @@ export const SOUNDS_COUNT_QUESTION: SoundCountType = {
   RABBIT: require(COUNT_RABBIT_SOUND_PATH),
   BIRD: require(COUNT_BIRD_SOUND_PATH),
   SHEEP: require(COUNT_SHEEP_SOUND_PATH),
+  OWL: require(COUNT_OWL_SOUND_PATH),
   ONE: require(ANSWER_ONE_SOUND_PATH),
   TWO: require(ANSWER_TWO_SOUND_PATH),
   THREE: require(ANSWER_THREE_SOUND_PATH),
@@ -304,6 +315,10 @@ export const SOUNDS_QUESTION: SoundsTypeQuestion = {
       QUESTION: require(SHEEP_QUESTION_SOUND_PATH),
       ANSWER: require(SHEEP_ANSWER_SOUND_PATH),
     },
+    OWL: {
+      QUESTION: require(OWL_QUESTION_SOUND_PATH),
+      ANSWER: require(OWL_ANSWER_SOUND_PATH),
+    },
   },
   SHAPE: {
     CIRCLE: {
@@ -341,6 +356,112 @@ export const SOUNDS_QUESTION: SoundsTypeQuestion = {
     TRIANGLE: {
       QUESTION: require(TRIANGLE_QUESTION_SOUND_PATH),
       ANSWER: require(TRIANGLE_ANSWER_SOUND_PATH),
+    },
+  },
+  LETTER: {
+    A: {
+      QUESTION: require('../../assets/audio/letter-a.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-a.mp3'),
+    },
+    B: {
+      QUESTION: require('../../assets/audio/letter-b.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-b.mp3'),
+    },
+    C: {
+      QUESTION: require('../../assets/audio/letter-c.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-c.mp3'),
+    },
+    D: {
+      QUESTION: require('../../assets/audio/letter-d.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-d.mp3'),
+    },
+    E: {
+      QUESTION: require('../../assets/audio/letter-e.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-e.mp3'),
+    },
+    F: {
+      QUESTION: require('../../assets/audio/letter-f.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-f.mp3'),
+    },
+    G: {
+      QUESTION: require('../../assets/audio/letter-g.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-g.mp3'),
+    },
+    H: {
+      QUESTION: require('../../assets/audio/letter-h.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-h.mp3'),
+    },
+    I: {
+      QUESTION: require('../../assets/audio/letter-i.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-i.mp3'),
+    },
+    J: {
+      QUESTION: require('../../assets/audio/letter-j.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-j.mp3'),
+    },
+    K: {
+      QUESTION: require('../../assets/audio/letter-k.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-k.mp3'),
+    },
+    L: {
+      QUESTION: require('../../assets/audio/letter-l.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-l.mp3'),
+    },
+    M: {
+      QUESTION: require('../../assets/audio/letter-m.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-m.mp3'),
+    },
+    N: {
+      QUESTION: require('../../assets/audio/letter-n.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-n.mp3'),
+    },
+    O: {
+      QUESTION: require('../../assets/audio/letter-o.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-o.mp3'),
+    },
+    P: {
+      QUESTION: require('../../assets/audio/letter-p.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-p.mp3'),
+    },
+    Q: {
+      QUESTION: require('../../assets/audio/letter-q.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-q.mp3'),
+    },
+    R: {
+      QUESTION: require('../../assets/audio/letter-r.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-r.mp3'),
+    },
+    S: {
+      QUESTION: require('../../assets/audio/letter-s.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-s.mp3'),
+    },
+    T: {
+      QUESTION: require('../../assets/audio/letter-t.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-t.mp3'),
+    },
+    U: {
+      QUESTION: require('../../assets/audio/letter-u.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-u.mp3'),
+    },
+    V: {
+      QUESTION: require('../../assets/audio/letter-v.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-v.mp3'),
+    },
+    W: {
+      QUESTION: require('../../assets/audio/letter-w.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-w.mp3'),
+    },
+    X: {
+      QUESTION: require('../../assets/audio/letter-x.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-x.mp3'),
+    },
+    Y: {
+      QUESTION: require('../../assets/audio/letter-y.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-y.mp3'),
+    },
+    Z: {
+      QUESTION: require('../../assets/audio/letter-z.mp3'),
+      ANSWER: require('../../assets/audio/response-letter-z.mp3'),
     },
   },
 };

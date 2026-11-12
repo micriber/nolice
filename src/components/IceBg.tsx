@@ -31,6 +31,7 @@ export const DECOR_LABELS: Record<DecorKey, string> = {
   bulles: 'Bulles',
   banquise: 'Banquise',
   automne: 'Automne',
+  etoiles: 'Étoiles',
 };
 
 // Répartition fixe et régulière : le même décor à chaque rendu, sans paquet ni couloir vide.
@@ -71,6 +72,20 @@ const LEAVES = Array.from({length: 20}, (_, i) => ({
   tilt: (i * 67) % 360,
   duration: 17000 + (i % 6) * 2100,
   sway: 10 + (i % 4) * 4,
+}));
+
+const HILLS_HEIGHT = 180;
+
+const STAR_COLUMNS = 4;
+const STAR_ROWS = 6;
+
+// Une étoile par case d'un quadrillage du ciel : il y en a partout, sans paquet ni coin vide.
+const STARS = Array.from({length: STAR_COLUMNS * STAR_ROWS}, (_, i) => ({
+  column: i % STAR_COLUMNS,
+  row: Math.floor(i / STAR_COLUMNS),
+  size: 16 + ((i * 7) % 4) * 6,
+  duration: 6400 + ((i * 3) % 5) * 1000,
+  delay: ((i * 0.5698) % 1) * 8000,
 }));
 
 const CLOUD_WIDTH = 96;
@@ -154,6 +169,63 @@ function Drift({
   );
 }
 
+// Étoile qui grossit puis rapetisse jusqu'à disparaître, et renaît ailleurs dans sa zone de l'écran.
+// `delay` décale son premier départ de celui des autres.
+function Twinkle({
+  zone,
+  size,
+  duration,
+  delay,
+}: {
+  zone: {left: number; top: number; width: number; height: number};
+  size: number;
+  duration: number;
+  delay: number;
+}) {
+  const grown = useRef(new Animated.Value(0)).current;
+  const x = useRef(new Animated.Value(0)).current;
+  const y = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    let stopped = false;
+    const step = (toValue: number) =>
+      Animated.timing(grown, {
+        toValue,
+        duration: duration / 2,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true,
+      });
+    const shine = () => {
+      x.setValue(zone.left + Math.random() * Math.max(0, zone.width - size));
+      y.setValue(zone.top + Math.random() * Math.max(0, zone.height - size));
+      Animated.sequence([step(1), step(0)]).start(({finished}) => {
+        if (finished && !stopped) shine();
+      });
+    };
+    const timer = setTimeout(shine, delay);
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+      grown.stopAnimation();
+      grown.setValue(0);
+    };
+  }, [zone.left, zone.top, zone.width, zone.height]);
+  return (
+    <Animated.View
+      style={{
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        transform: [{translateX: x}, {translateY: y}, {scale: grown}],
+      }}>
+      <MaterialCommunityIcons
+        name="star-four-points"
+        size={size}
+        color="#fff"
+      />
+    </Animated.View>
+  );
+}
+
 // Sol du décor : deux collines, celle du fond en transparence.
 function Hills({color}: {color: string}) {
   return (
@@ -185,6 +257,8 @@ function Cloud({opacity}: {opacity: number}) {
 
 export default function IceBg({tint = NOL.sky, scene = 'nuages'}: Props) {
   const {width, height} = useWindowDimensions();
+  // Le ciel s'arrête où commencent les collines.
+  const sky = height - HILLS_HEIGHT;
   return (
     <View
       style={[StyleSheet.absoluteFill, {backgroundColor: shade(tint, 0.68)}]}
@@ -273,6 +347,44 @@ export default function IceBg({tint = NOL.sky, scene = 'nuages'}: Props) {
         </>
       )}
 
+      {scene === 'etoiles' && (
+        <>
+          {/* voile lilas : un ciel de fin de journée, qui reste clair sous les titres */}
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              {backgroundColor: NOL.violet, opacity: 0.14},
+            ]}
+          />
+          <Svg
+            width={104}
+            height={104}
+            viewBox="0 0 104 104"
+            style={{position: 'absolute', top: '24%', right: '8%'}}>
+            <Circle cx={52} cy={52} r={50} fill={NOL.star} opacity={0.12} />
+            <Path
+              d="M62 18 A36 36 0 1 0 88 66 A29 29 0 1 1 62 18 Z"
+              fill={shade(NOL.star, 0.35)}
+            />
+          </Svg>
+          <Hills color={shade(NOL.violet, 0.5)} />
+          {STARS.map((star, i) => (
+            <Twinkle
+              key={i}
+              zone={{
+                left: (star.column * width) / STAR_COLUMNS,
+                top: (star.row * sky) / STAR_ROWS,
+                width: width / STAR_COLUMNS,
+                height: sky / STAR_ROWS,
+              }}
+              size={star.size}
+              duration={star.duration}
+              delay={star.delay}
+            />
+          ))}
+        </>
+      )}
+
       {scene === 'bulles' && (
         <>
           {BUBBLES.map((bubble, i) => (
@@ -346,6 +458,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 180,
+    height: HILLS_HEIGHT,
   },
 });

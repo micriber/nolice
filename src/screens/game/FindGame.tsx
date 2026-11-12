@@ -8,6 +8,8 @@ import uuid from 'react-native-uuid';
 import GameHeader from './GameHeader';
 import Tile from './Tile';
 import {COLOR_HEX} from './color-picture';
+import {LETTER_COLORS} from './letter-picture';
+import {FindGameKey} from './question-config';
 import {ResultSheet} from './result-sheet';
 import {SHAPE_COLORS} from './shape-picture';
 import Confetti from '../../components/Confetti';
@@ -18,6 +20,15 @@ import {useSettingsStore} from '../../store/settings';
 import {gameConfig} from '../../utils/color';
 import {useScale} from '../../utils/scale';
 import {FindGameScreenRouteProp, NavigationProp} from '../types';
+
+// Les jeux dont les quatre images partagent une couleur, tirée au sort à chaque question.
+const PICTURE_COLORS: Partial<Record<FindGameKey, string[]>> = {
+  shape: SHAPE_COLORS,
+  letter: LETTER_COLORS,
+};
+
+const pick = (colors: string[]) =>
+  colors[Math.floor(Math.random() * colors.length)];
 
 export function FindGame() {
   const route = useRoute<FindGameScreenRouteProp>();
@@ -33,8 +44,9 @@ export function FindGame() {
   const [picked, setPicked] = useState<number | null>(null);
   const [questionId, setQuestionId] = useState(uuid.v4());
   const [gameId] = useState(uuid.v4());
-  const [shapeColor, setShapeColor] = useState(
-    () => SHAPE_COLORS[Math.floor(Math.random() * SHAPE_COLORS.length)],
+  const colors = PICTURE_COLORS[gameType];
+  const [pictureColor, setPictureColor] = useState(
+    () => colors && pick(colors),
   );
 
   const game = gameConfig(gameType);
@@ -100,7 +112,10 @@ export function FindGame() {
         results={results}
         current={store.currentIndex}
         replayDisabled={answered}
-        prompt={`Trouve ${label}`}
+        // Écrire la lettre cherchée donnerait la réponse : seule la voix la nomme.
+        prompt={
+          gameType === 'letter' ? 'Trouve la bonne lettre' : `Trouve ${label}`
+        }
         onHome={() => {
           navigation.popTo('Home');
         }}
@@ -116,7 +131,7 @@ export function FindGame() {
                 value={questionConfig[possibility.value].key}
                 deepColor={game.deep}
                 contentSize={96 * scale}
-                shapeColor={gameType === 'shape' ? shapeColor : undefined}
+                pictureColor={pictureColor}
                 state={
                   !answered
                     ? 'idle'
@@ -154,9 +169,10 @@ export function FindGame() {
             return;
           }
           setQuestionId(uuid.v4());
-          if (gameType === 'shape') {
-            const colors = SHAPE_COLORS.filter((color) => color !== shapeColor);
-            setShapeColor(colors[Math.floor(Math.random() * colors.length)]);
+          if (colors) {
+            setPictureColor(
+              pick(colors.filter((color) => color !== pictureColor)),
+            );
           }
           store.nextQuestion();
           setPicked(null);

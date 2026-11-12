@@ -12,11 +12,11 @@ import Svg, {
 
 import {NOL, shade} from '../../utils/color';
 
+// Sans le bleu-vert, couleur du jeu : la forme se fondrait dans le fond de l'écran.
 export const SHAPE_COLORS = [
   NOL.coral,
   NOL.amber,
   NOL.violet,
-  NOL.teal,
   NOL.mint,
   NOL.sky,
 ];

@@ -38,7 +38,7 @@ export function shade(hex: string, amt: number): string {
   return '#' + c(r) + c(g) + c(b);
 }
 
-export type GameKey = 'number' | 'animal' | 'color' | 'shape';
+export type GameKey = 'number' | 'animal' | 'color' | 'shape' | 'letter';
 
 export type GameConfig = {
   key: GameKey;
@@ -58,6 +58,7 @@ export const GAMES: GameConfig[] = [
     deep: NOL.violetDeep,
   },
   {key: 'shape', label: 'Les formes', color: NOL.teal, deep: NOL.tealDeep},
+  {key: 'letter', label: 'Les lettres', color: NOL.mint, deep: NOL.mintDeep},
 ];
 
 export function gameConfig(key: GameKey): GameConfig {

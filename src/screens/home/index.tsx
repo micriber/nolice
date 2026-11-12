@@ -15,6 +15,7 @@ import {Defs, LinearGradient, Rect, Stop} from 'react-native-svg';
 import FillSvg from '../../components/FillSvg';
 import {
   AnimalGlyph,
+  Letters,
   Numerals,
   PaletteGlyph,
   ShapeCluster,
@@ -42,6 +43,8 @@ function CardGlyph({game, size}: {game: GameConfig; size: number}) {
       return <AnimalGlyph size={size} />;
     case 'color':
       return <PaletteGlyph size={size} />;
+    case 'letter':
+      return <Letters size={size} />;
     default:
       return <ShapeCluster size={size} />;
   }
@@ -194,6 +197,7 @@ export function Home({navigation}: Props) {
       color: 'ColorGame',
       animal: 'AnimalGame',
       shape: 'ShapeGame',
+      letter: 'LetterGame',
     };
     void logEvent(getAnalytics(), events[game.key]);
     navigation.navigate('FindGame', {

@@ -15,15 +15,17 @@ Si une prise ne convient pas, régénérer uniquement ce fichier et comparer ave
 Le script conserve les nouvelles prises et leurs réglages dans output/audio, sans remplacer les assets.
 Aperçu sans génération : npm run audio:samples -- --file response-losange.mp3
 Nouvelle prise : npm run audio:samples -- --file response-losange.mp3 --generate
-Les 27 réponses animaux, formes et couleurs : npm run audio:samples -- --responses --generate
-Les 9 phrases des récompenses à débloquer : npm run audio:samples -- --unlocks --generate
+Les 28 réponses animaux, formes et couleurs : npm run audio:samples -- --responses --generate
+Les 11 phrases des récompenses à débloquer : npm run audio:samples -- --unlocks --generate
 Les 3 phrases du parcours de bienvenue : npm run audio:samples -- --welcome --generate
 Les 3 phrases des récompenses gagnées : npm run audio:samples -- --rewards --generate
+Les 52 phrases des lettres : npm run audio:samples -- --letters --generate
 
 AFFICHAGE ET AUDIO
 Les consignes restent courtes à l’écran, plus complètes à l’oral.
 Couleurs : « Trouve le noir » affiché / « Trouve la couleur noire. » prononcé.
 Comptage : « Combien de lapins ? » affiché / « Combien comptes-tu de lapins ? » prononcé.
+Lettres : « Trouve la bonne lettre » affiché, sans la lettre, qui serait la réponse / « Trouve la lettre N. » prononcé.
 Les résultats affichent « La réponse : … », même si la voix dit « Voici… ».
 « Dommage ! » est affiché et prononcé après une mauvaise réponse.
 Récompense verrouillée : la fenêtre affiche la règle exacte (« au moins 9 bonnes réponses sur 10 ») / « Pour avoir cette mascotte, gagne le jeu… » prononcé.
@@ -80,6 +82,8 @@ rabbit.mp3 | Trouve le lapin.
 response-rabbit.mp3 | Voici le lapin.
 sheep.mp3 | Trouve le mouton.
 response-sheep.mp3 | Voici le mouton.
+owl.mp3 | Trouve le hibou.
+response-owl.mp3 | Voici le hibou.
 
 [FORMES]
 shape-circle.mp3 | Trouve le cercle.
@@ -110,6 +114,7 @@ count-cow.mp3 | Combien comptes-tu de vaches ?
 count-cat.mp3 | Combien comptes-tu de chats ?
 count-bird.mp3 | Combien comptes-tu d’oiseaux ?
 count-sheep.mp3 | Combien comptes-tu de moutons ?
+count-owl.mp3 | Combien comptes-tu de hiboux ?
 response-one.mp3 | La réponse est un.
 response-two.mp3 | La réponse est deux.
 response-three.mp3 | La réponse est trois.
@@ -137,6 +142,8 @@ unlock-color.mp3 | Pour avoir cette mascotte, gagne le jeu des couleurs.
 unlock-color-twice.mp3 | Pour avoir cette musique, gagne deux fois le jeu des couleurs.
 unlock-shape.mp3 | Pour avoir cette mascotte, gagne le jeu des formes.
 unlock-shape-twice.mp3 | Pour avoir ce décor, gagne deux fois le jeu des formes.
+unlock-letter.mp3 | Pour avoir cette mascotte, gagne le jeu des lettres.
+unlock-letter-twice.mp3 | Pour avoir ce décor, gagne deux fois le jeu des lettres.
 unlock-perfect.mp3 | Pour avoir cette mascotte, trouve toutes les bonnes réponses dans un jeu.
 
 [PARCOURS DE BIENVENUE]
@@ -148,3 +155,57 @@ welcome-track.mp3 | Choisis ta musique.
 reward-mascot.mp3 | Tu as gagné une nouvelle mascotte !
 reward-decor.mp3 | Tu as gagné un nouveau décor !
 reward-track.mp3 | Tu as gagné une nouvelle musique !
+
+[LETTRES]
+letter-a.mp3 | Trouve la lettre A.
+response-letter-a.mp3 | Voici la lettre A.
+letter-b.mp3 | Trouve la lettre B.
+response-letter-b.mp3 | Voici la lettre B.
+letter-c.mp3 | Trouve la lettre C.
+response-letter-c.mp3 | Voici la lettre C.
+letter-d.mp3 | Trouve la lettre D.
+response-letter-d.mp3 | Voici la lettre D.
+letter-e.mp3 | Trouve la lettre E.
+response-letter-e.mp3 | Voici la lettre E.
+letter-f.mp3 | Trouve la lettre F.
+response-letter-f.mp3 | Voici la lettre F.
+letter-g.mp3 | Trouve la lettre G.
+response-letter-g.mp3 | Voici la lettre G.
+letter-h.mp3 | Trouve la lettre H.
+response-letter-h.mp3 | Voici la lettre H.
+letter-i.mp3 | Trouve la lettre I.
+response-letter-i.mp3 | Voici la lettre I.
+letter-j.mp3 | Trouve la lettre J.
+response-letter-j.mp3 | Voici la lettre J.
+letter-k.mp3 | Trouve la lettre K.
+response-letter-k.mp3 | Voici la lettre K.
+letter-l.mp3 | Trouve la lettre L.
+response-letter-l.mp3 | Voici la lettre L.
+letter-m.mp3 | Trouve la lettre M.
+response-letter-m.mp3 | Voici la lettre M.
+letter-n.mp3 | Trouve la lettre N.
+response-letter-n.mp3 | Voici la lettre N.
+letter-o.mp3 | Trouve la lettre O.
+response-letter-o.mp3 | Voici la lettre O.
+letter-p.mp3 | Trouve la lettre P.
+response-letter-p.mp3 | Voici la lettre P.
+letter-q.mp3 | Trouve la lettre Q.
+response-letter-q.mp3 | Voici la lettre Q.
+letter-r.mp3 | Trouve la lettre R.
+response-letter-r.mp3 | Voici la lettre R.
+letter-s.mp3 | Trouve la lettre S.
+response-letter-s.mp3 | Voici la lettre S.
+letter-t.mp3 | Trouve la lettre T.
+response-letter-t.mp3 | Voici la lettre T.
+letter-u.mp3 | Trouve la lettre U.
+response-letter-u.mp3 | Voici la lettre U.
+letter-v.mp3 | Trouve la lettre V.
+response-letter-v.mp3 | Voici la lettre V.
+letter-w.mp3 | Trouve la lettre W.
+response-letter-w.mp3 | Voici la lettre W.
+letter-x.mp3 | Trouve la lettre X.
+response-letter-x.mp3 | Voici la lettre X.
+letter-y.mp3 | Trouve la lettre Y.
+response-letter-y.mp3 | Voici la lettre Y.
+letter-z.mp3 | Trouve la lettre Z.
+response-letter-z.mp3 | Voici la lettre Z.

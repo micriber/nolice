@@ -29,11 +29,11 @@ const gamesAt = (unlocks: Unlock[], successes: number) =>
 
 const allGames = GAMES.map((game) => game.key).sort();
 
-// Le plan des récompenses : dix en tout, une mascotte puis un décor ou une musique par jeu, deux mascottes au sans-faute.
+// Le plan des récompenses : douze en tout, une mascotte puis un décor ou une musique par jeu, deux mascottes au sans-faute.
 describe('reward plan', () => {
-  it('holds ten rewards', () => {
-    expect(mascots).toHaveLength(6);
-    expect(others).toHaveLength(4);
+  it('holds twelve rewards', () => {
+    expect(mascots).toHaveLength(7);
+    expect(others).toHaveLength(5);
   });
 
   it('gives each game one mascot on its first success', () => {
@@ -163,9 +163,9 @@ describe('rewardFor', () => {
       owned[reward.kind].push(reward.key);
     }
 
-    expect(owned.mascot).toHaveLength(6);
-    expect(owned.decor.sort()).toEqual(['automne', 'banquise']);
+    expect(owned.mascot).toHaveLength(7);
+    expect(owned.decor.sort()).toEqual(['automne', 'banquise', 'etoiles']);
     expect(owned.track.sort()).toEqual(['aventure', 'festive']);
-    expect(games).toBe(10);
+    expect(games).toBe(12);
   });
 });

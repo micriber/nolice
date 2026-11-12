@@ -29,6 +29,7 @@ export const QUESTION_CONFIGS: Record<FindGameKey, QuestionConfig[]> = {
     {key: 'pig', label: 'le cochon'},
     {key: 'rabbit', label: 'le lapin'},
     {key: 'sheep', label: 'le mouton'},
+    {key: 'owl', label: 'le hibou'},
   ],
   shape: [
     {key: 'circle', label: 'le cercle'},
@@ -41,4 +42,9 @@ export const QUESTION_CONFIGS: Record<FindGameKey, QuestionConfig[]> = {
     {key: 'star', label: "l'étoile"},
     {key: 'triangle', label: 'le triangle'},
   ],
+  letter: Array.from('abcdefghijklmnopqrstuvwxyz', (key) => ({
+    key,
+    // Espace insécable : la lettre ne part pas seule à la ligne.
+    label: `la lettre\u00A0${key.toUpperCase()}`,
+  })),
 };

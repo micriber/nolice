@@ -1,8 +1,8 @@
 # Nolice
 
-Mobile app (Android-first) — educational game for young French-speaking kids. Four mini-games:
+Mobile app (Android-first) — educational game for young French-speaking kids. Five mini-games:
 - **NumberGame** ("Les nombres") — count N animals shown, pick the right number 1–9
-- **FindGame** in 3 flavors via `gameType` param — `animal`, `color`, `shape`. User hears "Trouve X" and taps the matching picture among 4 choices.
+- **FindGame** in 4 flavors via `gameType` param — `animal`, `color`, `shape`, `letter`. User hears "Trouve X" and taps the matching picture among 4 choices.
 
 Each game runs 10 randomized questions, then shows a Score screen with replay button.
 
@@ -17,7 +17,7 @@ UI language: French only. UI text and audio are entirely in French.
 - **Analytics**: `@react-native-firebase/analytics` (modular API only — `logEvent`, not legacy namespaced API)
 - **Crash reporting**: Sentry (`@sentry/react-native`)
 - **Fonts**: Fredoka (display/titles) + Nunito (UI text) via `@expo-google-fonts` — see `src/utils/font.ts`
-- **Theme**: « Banquise » design (2026 redesign from a Claude Design handoff) — tokens in `src/utils/color.ts` (`NOL` palette, `shade()` helper, per-game `GAMES` config: amber=number, coral=animal, violet=color, teal=shape)
+- **Theme**: « Banquise » design (2026 redesign from a Claude Design handoff) — tokens in `src/utils/color.ts` (`NOL` palette, `shade()` helper, per-game `GAMES` config: amber=number, coral=animal, violet=color, teal=shape, mint=letter)
 - **Sizing**: dp values taken from the 412dp-wide phone design, multiplied by `useScale()` (`src/utils/scale.ts`) so tablets get the phone layout enlarged
 
 ## Repo layout
@@ -31,15 +31,15 @@ src/
   screens/
     welcome/index.tsx    First launch only: three steps to pick a mascot, a decor and a track among the base ones, each announced aloud, with the music button on top, then Home
     home/index.tsx       Landing = brand header (mascot and brush button, both → Settings, music) + 2-col grid of icon-led game cards
-    settings/index.tsx   Réglages: mascot (9), decor (4), music track (4) — persisted via useSettingsStore. Rewards not won yet are greyed with a lock and an « i »
+    settings/index.tsx   Réglages: mascot (10), decor (5), music track (4) — persisted via useSettingsStore. Rewards not won yet are greyed with a lock and an « i »
     settings/unlock-popup.tsx  Popup explaining how to win a locked reward, in writing and aloud
     game/
       NumberGame.tsx     "Combien de X ?" — count card + 4 number tiles
-      FindGame.tsx       "Trouve X" — generic for animal/color/shape, 2×2 tiles
+      FindGame.tsx       "Trouve X" — generic for animal/color/shape/letter, 2×2 tiles; shapes and letters share one colour per question, drawn at random among lists that leave out the game's own colour
       GameHeader.tsx     Top bar (home, progress dots, music) + prompt row with SpeakerOrb
       Tile.tsx           White answer tile: idle/right/wrong/dim states, badge, shake/pop
       result-sheet.tsx   Bottom sheet after answering (mascot mood + Bravo!/Presque! + Continuer)
-      {animal,color,shape}-picture.tsx  Picture components per type (animals are PNG, colors and shapes SVG), take a `size` dp prop
+      {animal,color,shape,letter}-picture.tsx  Picture components per type (animals are PNG, colors and shapes SVG, letters text in Nunito), take a `size` dp prop
       question-config.ts FindGame item lists per game type (`QUESTION_CONFIGS`: key + French label), `FindGameKey`, `QuestionConfig`
     score/index.tsx      Mascot mood + 3 stars + score pill + the reward won with this game, if any (tapping it selects it) + REJOUER → Home
     types.ts             StackNavigatorParamList, NavigationProp, FindGameParams
@@ -48,7 +48,7 @@ src/
     FillSvg.tsx          Svg stretched over its container (gradients, backgrounds)
     DecorThumb.tsx       Miniature of a decor (Settings, Welcome, unlock popup, reward card on Score)
     Equalizer.tsx        Dancing bars marking the track being heard (Settings, Welcome)
-    IceBg.tsx            Animated background, 4 scenes (banquise/bulles/nuages/automne): snow, bubbles, clouds or leaves drifting across the screen over two hills, `tint` per game
+    IceBg.tsx            Animated background, 5 scenes (banquise/bulles/nuages/automne/etoiles): snow, bubbles, clouds or leaves drifting across the screen, or stars that grow, shrink away and come back elsewhere in the sky, over two hills, `tint` per game
     MascotVisit.tsx      The mascot showing up at the bottom of the screen now and then (game screens only): it hops across, or pops up from below and jumps on the spot
     BigButton.tsx        Chunky 3D button that presses down (Continuer, Rejouer)
     RoundBtn.tsx         Chunky round button (home, brush, music)
@@ -57,14 +57,14 @@ src/
     Progress.tsx         10 question dots (green/red/current/upcoming)
     Confetti.tsx         One-shot falling confetti (correct answer, happy score)
     SpeakerOrb.tsx       account-voice icon in white orb + ring wave → replays question audio
-    GameGlyphs.tsx       Home card pictograms: Numerals "123", painter palette, shape cluster
+    GameGlyphs.tsx       Home card pictograms: Numerals "123", painter palette, shape cluster, Letters "ABC"
   store/
     audio.ts             useSoundStore — single foreground player + looping background player
     game.ts              useGameScoreStore — questions[], currentIndex, init/next/hasMore/getResults
     settings.ts          useSettingsStore — mascot/decor/musicTrack and `welcomed` (welcome tour done), persisted to a JSON file (expo-file-system)
     rewards.ts           useRewardsStore — mascots, decors and tracks won so far, persisted to a JSON file; `claim(gameId, game, score)` grants the reward of a finished game
   utils/                 array.shuffle, random helpers, color (NOL palette + GAMES) / font constants, scale (tablet enlargement), rewards (what unlocks each locked mascot, decor and track), tracks (label and pictogram of each music track)
-assets/audio/            ~96 mp3 files (questions, answers, feedback and score messages, unlock sentences, music tracks) and `dialogues.fr.txt`, the spoken text of each voice file
+assets/audio/            ~153 mp3 files (questions, answers, feedback and score messages, unlock sentences, music tracks) and `dialogues.fr.txt`, the spoken text of each voice file
 assets/animals/          PNG animals (game pictures and mascots)
 assets/branding/         nolice.png (default mascot « Nolice ») and the adaptive icon foreground
 assets/svg/              SVG color splashes and shapes
@@ -74,7 +74,7 @@ assets/svg/              SVG color splashes and shapes
 
 `Home` (landing = game selection) → (`NumberGame` | `FindGame`) → `Score` → back to `Home`. On the very first launch the stack starts on `Welcome` instead, which `replace`s itself with `Home` once the tour is finished and sets `welcomed`; `App.tsx` reads that flag once to choose the first route. The game screen `replace`s itself with `Score`, so Android back from Score lands on Home. `Settings` is reachable from Home's brush button and from the mascot next to it. There is no separate "JOUER" menu anymore — it was merged into Home during the redesign.
 
-`FindGame` is parameterized at navigation time with `{questionConfig, gameType}` — the same screen handles animal/color/shape, just a different list from `QUESTION_CONFIGS` (`src/screens/game/question-config.ts`). `Score` receives `{gameId, gameType}` (gameType colors the score number).
+`FindGame` is parameterized at navigation time with `{questionConfig, gameType}` — the same screen handles animal/color/shape/letter, just a different list from `QUESTION_CONFIGS` (`src/screens/game/question-config.ts`). `Score` receives `{gameId, gameType}` (gameType colors the score number).
 
 ## Audio model (important — easy to get wrong)
 
@@ -138,7 +138,7 @@ To run on a connected phone: enable USB debugging, `adb devices` should list it,
 Jest with the `jest-expo` preset, test files next to the code they cover (`*.test.ts`):
 - `src/store/game.test.ts`, `src/utils/random.test.ts` — question generation rules, checked over a few hundred random games each.
 - `src/screens/game/question-config.test.ts` — every FindGame item has its sounds and its picture.
-- `src/utils/rewards.test.ts` — the reward plan adds up (ten rewards, one mascot then one decor or track per game, two mascots for a perfect game), the popup sentences, that each spoken unlock sentence names the kind of reward its rule unlocks, and which reward a finished game wins.
+- `src/utils/rewards.test.ts` — the reward plan adds up (twelve rewards, one mascot then one decor or track per game, two mascots for a perfect game), the popup sentences, that each spoken unlock sentence names the kind of reward its rule unlocks, and which reward a finished game wins.
 - `src/store/rewards.test.ts` — rewards are saved and reloaded, a game is claimed once, and saved settings drop a mascot, decor or track that was not won. Runs against an in-memory `expo-file-system`.
 - `src/store/audio.test.ts` — the audio contract above, against a fake `expo-audio` player whose seek and status events the test drives. It proves the store's logic, not the real player: audio changes still need a device check.
 
@@ -156,7 +156,10 @@ Jest with the `jest-expo` preset, test files next to the code they cover (`*.tes
 - **Stretched SVGs go through `<FillSvg>`**: it measures its container and passes numeric sizes. A `width="100%"` Svg keeps its old drawing when the window is resized (a foldable being opened), and comes out too narrow inside a padded parent.
 - **Portrait lock on tablets**: Android may ignore it on screens ≥ 600dp and show the app in a portrait band inside a landscape screen (a narrow, short window — hence the height limit in `useScale()`). On Android 16 the lock is dropped entirely for apps targeting API 36; `plugins/withPortraitOnLargeScreens.js` declares the temporary opt-out, which stops working once the app targets API 37 — a landscape layout is needed before that bump.
 - **Rewards** (plan in `readme.md`, « Les récompenses à débloquer »): `src/utils/rewards.ts` holds the rules — what each locked mascot, decor or track needs (`MASCOT_UNLOCKS`, `DECOR_UNLOCKS`, `TRACK_UNLOCKS`) and `rewardFor(game, score, owned)`, which gives at most one reward per game: a perfect-game mascot on 10/10 while one is left, otherwise from 9/10 the next reward of the game. Score claims it once per `gameId` through `useRewardsStore`, announces it aloud and shows it on a card the child taps to select it; Settings greys what `lockOf()` still reports as locked, and `useSettingsStore` falls back to the default mascot, decor or track when the saved one was not won. Unlocking a new mascot, decor or track = one entry in its `*_UNLOCKS` map; the spoken sentence of that rule names the kind of reward (« cette mascotte », « ce décor », « cette musique »), so a rule moved to another kind needs its voice regenerated (`assets/audio/dialogues.fr.txt`, `npm run audio:samples -- --unlocks`).
-- **Adding a 5th/6th game**: append to `GAMES` in `src/utils/color.ts` — the Home grid auto-wraps to 3 rows of 2 (layout validated in the design).
+- **Mascot keys**: `owl` is Nolice the fox, a key saved in players' settings since 2.0; the owl won in the letters game is the mascot `hibou`, drawn by the animal picture `owl` (also an item of the animals game).
+- **Letter prompt**: the letters game writes « Trouve la bonne lettre » — only the voice names the letter, writing it would give the answer away. The result sheet does show it (« La réponse : la lettre N »).
+- **Letter shapes**: letters are drawn in Nunito (`FONT.UI_HEAVY`), not Fredoka, whose B has a single counter — a child must see the school shape.
+- **Adding a game**: append to `GAMES` in `src/utils/color.ts` — the Home grid wraps to rows of 2, a lone last card taking the full width. A FindGame flavor also needs its list in `QUESTION_CONFIGS`, its sounds in `SOUNDS_QUESTION`, a picture component and its case in `Tile`, a Home pictogram, and, to keep the reward plan, a mascot, a decor or track and the two `unlock-<game>` voices.
 
 ## Things that are NOT in the codebase
 

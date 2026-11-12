@@ -1,5 +1,6 @@
 import {ANIMALS} from './animal-picture';
 import {COLORS_MAP} from './color-picture';
+import {LETTERS} from './letter-picture';
 import {FindGameKey, QUESTION_CONFIGS} from './question-config';
 import {SHAPES} from './shape-picture';
 import {SOUNDS_QUESTION} from '../../store/audio';
@@ -11,6 +12,7 @@ const PICTURES: Record<FindGameKey, {[key: string]: unknown}> = {
   animal: ANIMALS,
   color: COLORS_MAP,
   shape: SHAPES,
+  letter: LETTERS,
 };
 
 const gameTypes = Object.keys(QUESTION_CONFIGS) as FindGameKey[];

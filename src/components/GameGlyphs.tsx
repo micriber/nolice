@@ -32,6 +32,28 @@ export function Numerals({size}: {size: number}) {
   );
 }
 
+// « ABC » pour le jeu des lettres.
+export function Letters({size}: {size: number}) {
+  const cols = [NOL.coral, NOL.mintDeep, NOL.violet];
+  return (
+    <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
+      {['A', 'B', 'C'].map((letter, i) => (
+        <Text
+          key={letter}
+          style={{
+            fontFamily: FONT.UI_HEAVY,
+            fontSize: i === 1 ? size * 0.62 : size * 0.46,
+            lineHeight: i === 1 ? size * 0.7 : size * 0.52,
+            color: cols[i],
+            marginHorizontal: size * 0.01,
+          }}>
+          {letter}
+        </Text>
+      ))}
+    </View>
+  );
+}
+
 export function AnimalGlyph({size}: {size: number}) {
   return (
     <View style={{width: size, height: size}}>

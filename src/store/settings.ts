@@ -14,8 +14,10 @@ export type MascotKey =
   | 'bird'
   | 'pig'
   | 'rabbit'
-  | 'cow';
-export type DecorKey = 'banquise' | 'bulles' | 'nuages' | 'automne';
+  | 'cow'
+  // « owl » est déjà la clé de Nolice, enregistrée chez les joueurs.
+  | 'hibou';
+export type DecorKey = 'banquise' | 'bulles' | 'nuages' | 'automne' | 'etoiles';
 export type MusicTrackKey = 'joyeuse' | 'calme' | 'aventure' | 'festive';
 
 export type Settings = {
