@@ -1,14 +1,9 @@
-import {RFPercentage} from 'react-native-responsive-fontsize';
-
+// Typo refonte : Fredoka (titres, ronde et joyeuse) + Nunito (texte UI).
 export const FONT = {
-  FAMILY: 'TitilliumWeb_700Bold',
-  SIZE: {
-    SMALL: RFPercentage(3),
-    BASE: RFPercentage(5),
-    MEDIUM: RFPercentage(6),
-    BIG: RFPercentage(8),
-    GIANT: RFPercentage(10),
-  },
+  DISPLAY: 'Fredoka_600SemiBold',
+  DISPLAY_BOLD: 'Fredoka_700Bold',
+  UI: 'Nunito_700Bold',
+  UI_HEAVY: 'Nunito_800ExtraBold',
 };
 
 export default FONT;

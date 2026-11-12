@@ -1,0 +1,78 @@
+import React from 'react';
+import {Text, View} from 'react-native';
+
+import {AnimalImage} from '../screens/game/animal-picture';
+import {ColorImage} from '../screens/game/color-picture';
+import {ShapeImage} from '../screens/game/shape-picture';
+import {NOL} from '../utils/color';
+import FONT from '../utils/font';
+
+// Pictogrammes des cartes de jeu — gros et lisibles sans savoir lire
+// (retour de Bernard : les enfants choisissent le jeu avec l'icône).
+
+// « 123 » pour le jeu des nombres (à la place du dé, qui portait à confusion).
+export function Numerals({size}: {size: number}) {
+  const cols = [NOL.coral, NOL.amberDeep, NOL.teal];
+  return (
+    <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
+      {['1', '2', '3'].map((d, i) => (
+        <Text
+          key={d}
+          style={{
+            fontFamily: FONT.DISPLAY_BOLD,
+            fontSize: i === 1 ? size * 0.7 : size * 0.52,
+            lineHeight: i === 1 ? size * 0.78 : size * 0.58,
+            color: cols[i],
+            marginHorizontal: size * 0.02,
+          }}>
+          {d}
+        </Text>
+      ))}
+    </View>
+  );
+}
+
+export function AnimalGlyph({size}: {size: number}) {
+  return (
+    <View style={{width: size, height: size}}>
+      <View style={{position: 'absolute', left: 0, top: size * 0.06}}>
+        <AnimalImage type="cat" size={size * 0.72} />
+      </View>
+      <View style={{position: 'absolute', right: 0, bottom: 0}}>
+        <AnimalImage type="duck" size={size * 0.62} />
+      </View>
+    </View>
+  );
+}
+
+export function PaletteGlyph({size}: {size: number}) {
+  return (
+    <View style={{width: size, height: size}}>
+      <View style={{position: 'absolute', left: 0, top: size * 0.04}}>
+        <ColorImage type="red" size={size * 0.62} />
+      </View>
+      <View style={{position: 'absolute', right: 0, top: size * 0.04}}>
+        <ColorImage type="yellow" size={size * 0.62} />
+      </View>
+      <View style={{position: 'absolute', left: size * 0.19, bottom: 0}}>
+        <ColorImage type="blue" size={size * 0.62} />
+      </View>
+    </View>
+  );
+}
+
+export function ShapeCluster({size}: {size: number}) {
+  return (
+    <View
+      style={{
+        width: size,
+        height: size,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+      }}>
+      {['circle', 'triangle', 'square', 'star'].map((type) => (
+        <ShapeImage key={type} type={type} size={size / 2} />
+      ))}
+    </View>
+  );
+}

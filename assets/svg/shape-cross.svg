@@ -1,4 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <path d="M 84.998 25 H 114.998 V 85 H 174.996 V 114.999 H 114.998 V 175 H 84.998 V 114.999 H 25 V 85 H 84.998 Z" style="stroke: rgba(0, 0, 0, 0); fill: rgb(12, 0, 214);" transform="matrix(1, 0, 0, 1, -3.552713678800501e-15, 0)"/>
+  <defs>
+    <linearGradient id="crossFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#B198E8"/>
+      <stop offset="1" stop-color="#9B7EDE"/>
+    </linearGradient>
+  </defs>
+  <path d="M 82 20 H 118 Q 122 20 122 24 V 78 H 176 Q 180 78 180 82 V 118 Q 180 122 176 122 H 122 V 176 Q 122 180 118 180 H 82 Q 78 180 78 176 V 122 H 24 Q 20 122 20 118 V 82 Q 20 78 24 78 H 78 V 24 Q 78 20 82 20 Z" fill="url(#crossFill)" stroke="#7C5BCB" stroke-width="3" stroke-linejoin="round"/>
 </svg>

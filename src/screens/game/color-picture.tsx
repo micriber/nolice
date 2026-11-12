@@ -1,6 +1,4 @@
 import React from 'react';
-import {View} from 'react-native';
-import {RFPercentage} from 'react-native-responsive-fontsize';
 
 // @ts-expect-error
 import Black from '../../../assets/svg/splash-black.svg';
@@ -21,53 +19,47 @@ import Purple from '../../../assets/svg/splash-purple.svg';
 // @ts-expect-error
 import Red from '../../../assets/svg/splash-red.svg';
 // @ts-expect-error
+import White from '../../../assets/svg/splash-white.svg';
+// @ts-expect-error
 import Yellow from '../../../assets/svg/splash-yellow.svg';
 
-export function ColorImage({type = 'red'}) {
-  let animal;
-  switch (type) {
-    case 'red':
-      animal = <Red />;
-      break;
-    case 'yellow':
-      animal = <Yellow />;
-      break;
-    case 'brown':
-      animal = <Brown />;
-      break;
-    case 'blue':
-      animal = <Blue />;
-      break;
-    case 'pink':
-      animal = <Pink />;
-      break;
-    case 'green':
-      animal = <Green />;
-      break;
-    case 'black':
-      animal = <Black />;
-      break;
-    case 'purple':
-      animal = <Purple />;
-      break;
-    case 'orange':
-      animal = <Orange />;
-      break;
-    case 'grey':
-      animal = <Grey />;
-      break;
-  }
-  return (
-    <View
-      style={[
-        {
-          height: RFPercentage(14),
-          width: RFPercentage(14),
-          marginLeft: RFPercentage(1),
-          marginTop: RFPercentage(1),
-        },
-      ]}>
-      {animal}
-    </View>
-  );
+export const COLORS_MAP: {[key: string]: React.ComponentType<any>} = {
+  red: Red,
+  yellow: Yellow,
+  brown: Brown,
+  blue: Blue,
+  pink: Pink,
+  green: Green,
+  black: Black,
+  purple: Purple,
+  orange: Orange,
+  grey: Grey,
+  white: White,
+};
+
+// Teinte dominante de chaque éclaboussure (pastille « La réponse » du résultat).
+export const COLOR_HEX: {[key: string]: string} = {
+  red: '#E53935',
+  yellow: '#F5D52E',
+  brown: '#93613E',
+  blue: '#3289DD',
+  pink: '#F38ABB',
+  green: '#35B95C',
+  black: '#292929',
+  purple: '#8D52C7',
+  orange: '#F58A16',
+  grey: '#959595',
+  white: '#F5F4EF',
+};
+
+export function ColorImage({
+  type = 'red',
+  size,
+}: {
+  type?: string;
+  size: number;
+}) {
+  const Color = COLORS_MAP[type];
+  if (!Color) return null;
+  return <Color width={size} height={size} />;
 }

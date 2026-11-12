@@ -10,17 +10,22 @@ import {
 import {File, Paths} from 'expo-file-system';
 import {create} from 'zustand';
 
+import type {MusicTrackKey} from './settings';
+import type {GameKey} from '../utils/color';
+import type {Reward, Unlock} from '../utils/rewards';
+
 interface AudioStoreState {
   backgroundPlaying: boolean;
   backgroundLoaded: boolean;
   currentPlayer: AudioPlayer | null;
   audioLoading: boolean;
   assetsLoaded: boolean;
-  pauseBackground: () => Promise<void>;
-  unPauseBackground: () => Promise<void>;
+  toggleBackground: () => boolean;
   playBackground: (src: AudioSource) => Promise<void>;
+  startBackground: (src: AudioSource) => Promise<void>;
   play: (src: AudioSource, callback?: () => void) => Promise<void>;
   replay: () => Promise<void>;
+  stop: () => void;
   preloadAllAssets: () => Promise<void>;
 }
 
@@ -89,8 +94,13 @@ const ORANGE_ANSWER_SOUND_PATH = '../../assets/audio/response-orange.mp3';
 const GREY_QUESTION_SOUND_PATH = '../../assets/audio/grey.mp3';
 const GREY_ANSWER_SOUND_PATH = '../../assets/audio/response-grey.mp3';
 const CONGRATULATION_SOUND_PATH = '../../assets/audio/congratulation.mp3';
+const ALMOST_SOUND_PATH = '../../assets/audio/score-almost.mp3';
+const PERFECT_SOUND_PATH = '../../assets/audio/score-perfect.mp3';
 const RETRY_SOUND_PATH = '../../assets/audio/retry.mp3';
-const MUSIC_SOUND_PATH = '../../assets/audio/music.mp3';
+const JOYEUSE_MUSIC_PATH = '../../assets/audio/joyeux.mp3';
+const CALME_MUSIC_PATH = '../../assets/audio/calme.mp3';
+const AVENTURE_MUSIC_PATH = '../../assets/audio/aventure.mp3';
+const FESTIVE_MUSIC_PATH = '../../assets/audio/festive.mp3';
 const ANSWER_ONE_SOUND_PATH = '../../assets/audio/response-one.mp3';
 const ANSWER_TWO_SOUND_PATH = '../../assets/audio/response-two.mp3';
 const ANSWER_THREE_SOUND_PATH = '../../assets/audio/response-three.mp3';
@@ -100,6 +110,25 @@ const ANSWER_SIX_SOUND_PATH = '../../assets/audio/response-six.mp3';
 const ANSWER_SEVEN_SOUND_PATH = '../../assets/audio/response-seven.mp3';
 const ANSWER_EIGHT_SOUND_PATH = '../../assets/audio/response-eight.mp3';
 const ANSWER_NINE_SOUND_PATH = '../../assets/audio/response-nine.mp3';
+const UNLOCK_NUMBER_SOUND_PATH = '../../assets/audio/unlock-number.mp3';
+const UNLOCK_NUMBER_TWICE_SOUND_PATH =
+  '../../assets/audio/unlock-number-twice.mp3';
+const UNLOCK_ANIMAL_SOUND_PATH = '../../assets/audio/unlock-animal.mp3';
+const UNLOCK_ANIMAL_TWICE_SOUND_PATH =
+  '../../assets/audio/unlock-animal-twice.mp3';
+const UNLOCK_COLOR_SOUND_PATH = '../../assets/audio/unlock-color.mp3';
+const UNLOCK_COLOR_TWICE_SOUND_PATH =
+  '../../assets/audio/unlock-color-twice.mp3';
+const UNLOCK_SHAPE_SOUND_PATH = '../../assets/audio/unlock-shape.mp3';
+const UNLOCK_SHAPE_TWICE_SOUND_PATH =
+  '../../assets/audio/unlock-shape-twice.mp3';
+const UNLOCK_PERFECT_SOUND_PATH = '../../assets/audio/unlock-perfect.mp3';
+const WELCOME_MASCOT_SOUND_PATH = '../../assets/audio/welcome-mascot.mp3';
+const WELCOME_DECOR_SOUND_PATH = '../../assets/audio/welcome-decor.mp3';
+const WELCOME_TRACK_SOUND_PATH = '../../assets/audio/welcome-track.mp3';
+const REWARD_MASCOT_SOUND_PATH = '../../assets/audio/reward-mascot.mp3';
+const REWARD_DECOR_SOUND_PATH = '../../assets/audio/reward-decor.mp3';
+const REWARD_TRACK_SOUND_PATH = '../../assets/audio/reward-track.mp3';
 
 type SoundsTypeQuestion = {
   [gameType: string]: SoundQuestionType;
@@ -116,16 +145,64 @@ type SoundsType = {
   DOMMAGE: AudioSource;
   RETRY: AudioSource;
   BRAVO: AudioSource;
-  MUSIC: AudioSource;
   CONGRATULATION: AudioSource;
+  ALMOST: AudioSource;
+  PERFECT: AudioSource;
 };
 
 export const SOUNDS: SoundsType = {
-  MUSIC: require(MUSIC_SOUND_PATH),
   DOMMAGE: require(DOMMAGE_SOUND_PATH),
   RETRY: require(RETRY_SOUND_PATH),
   BRAVO: require(BRAVO_SOUND_PATH),
   CONGRATULATION: require(CONGRATULATION_SOUND_PATH),
+  ALMOST: require(ALMOST_SOUND_PATH),
+  PERFECT: require(PERFECT_SOUND_PATH),
+};
+
+export const MUSIC_TRACKS: Record<MusicTrackKey, AudioSource> = {
+  joyeuse: require(JOYEUSE_MUSIC_PATH),
+  calme: require(CALME_MUSIC_PATH),
+  aventure: require(AVENTURE_MUSIC_PATH),
+  festive: require(FESTIVE_MUSIC_PATH),
+};
+
+const SOUNDS_UNLOCK: Record<GameKey, Record<1 | 2, AudioSource>> = {
+  number: {
+    1: require(UNLOCK_NUMBER_SOUND_PATH),
+    2: require(UNLOCK_NUMBER_TWICE_SOUND_PATH),
+  },
+  animal: {
+    1: require(UNLOCK_ANIMAL_SOUND_PATH),
+    2: require(UNLOCK_ANIMAL_TWICE_SOUND_PATH),
+  },
+  color: {
+    1: require(UNLOCK_COLOR_SOUND_PATH),
+    2: require(UNLOCK_COLOR_TWICE_SOUND_PATH),
+  },
+  shape: {
+    1: require(UNLOCK_SHAPE_SOUND_PATH),
+    2: require(UNLOCK_SHAPE_TWICE_SOUND_PATH),
+  },
+};
+const UNLOCK_PERFECT_SOUND: AudioSource = require(UNLOCK_PERFECT_SOUND_PATH);
+
+// La phrase qui dit comment gagner une récompense encore verrouillée.
+export function unlockSound(unlock: Unlock): AudioSource {
+  return unlock === 'perfect'
+    ? UNLOCK_PERFECT_SOUND
+    : SOUNDS_UNLOCK[unlock.game][unlock.successes];
+}
+
+export const SOUNDS_WELCOME = {
+  MASCOT: require(WELCOME_MASCOT_SOUND_PATH) as AudioSource,
+  DECOR: require(WELCOME_DECOR_SOUND_PATH) as AudioSource,
+  TRACK: require(WELCOME_TRACK_SOUND_PATH) as AudioSource,
+};
+
+export const SOUNDS_REWARD: Record<Reward['kind'], AudioSource> = {
+  mascot: require(REWARD_MASCOT_SOUND_PATH),
+  decor: require(REWARD_DECOR_SOUND_PATH),
+  track: require(REWARD_TRACK_SOUND_PATH),
 };
 
 export interface SoundCountType {
@@ -268,23 +345,35 @@ export const SOUNDS_QUESTION: SoundsTypeQuestion = {
   },
 };
 
-function errorSafe(callback: () => void, message: string = 'Audio error:') {
+function errorSafe(callback: () => void, message: string) {
   try {
     callback();
   } catch (error: any) {
     Sentry.logger.error(message, {error: error?.message ?? String(error)});
-    if (error.name !== 'AudioFocusNotAcquiredException') {
-      Sentry.withScope(function () {
-        Sentry.captureException(error);
-      });
-    }
+    Sentry.captureException(error);
   }
 }
 
 let backgroundPlayer: AudioPlayer | null = null;
+let backgroundSource: AudioSource | null = null;
 let foregroundPlayer: AudioPlayer | null = null;
 let foregroundCallback: (() => void) | null = null;
 let foregroundCallbackFired = false;
+let playToken = 0;
+
+const MUSIC_VOLUME = 0.2;
+const DUCKED_MUSIC_VOLUME = 0.06;
+let musicDucked = false;
+
+// La musique s'efface pendant une consigne, pour que la voix reste nette.
+function duckMusic(ducked: boolean) {
+  musicDucked = ducked;
+  try {
+    if (backgroundPlayer) {
+      backgroundPlayer.volume = ducked ? DUCKED_MUSIC_VOLUME : MUSIC_VOLUME;
+    }
+  } catch {}
+}
 
 const resolvedUris = new Map<number, string>();
 
@@ -348,8 +437,16 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
       SOUNDS.BRAVO,
       SOUNDS.DOMMAGE,
       SOUNDS.CONGRATULATION,
+      SOUNDS.ALMOST,
+      SOUNDS.PERFECT,
       SOUNDS.RETRY,
       ...Object.values(SOUNDS_COUNT_QUESTION),
+      UNLOCK_PERFECT_SOUND,
+      ...Object.values(SOUNDS_WELCOME),
+      ...Object.values(SOUNDS_REWARD),
+      ...Object.values(SOUNDS_UNLOCK).flatMap((sounds) =>
+        Object.values(sounds),
+      ),
     ];
     for (const gameType of Object.keys(SOUNDS_QUESTION)) {
       for (const key of Object.keys(SOUNDS_QUESTION[gameType])) {
@@ -379,7 +476,8 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
     set({assetsLoaded: true});
   },
   play: async (src: AudioSource, callback?: () => void) => {
-    foregroundCallback = callback ?? null;
+    const token = ++playToken;
+    foregroundCallback = null;
     foregroundCallbackFired = false;
     set({audioLoading: true});
 
@@ -398,12 +496,15 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
             if (get().audioLoading) {
               set({audioLoading: false});
             }
+            const token = playToken;
             if (!foregroundCallbackFired && foregroundCallback) {
               foregroundCallbackFired = true;
               const cb = foregroundCallback;
               foregroundCallback = null;
               cb();
             }
+            // Si le callback a enchaîné sur un autre son, la musique reste baissée.
+            if (token === playToken) duckMusic(false);
           }
         });
       } else {
@@ -414,12 +515,17 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
       }
 
       setTimeout(() => {
-        if (get().audioLoading) {
+        if (token === playToken && get().audioLoading) {
           set({audioLoading: false});
         }
       }, 2000);
 
       await foregroundPlayer.seekTo(0);
+      // Un stop() ou un play() plus récent pendant le seekTo l'emporte.
+      if (token !== playToken) return;
+      // Armé seulement ici : un didJustFinish tardif du son précédent arrive avant la fin du seekTo.
+      foregroundCallback = callback ?? null;
+      duckMusic(true);
       foregroundPlayer.play();
     } catch (err: any) {
       Sentry.logger.error('Audio error: play', {
@@ -427,57 +533,73 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
       });
       Sentry.captureException(err);
       set({audioLoading: false});
+      if (token === playToken) duckMusic(false);
     }
+  },
+  stop: () => {
+    playToken++;
+    foregroundCallback = null;
+    try {
+      foregroundPlayer?.pause();
+    } catch {}
+    duckMusic(false);
+    set({audioLoading: false});
   },
   replay: async () => {
     const player = get().currentPlayer;
     if (!player) return;
     try {
       await player.seekTo(0);
+      duckMusic(true);
       player.play();
     } catch (err: any) {
       Sentry.logger.error('Audio error: replay', {
         error: err?.message ?? String(err),
       });
       Sentry.captureException(err);
+      duckMusic(false);
     }
   },
   playBackground: async (src: AudioSource) => {
-    errorSafe(async () => {
-      if (!get().backgroundPlaying) {
-        await setAudioModeAsync({
-          interruptionMode: 'doNotMix',
-        });
+    errorSafe(() => {
+      if (backgroundPlayer && backgroundSource === src) return;
+      const shouldPlay = !get().backgroundLoaded || get().backgroundPlaying;
 
-        if (backgroundPlayer) {
-          backgroundPlayer.remove();
-        }
-
-        backgroundPlayer = createAudioPlayer(src);
-        backgroundPlayer.loop = true;
-        backgroundPlayer.volume = 0.2;
-
-        set({backgroundLoaded: true, backgroundPlaying: true});
-
-        await backgroundPlayer.seekTo(2);
-        backgroundPlayer.play();
-      }
-    }, 'Audio error: playBackground');
-  },
-  pauseBackground: async () => {
-    errorSafe(async () => {
       if (backgroundPlayer) {
         backgroundPlayer.pause();
+        backgroundPlayer.replace(src);
+      } else {
+        backgroundPlayer = createAudioPlayer(src);
       }
-      set({backgroundPlaying: false});
-    }, 'Audio error: pauseBackground');
+      backgroundSource = src;
+      backgroundPlayer.loop = true;
+      backgroundPlayer.volume = musicDucked
+        ? DUCKED_MUSIC_VOLUME
+        : MUSIC_VOLUME;
+      if (shouldPlay) backgroundPlayer.play();
+      set({backgroundLoaded: true, backgroundPlaying: shouldPlay});
+    }, 'Audio error: playBackground');
+    // Le splash attend backgroundLoaded : il doit passer à true même si la lecture échoue.
+    if (!get().backgroundLoaded) set({backgroundLoaded: true});
   },
-  unPauseBackground: async () => {
-    errorSafe(async () => {
-      if (backgroundPlayer) {
-        backgroundPlayer.play();
+  // L'enfant vient de choisir cette musique : elle joue même si la musique était coupée.
+  startBackground: async (src: AudioSource) => {
+    await get().playBackground(src);
+    if (!get().backgroundPlaying) get().toggleBackground();
+  },
+  toggleBackground: () => {
+    let playing = get().backgroundPlaying;
+    errorSafe(() => {
+      // Le système peut avoir coupé la musique (perte du focus audio) sans que le store le sache.
+      const audible = playing && (backgroundPlayer?.playing ?? true);
+      if (audible) {
+        backgroundPlayer?.pause();
+      } else {
+        backgroundPlayer?.play();
       }
-      set({backgroundPlaying: true});
-    }, 'Audio error: unPauseBackground');
+      playing = !audible;
+      set({backgroundPlaying: playing});
+    }, 'Audio error: toggleBackground');
+    return playing;
   },
 }));

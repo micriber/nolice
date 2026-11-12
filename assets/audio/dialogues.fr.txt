@@ -1,0 +1,150 @@
+DIALOGUES AUDIO DE NOLICE — VALIDÉS
+
+Voix retenue : Jeanne — Narrator (txtf1EDouKke753vN8SL)
+Modèle retenu : eleven_v4
+Format : nom du fichier.mp3 | texte prononcé
+Les titres et commentaires ne sont pas à prononcer.
+Ce fichier est la source des textes pour le script de génération.
+
+RÈGLES DE GÉNÉRATION
+Voix naturelle de Jeanne : stabilité 0,5 ; similarité 0,75 ; français ; MP3 44,1 kHz / 128 kb/s.
+Transmettre uniquement la phrase validée, sans balise de douceur, de chuchotement ou SSML.
+Conserver une phrase continue : ne pas ajouter de pause ou de ponctuation après « Voici ».
+Une génération peut varier en intonation malgré des réglages identiques : écouter avant intégration.
+Si une prise ne convient pas, régénérer uniquement ce fichier et comparer avec la version précédente.
+Le script conserve les nouvelles prises et leurs réglages dans output/audio, sans remplacer les assets.
+Aperçu sans génération : npm run audio:samples -- --file response-losange.mp3
+Nouvelle prise : npm run audio:samples -- --file response-losange.mp3 --generate
+Les 27 réponses animaux, formes et couleurs : npm run audio:samples -- --responses --generate
+Les 9 phrases des récompenses à débloquer : npm run audio:samples -- --unlocks --generate
+Les 3 phrases du parcours de bienvenue : npm run audio:samples -- --welcome --generate
+Les 3 phrases des récompenses gagnées : npm run audio:samples -- --rewards --generate
+
+AFFICHAGE ET AUDIO
+Les consignes restent courtes à l’écran, plus complètes à l’oral.
+Couleurs : « Trouve le noir » affiché / « Trouve la couleur noire. » prononcé.
+Comptage : « Combien de lapins ? » affiché / « Combien comptes-tu de lapins ? » prononcé.
+Les résultats affichent « La réponse : … », même si la voix dit « Voici… ».
+« Dommage ! » est affiché et prononcé après une mauvaise réponse.
+Récompense verrouillée : la fenêtre affiche la règle exacte (« au moins 9 bonnes réponses sur 10 ») / « Pour avoir cette mascotte, gagne le jeu… » prononcé.
+
+ENCHAÎNEMENTS
+Après chaque réponse : bravo.mp3 ou dommage.mp3, puis le fichier response-*.mp3.
+Exemple : « Dommage ! Voici la couleur noire. »
+Comptage : « Bravo ! La réponse est huit. »
+Score 0 à 4 : retry.mp3 ; titre « Bien essayé ! ».
+Score 5 à 8 : congratulation.mp3 ; titre « Bien joué ! ».
+Score 9 : score-almost.mp3 ; titre « Bravo ! ».
+Score 10 : score-perfect.mp3 ; titre « Bravo ! ».
+Récompense gagnée (score 9 ou 10) : après la phrase de score, le fichier reward-*.mp3 de sa sorte ; la carte affiche « Nouvelle mascotte ! ».
+Fenêtre d’une récompense verrouillée (Réglages) : le fichier unlock-*.mp3 de sa règle, à l’ouverture.
+Parcours de bienvenue : le fichier welcome-*.mp3 de l’étape, à l’arrivée sur l’étape (retour en arrière compris).
+Chaque phrase unlock-* nomme la sorte de récompense que sa règle débloque : la régénérer si le plan des récompenses change.
+
+[COULEURS]
+yellow.mp3 | Trouve la couleur jaune.
+response-yellow.mp3 | Voici la couleur jaune.
+red.mp3 | Trouve la couleur rouge.
+response-red.mp3 | Voici la couleur rouge.
+brown.mp3 | Trouve la couleur marron.
+response-brown.mp3 | Voici la couleur marron.
+blue.mp3 | Trouve la couleur bleue.
+response-blue.mp3 | Voici la couleur bleue.
+pink.mp3 | Trouve la couleur rose.
+response-pink.mp3 | Voici la couleur rose.
+green.mp3 | Trouve la couleur verte.
+response-green.mp3 | Voici la couleur verte.
+black.mp3 | Trouve la couleur noire.
+response-black.mp3 | Voici la couleur noire.
+purple.mp3 | Trouve la couleur violette.
+response-purple.mp3 | Voici la couleur violette.
+orange.mp3 | Trouve la couleur orange.
+response-orange.mp3 | Voici la couleur orange.
+grey.mp3 | Trouve la couleur grise.
+response-grey.mp3 | Voici la couleur grise.
+
+[ANIMAUX]
+bird.mp3 | Trouve l’oiseau.
+response-bird.mp3 | Voici l’oiseau.
+cat.mp3 | Trouve le chat.
+response-cat.mp3 | Voici le chat.
+cow.mp3 | Trouve la vache.
+response-cow.mp3 | Voici la vache.
+dog.mp3 | Trouve le chien.
+response-dog.mp3 | Voici le chien.
+duck.mp3 | Trouve le canard.
+response-duck.mp3 | Voici le canard.
+pig.mp3 | Trouve le cochon.
+response-pig.mp3 | Voici le cochon.
+rabbit.mp3 | Trouve le lapin.
+response-rabbit.mp3 | Voici le lapin.
+sheep.mp3 | Trouve le mouton.
+response-sheep.mp3 | Voici le mouton.
+
+[FORMES]
+shape-circle.mp3 | Trouve le cercle.
+response-circle.mp3 | Voici le cercle.
+shape-cross.mp3 | Trouve la croix.
+response-cross.mp3 | Voici la croix.
+shape-heart.mp3 | Trouve le cœur.
+response-heart.mp3 | Voici le cœur.
+shape-losange.mp3 | Trouve le losange.
+response-losange.mp3 | Voici le losange.
+shape-oval.mp3 | Trouve l’ovale.
+response-oval.mp3 | Voici l’ovale.
+shape-rectangle.mp3 | Trouve le rectangle.
+response-rectangle.mp3 | Voici le rectangle.
+shape-square.mp3 | Trouve le carré.
+response-square.mp3 | Voici le carré.
+shape-star.mp3 | Trouve l’étoile.
+response-star.mp3 | Voici l’étoile.
+shape-triangle.mp3 | Trouve le triangle.
+response-triangle.mp3 | Voici le triangle.
+
+[COMPTAGE]
+count-duck.mp3 | Combien comptes-tu de canards ?
+count-rabbit.mp3 | Combien comptes-tu de lapins ?
+count-dog.mp3 | Combien comptes-tu de chiens ?
+count-pig.mp3 | Combien comptes-tu de cochons ?
+count-cow.mp3 | Combien comptes-tu de vaches ?
+count-cat.mp3 | Combien comptes-tu de chats ?
+count-bird.mp3 | Combien comptes-tu d’oiseaux ?
+count-sheep.mp3 | Combien comptes-tu de moutons ?
+response-one.mp3 | La réponse est un.
+response-two.mp3 | La réponse est deux.
+response-three.mp3 | La réponse est trois.
+response-four.mp3 | La réponse est quatre.
+response-five.mp3 | La réponse est cinq.
+response-six.mp3 | La réponse est six.
+response-seven.mp3 | La réponse est sept.
+response-eight.mp3 | La réponse est huit.
+response-nine.mp3 | La réponse est neuf.
+
+[RETOURS ET SCORE]
+bravo.mp3 | Bravo !
+dommage.mp3 | Dommage !
+congratulation.mp3 | Bien joué ! Tu as eu plein de bonnes réponses !
+score-almost.mp3 | Bravo ! Tu as eu presque toutes les bonnes réponses !
+score-perfect.mp3 | Bravo ! Tu as eu toutes les bonnes réponses !
+retry.mp3 | Bien essayé ! On recommence ?
+
+[RÉCOMPENSES À DÉBLOQUER]
+unlock-number.mp3 | Pour avoir cette mascotte, gagne le jeu des nombres.
+unlock-number-twice.mp3 | Pour avoir cette musique, gagne deux fois le jeu des nombres.
+unlock-animal.mp3 | Pour avoir cette mascotte, gagne le jeu des animaux.
+unlock-animal-twice.mp3 | Pour avoir ce décor, gagne deux fois le jeu des animaux.
+unlock-color.mp3 | Pour avoir cette mascotte, gagne le jeu des couleurs.
+unlock-color-twice.mp3 | Pour avoir cette musique, gagne deux fois le jeu des couleurs.
+unlock-shape.mp3 | Pour avoir cette mascotte, gagne le jeu des formes.
+unlock-shape-twice.mp3 | Pour avoir ce décor, gagne deux fois le jeu des formes.
+unlock-perfect.mp3 | Pour avoir cette mascotte, trouve toutes les bonnes réponses dans un jeu.
+
+[PARCOURS DE BIENVENUE]
+welcome-mascot.mp3 | Bienvenue ! Choisis ta mascotte.
+welcome-decor.mp3 | Choisis ton décor.
+welcome-track.mp3 | Choisis ta musique.
+
+[RÉCOMPENSES GAGNÉES]
+reward-mascot.mp3 | Tu as gagné une nouvelle mascotte !
+reward-decor.mp3 | Tu as gagné un nouveau décor !
+reward-track.mp3 | Tu as gagné une nouvelle musique !
