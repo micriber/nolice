@@ -22,4 +22,6 @@ export const TRACK_CHOICES: {
   {key: 'calme', label: 'Calme', icon: 'weather-night', color: NOL.violet},
   {key: 'aventure', label: 'Aventure', icon: 'rocket-launch', color: NOL.teal},
   {key: 'festive', label: 'Festive', icon: 'party-popper', color: NOL.coral},
+  {key: 'jazzy', label: 'Jazzy', icon: 'saxophone', color: NOL.skyDeep},
+  {key: 'nature', label: 'Nature', icon: 'tree', color: NOL.mintDeep},
 ];

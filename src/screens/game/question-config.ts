@@ -30,6 +30,12 @@ export const QUESTION_CONFIGS: Record<FindGameKey, QuestionConfig[]> = {
     {key: 'rabbit', label: 'le lapin'},
     {key: 'sheep', label: 'le mouton'},
     {key: 'owl', label: 'le hibou'},
+    {key: 'frog', label: 'la grenouille'},
+    {key: 'butterfly', label: 'le papillon'},
+    {key: 'turtle', label: 'la tortue'},
+    {key: 'ladybug', label: 'la coccinelle'},
+    {key: 'crab', label: 'le crabe'},
+    {key: 'whale', label: 'la baleine'},
   ],
   shape: [
     {key: 'circle', label: 'le cercle'},

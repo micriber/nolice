@@ -32,13 +32,13 @@ Une version **Nolice – Élémentaire** est également envisagée ensuite, avec
 
 ### Les récompenses à débloquer
 
-Douze récompenses se gagnent en jouant : sept mascottes, trois décors et deux musiques.
+Vingt et une récompenses se gagnent en jouant : treize mascottes, quatre décors et quatre musiques.
 
 | | Disponible au départ | À débloquer |
 |---|---|---|
-| Mascottes | Nolice, le chat et le chien | Les sept autres animaux du jeu : lapin, canard, oiseau, cochon, vache, mouton et hibou |
-| Décors | Nuages et bulles | La banquise, l’automne et les étoiles |
-| Musiques | Joyeuse et calme | Aventure et festive |
+| Mascottes | Nolice, le chat et le chien | Treize autres animaux : lapin, canard, oiseau, cochon, vache, mouton, hibou, grenouille, papillon, tortue, coccinelle, crabe et baleine |
+| Décors | Nuages et bulles | La banquise, l’automne, les étoiles et l’océan |
+| Musiques | Joyeuse et calme | Aventure, festive, jazzy et nature |
 
 Chaque jeu est lié à une mascotte, puis à un décor ou une musique :
 
@@ -50,14 +50,14 @@ Chaque jeu est lié à une mascotte, puis à un décor ou une musique :
 | Les formes | Le cochon | La banquise |
 | Les lettres | Le hibou | Les étoiles |
 
-Une réussite est une partie terminée avec au moins 9 sur 10. Le lapin et la vache sont les deux mascottes du sans-faute.
+Une réussite est une partie terminée avec au moins 9 sur 10. Le lapin, la vache, le papillon, la tortue, la coccinelle, le crabe et la baleine sont les mascottes du sans-faute. Le décor de l’océan, puis les musiques jazzy et nature, se gagnent eux aussi au sans-faute, une fois ces mascottes obtenues. La grenouille est pour l’instant une mascotte du sans-faute : elle deviendra la mascotte du sixième jeu quand il existera. La deuxième récompense de ce jeu, un décor ou une musique, reste à trouver.
 
 Une partie ne donne jamais plus d’une récompense :
 
-- Un sans-faute (10 sur 10), dans n’importe quel jeu, donne une mascotte du sans-faute tant qu’il en reste.
+- Un sans-faute (10 sur 10), dans n’importe quel jeu, donne une récompense du sans-faute tant qu’il en reste : les mascottes d’abord, puis le décor, puis les musiques.
 - Sinon, une réussite donne la récompense suivante du jeu : sa mascotte, puis son décor ou sa musique.
 
-Les douze récompenses demandent donc au moins douze parties réussies.
+Les vingt et une récompenses demandent donc au moins vingt et une parties réussies.
 
 Les récompenses sont à publier dans la même version que le choix de la mascotte et du décor, absent de la version aujourd’hui en ligne : aucun joueur ne perd alors quelque chose qu’il avait déjà.
 

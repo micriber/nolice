@@ -40,6 +40,12 @@ const COUNT_RABBIT_SOUND_PATH = '../../assets/audio/count-rabbit.mp3';
 const COUNT_BIRD_SOUND_PATH = '../../assets/audio/count-bird.mp3';
 const COUNT_SHEEP_SOUND_PATH = '../../assets/audio/count-sheep.mp3';
 const COUNT_OWL_SOUND_PATH = '../../assets/audio/count-owl.mp3';
+const COUNT_FROG_SOUND_PATH = '../../assets/audio/count-frog.mp3';
+const COUNT_BUTTERFLY_SOUND_PATH = '../../assets/audio/count-butterfly.mp3';
+const COUNT_TURTLE_SOUND_PATH = '../../assets/audio/count-turtle.mp3';
+const COUNT_LADYBUG_SOUND_PATH = '../../assets/audio/count-ladybug.mp3';
+const COUNT_CRAB_SOUND_PATH = '../../assets/audio/count-crab.mp3';
+const COUNT_WHALE_SOUND_PATH = '../../assets/audio/count-whale.mp3';
 const DUCK_QUESTION_SOUND_PATH = '../../assets/audio/duck.mp3';
 const DUCK_ANSWER_SOUND_PATH = '../../assets/audio/response-duck.mp3';
 const CAT_QUESTION_SOUND_PATH = '../../assets/audio/cat.mp3';
@@ -58,6 +64,18 @@ const SHEEP_QUESTION_SOUND_PATH = '../../assets/audio/sheep.mp3';
 const SHEEP_ANSWER_SOUND_PATH = '../../assets/audio/response-sheep.mp3';
 const OWL_QUESTION_SOUND_PATH = '../../assets/audio/owl.mp3';
 const OWL_ANSWER_SOUND_PATH = '../../assets/audio/response-owl.mp3';
+const FROG_QUESTION_SOUND_PATH = '../../assets/audio/frog.mp3';
+const FROG_ANSWER_SOUND_PATH = '../../assets/audio/response-frog.mp3';
+const BUTTERFLY_QUESTION_SOUND_PATH = '../../assets/audio/butterfly.mp3';
+const BUTTERFLY_ANSWER_SOUND_PATH = '../../assets/audio/response-butterfly.mp3';
+const TURTLE_QUESTION_SOUND_PATH = '../../assets/audio/turtle.mp3';
+const TURTLE_ANSWER_SOUND_PATH = '../../assets/audio/response-turtle.mp3';
+const LADYBUG_QUESTION_SOUND_PATH = '../../assets/audio/ladybug.mp3';
+const LADYBUG_ANSWER_SOUND_PATH = '../../assets/audio/response-ladybug.mp3';
+const CRAB_QUESTION_SOUND_PATH = '../../assets/audio/crab.mp3';
+const CRAB_ANSWER_SOUND_PATH = '../../assets/audio/response-crab.mp3';
+const WHALE_QUESTION_SOUND_PATH = '../../assets/audio/whale.mp3';
+const WHALE_ANSWER_SOUND_PATH = '../../assets/audio/response-whale.mp3';
 const CIRCLE_QUESTION_SOUND_PATH = '../../assets/audio/shape-circle.mp3';
 const CIRCLE_ANSWER_SOUND_PATH = '../../assets/audio/response-circle.mp3';
 const CROSS_QUESTION_SOUND_PATH = '../../assets/audio/shape-cross.mp3';
@@ -104,6 +122,8 @@ const JOYEUSE_MUSIC_PATH = '../../assets/audio/joyeux.mp3';
 const CALME_MUSIC_PATH = '../../assets/audio/calme.mp3';
 const AVENTURE_MUSIC_PATH = '../../assets/audio/aventure.mp3';
 const FESTIVE_MUSIC_PATH = '../../assets/audio/festive.mp3';
+const JAZZY_MUSIC_PATH = '../../assets/audio/jazz.mp3';
+const NATURE_MUSIC_PATH = '../../assets/audio/nature.mp3';
 const ANSWER_ONE_SOUND_PATH = '../../assets/audio/response-one.mp3';
 const ANSWER_TWO_SOUND_PATH = '../../assets/audio/response-two.mp3';
 const ANSWER_THREE_SOUND_PATH = '../../assets/audio/response-three.mp3';
@@ -129,6 +149,10 @@ const UNLOCK_LETTER_SOUND_PATH = '../../assets/audio/unlock-letter.mp3';
 const UNLOCK_LETTER_TWICE_SOUND_PATH =
   '../../assets/audio/unlock-letter-twice.mp3';
 const UNLOCK_PERFECT_SOUND_PATH = '../../assets/audio/unlock-perfect.mp3';
+const UNLOCK_PERFECT_TRACK_SOUND_PATH =
+  '../../assets/audio/unlock-perfect-track.mp3';
+const UNLOCK_PERFECT_DECOR_SOUND_PATH =
+  '../../assets/audio/unlock-perfect-decor.mp3';
 const WELCOME_MASCOT_SOUND_PATH = '../../assets/audio/welcome-mascot.mp3';
 const WELCOME_DECOR_SOUND_PATH = '../../assets/audio/welcome-decor.mp3';
 const WELCOME_TRACK_SOUND_PATH = '../../assets/audio/welcome-track.mp3';
@@ -170,6 +194,8 @@ export const MUSIC_TRACKS: Record<MusicTrackKey, AudioSource> = {
   calme: require(CALME_MUSIC_PATH),
   aventure: require(AVENTURE_MUSIC_PATH),
   festive: require(FESTIVE_MUSIC_PATH),
+  jazzy: require(JAZZY_MUSIC_PATH),
+  nature: require(NATURE_MUSIC_PATH),
 };
 
 const SOUNDS_UNLOCK: Record<GameKey, Record<1 | 2, AudioSource>> = {
@@ -194,12 +220,17 @@ const SOUNDS_UNLOCK: Record<GameKey, Record<1 | 2, AudioSource>> = {
     2: require(UNLOCK_LETTER_TWICE_SOUND_PATH),
   },
 };
-const UNLOCK_PERFECT_SOUND: AudioSource = require(UNLOCK_PERFECT_SOUND_PATH);
+// Au sans-faute, la phrase nomme la sorte de récompense.
+const SOUNDS_UNLOCK_PERFECT: Record<Reward['kind'], AudioSource> = {
+  mascot: require(UNLOCK_PERFECT_SOUND_PATH),
+  decor: require(UNLOCK_PERFECT_DECOR_SOUND_PATH),
+  track: require(UNLOCK_PERFECT_TRACK_SOUND_PATH),
+};
 
 // La phrase qui dit comment gagner une récompense encore verrouillée.
-export function unlockSound(unlock: Unlock): AudioSource {
+export function unlockSound(unlock: Unlock, kind: Reward['kind']): AudioSource {
   return unlock === 'perfect'
-    ? UNLOCK_PERFECT_SOUND
+    ? SOUNDS_UNLOCK_PERFECT[kind]
     : SOUNDS_UNLOCK[unlock.game][unlock.successes];
 }
 
@@ -228,6 +259,12 @@ export const SOUNDS_COUNT_QUESTION: SoundCountType = {
   BIRD: require(COUNT_BIRD_SOUND_PATH),
   SHEEP: require(COUNT_SHEEP_SOUND_PATH),
   OWL: require(COUNT_OWL_SOUND_PATH),
+  FROG: require(COUNT_FROG_SOUND_PATH),
+  BUTTERFLY: require(COUNT_BUTTERFLY_SOUND_PATH),
+  TURTLE: require(COUNT_TURTLE_SOUND_PATH),
+  LADYBUG: require(COUNT_LADYBUG_SOUND_PATH),
+  CRAB: require(COUNT_CRAB_SOUND_PATH),
+  WHALE: require(COUNT_WHALE_SOUND_PATH),
   ONE: require(ANSWER_ONE_SOUND_PATH),
   TWO: require(ANSWER_TWO_SOUND_PATH),
   THREE: require(ANSWER_THREE_SOUND_PATH),
@@ -318,6 +355,30 @@ export const SOUNDS_QUESTION: SoundsTypeQuestion = {
     OWL: {
       QUESTION: require(OWL_QUESTION_SOUND_PATH),
       ANSWER: require(OWL_ANSWER_SOUND_PATH),
+    },
+    FROG: {
+      QUESTION: require(FROG_QUESTION_SOUND_PATH),
+      ANSWER: require(FROG_ANSWER_SOUND_PATH),
+    },
+    BUTTERFLY: {
+      QUESTION: require(BUTTERFLY_QUESTION_SOUND_PATH),
+      ANSWER: require(BUTTERFLY_ANSWER_SOUND_PATH),
+    },
+    TURTLE: {
+      QUESTION: require(TURTLE_QUESTION_SOUND_PATH),
+      ANSWER: require(TURTLE_ANSWER_SOUND_PATH),
+    },
+    LADYBUG: {
+      QUESTION: require(LADYBUG_QUESTION_SOUND_PATH),
+      ANSWER: require(LADYBUG_ANSWER_SOUND_PATH),
+    },
+    CRAB: {
+      QUESTION: require(CRAB_QUESTION_SOUND_PATH),
+      ANSWER: require(CRAB_ANSWER_SOUND_PATH),
+    },
+    WHALE: {
+      QUESTION: require(WHALE_QUESTION_SOUND_PATH),
+      ANSWER: require(WHALE_ANSWER_SOUND_PATH),
     },
   },
   SHAPE: {
@@ -562,7 +623,7 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
       SOUNDS.PERFECT,
       SOUNDS.RETRY,
       ...Object.values(SOUNDS_COUNT_QUESTION),
-      UNLOCK_PERFECT_SOUND,
+      ...Object.values(SOUNDS_UNLOCK_PERFECT),
       ...Object.values(SOUNDS_WELCOME),
       ...Object.values(SOUNDS_REWARD),
       ...Object.values(SOUNDS_UNLOCK).flatMap((sounds) =>

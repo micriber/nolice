@@ -38,6 +38,15 @@ export default function DecorThumb({scene, unit, radius}: Props) {
             />
           </>
         )}
+        {scene === 'ocean' && (
+          <>
+            <Rect width="120" height="70" fill={NOL.sky} opacity={0.14} />
+            <Path
+              d="M0 42 Q30 28 60 40 T120 36 L120 70 L0 70 Z"
+              fill={shade(NOL.amber, 0.55)}
+            />
+          </>
+        )}
         {scene === 'automne' && (
           <Path
             d="M0 42 Q30 28 60 40 T120 36 L120 70 L0 70 Z"
@@ -110,6 +119,27 @@ export default function DecorThumb({scene, unit, radius}: Props) {
               position: 'absolute',
               left: star[0] * scale,
               top: star[1] * scale,
+            }}
+          />
+        ))}
+      {scene === 'ocean' &&
+        (
+          [
+            [12, 8, 18, NOL.coral],
+            [52, 18, 14, NOL.violet],
+            [84, 6, 20, NOL.teal],
+          ] as [number, number, number, string][]
+        ).map((fish, i) => (
+          <MaterialCommunityIcons
+            key={i}
+            name="fish"
+            size={fish[2] * scale}
+            color={fish[3]}
+            style={{
+              position: 'absolute',
+              left: fish[0] * scale,
+              top: fish[1] * scale,
+              opacity: 0.7,
             }}
           />
         ))}

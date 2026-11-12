@@ -22,7 +22,7 @@ const WAIT: Range = [30000, 60000];
 const DURATION = {walk: 10000, peek: 5000};
 const BOTTOM = 36;
 // Les mascottes sont dessinées tournées vers la droite, sauf celles-ci.
-const DRAWN_LEFTWARD: MascotKey[] = ['sheep'];
+const DRAWN_LEFTWARD: MascotKey[] = ['sheep', 'whale'];
 
 const between = ([min, max]: Range) => min + Math.random() * (max - min);
 

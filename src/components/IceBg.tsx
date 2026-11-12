@@ -32,6 +32,7 @@ export const DECOR_LABELS: Record<DecorKey, string> = {
   banquise: 'Banquise',
   automne: 'Automne',
   etoiles: 'Étoiles',
+  ocean: 'Océan',
 };
 
 // Répartition fixe et régulière : le même décor à chaque rendu, sans paquet ni couloir vide.
@@ -87,6 +88,23 @@ const STARS = Array.from({length: STAR_COLUMNS * STAR_ROWS}, (_, i) => ({
   duration: 6400 + ((i * 3) % 5) * 1000,
   delay: ((i * 0.5698) % 1) * 8000,
 }));
+
+const FISH_COLORS = [NOL.coral, NOL.amber, NOL.violet, NOL.teal, NOL.mint];
+
+// Un couloir par poisson, au-dessus du sable : deux poissons ne se croisent jamais.
+const FISH = Array.from({length: 10}, (_, i) => {
+  const leftward = i % 2 === 1;
+  // Place de départ sur la largeur de l'écran : sans elle, les deux sens de nage se regroupent du même côté.
+  const across = 0.03 + ((i * 0.618) % 1) * 0.94;
+  return {
+    top: 6 + (i / 10) * 70,
+    phase: leftward ? 1 - across : across,
+    size: 26 + (i % 4) * 7,
+    color: FISH_COLORS[i % FISH_COLORS.length],
+    leftward,
+    duration: 32000 + (i % 5) * 6000,
+  };
+});
 
 const CLOUD_WIDTH = 96;
 
@@ -382,6 +400,39 @@ export default function IceBg({tint = NOL.sky, scene = 'nuages'}: Props) {
               delay={star.delay}
             />
           ))}
+        </>
+      )}
+
+      {scene === 'ocean' && (
+        <>
+          {/* voile bleu : l'eau, qui reste claire sous les titres */}
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              {backgroundColor: NOL.sky, opacity: 0.14},
+            ]}
+          />
+          {FISH.map((fish, i) => (
+            <Drift
+              key={i}
+              axis="x"
+              from={fish.leftward ? width + fish.size : -fish.size * 1.5}
+              to={fish.leftward ? -fish.size * 1.5 : width + fish.size}
+              phase={fish.phase}
+              duration={fish.duration}
+              sway={5}
+              style={{top: `${fish.top}%`, opacity: 0.45}}>
+              {/* le pictogramme regarde vers la droite */}
+              <MaterialCommunityIcons
+                name="fish"
+                size={fish.size}
+                color={fish.color}
+                style={fish.leftward && {transform: [{scaleX: -1}]}}
+              />
+            </Drift>
+          ))}
+          {/* après les poissons : ceux du bas passent derrière le sable */}
+          <Hills color={shade(NOL.amber, 0.55)} />
         </>
       )}
 

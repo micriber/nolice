@@ -13,17 +13,27 @@ export const MASCOT_UNLOCKS: Partial<Record<MascotKey, Unlock>> = {
   hibou: {game: 'letter', successes: 1},
   rabbit: 'perfect',
   cow: 'perfect',
+  // En attendant le sixième jeu, dont elle sera la mascotte.
+  frog: 'perfect',
+  butterfly: 'perfect',
+  turtle: 'perfect',
+  ladybug: 'perfect',
+  crab: 'perfect',
+  whale: 'perfect',
 };
 
 export const DECOR_UNLOCKS: Partial<Record<DecorKey, Unlock>> = {
   banquise: {game: 'shape', successes: 2},
   automne: {game: 'animal', successes: 2},
   etoiles: {game: 'letter', successes: 2},
+  ocean: 'perfect',
 };
 
 export const TRACK_UNLOCKS: Partial<Record<MusicTrackKey, Unlock>> = {
   aventure: {game: 'number', successes: 2},
   festive: {game: 'color', successes: 2},
+  jazzy: 'perfect',
+  nature: 'perfect',
 };
 
 export const SUCCESS_SCORE = 9;
@@ -70,8 +80,8 @@ const REWARDS: Reward[] = [
   ),
 ];
 
-// Une partie donne au plus une récompense : au sans-faute, une mascotte du sans-faute tant qu'il en
-// reste ; sinon, à partir de 9 sur 10, la récompense suivante du jeu (sa mascotte, puis son décor ou sa musique).
+// Une partie donne au plus une récompense : au sans-faute, une récompense du sans-faute tant qu'il en
+// reste, les mascottes d'abord, puis le décor et les musiques ; sinon, à partir de 9 sur 10, la récompense suivante du jeu (sa mascotte, puis son décor ou sa musique).
 export function rewardFor(
   game: GameKey,
   score: number,

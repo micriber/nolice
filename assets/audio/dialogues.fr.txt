@@ -15,8 +15,8 @@ Si une prise ne convient pas, régénérer uniquement ce fichier et comparer ave
 Le script conserve les nouvelles prises et leurs réglages dans output/audio, sans remplacer les assets.
 Aperçu sans génération : npm run audio:samples -- --file response-losange.mp3
 Nouvelle prise : npm run audio:samples -- --file response-losange.mp3 --generate
-Les 28 réponses animaux, formes et couleurs : npm run audio:samples -- --responses --generate
-Les 11 phrases des récompenses à débloquer : npm run audio:samples -- --unlocks --generate
+Les 34 réponses animaux, formes et couleurs : npm run audio:samples -- --responses --generate
+Les 13 phrases des récompenses à débloquer : npm run audio:samples -- --unlocks --generate
 Les 3 phrases du parcours de bienvenue : npm run audio:samples -- --welcome --generate
 Les 3 phrases des récompenses gagnées : npm run audio:samples -- --rewards --generate
 Les 52 phrases des lettres : npm run audio:samples -- --letters --generate
@@ -84,6 +84,18 @@ sheep.mp3 | Trouve le mouton.
 response-sheep.mp3 | Voici le mouton.
 owl.mp3 | Trouve le hibou.
 response-owl.mp3 | Voici le hibou.
+frog.mp3 | Trouve la grenouille.
+response-frog.mp3 | Voici la grenouille.
+butterfly.mp3 | Trouve le papillon.
+response-butterfly.mp3 | Voici le papillon.
+turtle.mp3 | Trouve la tortue.
+response-turtle.mp3 | Voici la tortue.
+ladybug.mp3 | Trouve la coccinelle.
+response-ladybug.mp3 | Voici la coccinelle.
+crab.mp3 | Trouve le crabe.
+response-crab.mp3 | Voici le crabe.
+whale.mp3 | Trouve la baleine.
+response-whale.mp3 | Voici la baleine.
 
 [FORMES]
 shape-circle.mp3 | Trouve le cercle.
@@ -115,6 +127,12 @@ count-cat.mp3 | Combien comptes-tu de chats ?
 count-bird.mp3 | Combien comptes-tu d’oiseaux ?
 count-sheep.mp3 | Combien comptes-tu de moutons ?
 count-owl.mp3 | Combien comptes-tu de hiboux ?
+count-frog.mp3 | Combien comptes-tu de grenouilles ?
+count-butterfly.mp3 | Combien comptes-tu de papillons ?
+count-turtle.mp3 | Combien comptes-tu de tortues ?
+count-ladybug.mp3 | Combien comptes-tu de coccinelles ?
+count-crab.mp3 | Combien comptes-tu de crabes ?
+count-whale.mp3 | Combien comptes-tu de baleines ?
 response-one.mp3 | La réponse est un.
 response-two.mp3 | La réponse est deux.
 response-three.mp3 | La réponse est trois.
@@ -145,6 +163,8 @@ unlock-shape-twice.mp3 | Pour avoir ce décor, gagne deux fois le jeu des formes
 unlock-letter.mp3 | Pour avoir cette mascotte, gagne le jeu des lettres.
 unlock-letter-twice.mp3 | Pour avoir ce décor, gagne deux fois le jeu des lettres.
 unlock-perfect.mp3 | Pour avoir cette mascotte, trouve toutes les bonnes réponses dans un jeu.
+unlock-perfect-decor.mp3 | Pour avoir ce décor, trouve toutes les bonnes réponses dans un jeu.
+unlock-perfect-track.mp3 | Pour avoir cette musique, trouve toutes les bonnes réponses dans un jeu.
 
 [PARCOURS DE BIENVENUE]
 welcome-mascot.mp3 | Bienvenue ! Choisis ta mascotte.

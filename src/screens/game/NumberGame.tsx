@@ -40,6 +40,15 @@ const animalSoundMap: AnimalSoundMap = {
   bird: {label: "d'oiseaux", sound: SOUNDS_COUNT_QUESTION.BIRD},
   sheep: {label: 'de moutons', sound: SOUNDS_COUNT_QUESTION.SHEEP},
   owl: {label: 'de hiboux', sound: SOUNDS_COUNT_QUESTION.OWL},
+  frog: {label: 'de grenouilles', sound: SOUNDS_COUNT_QUESTION.FROG},
+  butterfly: {
+    label: 'de papillons',
+    sound: SOUNDS_COUNT_QUESTION.BUTTERFLY,
+  },
+  turtle: {label: 'de tortues', sound: SOUNDS_COUNT_QUESTION.TURTLE},
+  ladybug: {label: 'de coccinelles', sound: SOUNDS_COUNT_QUESTION.LADYBUG},
+  crab: {label: 'de crabes', sound: SOUNDS_COUNT_QUESTION.CRAB},
+  whale: {label: 'de baleines', sound: SOUNDS_COUNT_QUESTION.WHALE},
 };
 
 const animalNames = Object.keys(animalSoundMap);

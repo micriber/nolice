@@ -31,7 +31,7 @@ src/
   screens/
     welcome/index.tsx    First launch only: three steps to pick a mascot, a decor and a track among the base ones, each announced aloud, with the music button on top, then Home
     home/index.tsx       Landing = brand header (mascot and brush button, both → Settings, music) + 2-col grid of icon-led game cards
-    settings/index.tsx   Réglages: mascot (10), decor (5), music track (4) — persisted via useSettingsStore. Rewards not won yet are greyed with a lock and an « i »
+    settings/index.tsx   Réglages: mascot (16, four per row), decor (6) and music track (6), three per row — persisted via useSettingsStore. Rewards not won yet are greyed with a lock and an « i »
     settings/unlock-popup.tsx  Popup explaining how to win a locked reward, in writing and aloud
     game/
       NumberGame.tsx     "Combien de X ?" — count card + 4 number tiles
@@ -48,7 +48,7 @@ src/
     FillSvg.tsx          Svg stretched over its container (gradients, backgrounds)
     DecorThumb.tsx       Miniature of a decor (Settings, Welcome, unlock popup, reward card on Score)
     Equalizer.tsx        Dancing bars marking the track being heard (Settings, Welcome)
-    IceBg.tsx            Animated background, 5 scenes (banquise/bulles/nuages/automne/etoiles): snow, bubbles, clouds or leaves drifting across the screen, or stars that grow, shrink away and come back elsewhere in the sky, over two hills, `tint` per game
+    IceBg.tsx            Animated background, 6 scenes (banquise/bulles/nuages/automne/etoiles/ocean): snow, bubbles, clouds, leaves or fish drifting across the screen, or stars that grow, shrink away and come back elsewhere in the sky, over two hills, `tint` per game
     MascotVisit.tsx      The mascot showing up at the bottom of the screen now and then (game screens only): it hops across, or pops up from below and jumps on the spot
     BigButton.tsx        Chunky 3D button that presses down (Continuer, Rejouer)
     RoundBtn.tsx         Chunky round button (home, brush, music)
@@ -64,7 +64,7 @@ src/
     settings.ts          useSettingsStore — mascot/decor/musicTrack and `welcomed` (welcome tour done), persisted to a JSON file (expo-file-system)
     rewards.ts           useRewardsStore — mascots, decors and tracks won so far, persisted to a JSON file; `claim(gameId, game, score)` grants the reward of a finished game
   utils/                 array.shuffle, random helpers, color (NOL palette + GAMES) / font constants, scale (tablet enlargement), rewards (what unlocks each locked mascot, decor and track), tracks (label and pictogram of each music track)
-assets/audio/            ~153 mp3 files (questions, answers, feedback and score messages, unlock sentences, music tracks) and `dialogues.fr.txt`, the spoken text of each voice file
+assets/audio/            ~175 mp3 files (questions, answers, feedback and score messages, unlock sentences, music tracks) and `dialogues.fr.txt`, the spoken text of each voice file
 assets/animals/          PNG animals (game pictures and mascots)
 assets/branding/         nolice.png (default mascot « Nolice ») and the adaptive icon foreground
 assets/svg/              SVG color splashes and shapes
@@ -95,11 +95,11 @@ Key contract:
 
 Audio file mapping (`src/store/audio.ts`):
 - `SOUNDS` — global one-offs: `BRAVO`, `DOMMAGE`, `CONGRATULATION`, `RETRY`
-- `MUSIC_TRACKS` — background tracks keyed by the `musicTrack` setting (`joyeuse`, `calme`, `aventure`, `festive`); `App.tsx` calls `playBackground(MUSIC_TRACKS[musicTrack])` each time the setting changes
+- `MUSIC_TRACKS` — background tracks keyed by the `musicTrack` setting (`joyeuse`, `calme`, `aventure`, `festive`, `jazzy`, `nature`); `App.tsx` calls `playBackground(MUSIC_TRACKS[musicTrack])` each time the setting changes
 - `SOUNDS_COUNT_QUESTION` — count questions per animal + spoken numbers 1–9
 - `SOUNDS_REWARD` — the sentence announcing the reward just won, per kind, chained after the score sentence on Score
 - `SOUNDS_WELCOME` — the sentence spoken on arriving at each step of the welcome tour
-- `unlockSound(unlock)` — the sentence spoken when the popup of a locked reward opens, one file per unlock rule (`unlock-<game>.mp3`, `unlock-<game>-twice.mp3`, `unlock-perfect.mp3`)
+- `unlockSound(unlock, kind)` — the sentence spoken when the popup of a locked reward opens, one file per unlock rule (`unlock-<game>.mp3`, `unlock-<game>-twice.mp3`), and for a perfect game one per kind of reward (`unlock-perfect.mp3` for a mascot, `unlock-perfect-decor.mp3`, `unlock-perfect-track.mp3`)
 - `SOUNDS_QUESTION[gameType.toUpperCase()][key.toUpperCase()].{QUESTION,ANSWER}` — find/identify per game type per item
 
 ResultSheet plays BRAVO/DOMMAGE → callback plays the correct-answer sound → callback sets `soundFinished=true` which reveals the Continuer button (kept rendered with `opacity:0` + `pointerEvents:'none'` to keep the sheet height stable, with a 4s safety timeout).
@@ -138,7 +138,7 @@ To run on a connected phone: enable USB debugging, `adb devices` should list it,
 Jest with the `jest-expo` preset, test files next to the code they cover (`*.test.ts`):
 - `src/store/game.test.ts`, `src/utils/random.test.ts` — question generation rules, checked over a few hundred random games each.
 - `src/screens/game/question-config.test.ts` — every FindGame item has its sounds and its picture.
-- `src/utils/rewards.test.ts` — the reward plan adds up (twelve rewards, one mascot then one decor or track per game, two mascots for a perfect game), the popup sentences, that each spoken unlock sentence names the kind of reward its rule unlocks, and which reward a finished game wins.
+- `src/utils/rewards.test.ts` — the reward plan adds up (twenty-one rewards, one mascot then one decor or track per game, eight mascots, one decor and two tracks for a perfect game), the popup sentences, that each spoken unlock sentence names the kind of reward its rule unlocks, and which reward a finished game wins.
 - `src/store/rewards.test.ts` — rewards are saved and reloaded, a game is claimed once, and saved settings drop a mascot, decor or track that was not won. Runs against an in-memory `expo-file-system`.
 - `src/store/audio.test.ts` — the audio contract above, against a fake `expo-audio` player whose seek and status events the test drives. It proves the store's logic, not the real player: audio changes still need a device check.
 
@@ -155,7 +155,8 @@ Jest with the `jest-expo` preset, test files next to the code they cover (`*.tes
 - **Tablet sizing**: every size a child sees goes through `useScale()` — 1 on a phone, up to 2 on a tablet, held back by the window height so a page never overflows. A page taller than 700dp in the design passes its own design height (`useScale(860)` in Settings). A raw dp value stays phone-sized on a tablet.
 - **Stretched SVGs go through `<FillSvg>`**: it measures its container and passes numeric sizes. A `width="100%"` Svg keeps its old drawing when the window is resized (a foldable being opened), and comes out too narrow inside a padded parent.
 - **Portrait lock on tablets**: Android may ignore it on screens ≥ 600dp and show the app in a portrait band inside a landscape screen (a narrow, short window — hence the height limit in `useScale()`). On Android 16 the lock is dropped entirely for apps targeting API 36; `plugins/withPortraitOnLargeScreens.js` declares the temporary opt-out, which stops working once the app targets API 37 — a landscape layout is needed before that bump.
-- **Rewards** (plan in `readme.md`, « Les récompenses à débloquer »): `src/utils/rewards.ts` holds the rules — what each locked mascot, decor or track needs (`MASCOT_UNLOCKS`, `DECOR_UNLOCKS`, `TRACK_UNLOCKS`) and `rewardFor(game, score, owned)`, which gives at most one reward per game: a perfect-game mascot on 10/10 while one is left, otherwise from 9/10 the next reward of the game. Score claims it once per `gameId` through `useRewardsStore`, announces it aloud and shows it on a card the child taps to select it; Settings greys what `lockOf()` still reports as locked, and `useSettingsStore` falls back to the default mascot, decor or track when the saved one was not won. Unlocking a new mascot, decor or track = one entry in its `*_UNLOCKS` map; the spoken sentence of that rule names the kind of reward (« cette mascotte », « ce décor », « cette musique »), so a rule moved to another kind needs its voice regenerated (`assets/audio/dialogues.fr.txt`, `npm run audio:samples -- --unlocks`).
+- **Rewards** (plan in `readme.md`, « Les récompenses à débloquer »): `src/utils/rewards.ts` holds the rules — what each locked mascot, decor or track needs (`MASCOT_UNLOCKS`, `DECOR_UNLOCKS`, `TRACK_UNLOCKS`) and `rewardFor(game, score, owned)`, which gives at most one reward per game: a perfect-game reward on 10/10 while one is left (mascots first, then the decor, then the tracks), otherwise from 9/10 the next reward of the game. Score claims it once per `gameId` through `useRewardsStore`, announces it aloud and shows it on a card the child taps to select it; Settings greys what `lockOf()` still reports as locked, and `useSettingsStore` falls back to the default mascot, decor or track when the saved one was not won. Unlocking a new mascot, decor or track = one entry in its `*_UNLOCKS` map; the spoken sentence of that rule names the kind of reward (« cette mascotte », « ce décor », « cette musique »), so a rule moved to another kind needs its voice regenerated (`assets/audio/dialogues.fr.txt`, `npm run audio:samples -- --unlocks`).
+- **Waiting for the sixth game**: the frog is a perfect-game mascot for now (`MASCOT_UNLOCKS`) and becomes the mascot of the sixth game once it exists; that game's second reward, a decor or a track, is still to be found.
 - **Mascot keys**: `owl` is Nolice the fox, a key saved in players' settings since 2.0; the owl won in the letters game is the mascot `hibou`, drawn by the animal picture `owl` (also an item of the animals game).
 - **Letter prompt**: the letters game writes « Trouve la bonne lettre » — only the voice names the letter, writing it would give the answer away. The result sheet does show it (« La réponse : la lettre N »).
 - **Letter shapes**: letters are drawn in Nunito (`FONT.UI_HEAVY`), not Fredoka, whose B has a single counter — a child must see the school shape.

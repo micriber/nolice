@@ -17,6 +17,12 @@ export const MASCOTS: {key: MascotKey; label: string}[] = [
   {key: 'rabbit', label: 'Lapin'},
   {key: 'cow', label: 'Vache'},
   {key: 'hibou', label: 'Hibou'},
+  {key: 'frog', label: 'Grenouille'},
+  {key: 'butterfly', label: 'Papillon'},
+  {key: 'turtle', label: 'Tortue'},
+  {key: 'ladybug', label: 'Coccinelle'},
+  {key: 'crab', label: 'Crabe'},
+  {key: 'whale', label: 'Baleine'},
 ];
 
 export type MascotMood = 'none' | 'happy' | 'content' | 'sad';

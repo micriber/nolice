@@ -11,6 +11,7 @@ import {
   rewardFor,
   unlockHint,
 } from './rewards';
+import type {MascotKey} from '../store/settings';
 
 const mascots = Object.values(MASCOT_UNLOCKS);
 const others = [
@@ -29,11 +30,15 @@ const gamesAt = (unlocks: Unlock[], successes: number) =>
 
 const allGames = GAMES.map((game) => game.key).sort();
 
-// Le plan des récompenses : douze en tout, une mascotte puis un décor ou une musique par jeu, deux mascottes au sans-faute.
+const perfectMascots = (Object.keys(MASCOT_UNLOCKS) as MascotKey[]).filter(
+  (key) => MASCOT_UNLOCKS[key] === 'perfect',
+);
+
+// Le plan des récompenses : vingt et une en tout, une mascotte puis un décor ou une musique par jeu, huit mascottes, un décor et deux musiques au sans-faute.
 describe('reward plan', () => {
-  it('holds twelve rewards', () => {
-    expect(mascots).toHaveLength(7);
-    expect(others).toHaveLength(5);
+  it('holds twenty-one rewards', () => {
+    expect(mascots).toHaveLength(13);
+    expect(others).toHaveLength(8);
   });
 
   it('gives each game one mascot on its first success', () => {
@@ -44,8 +49,9 @@ describe('reward plan', () => {
     expect(gamesAt(others, 2)).toEqual(allGames);
   });
 
-  it('keeps two mascots for a perfect game', () => {
-    expect(mascots.filter((unlock) => unlock === 'perfect')).toHaveLength(2);
+  it('keeps eight mascots, one decor and two tracks for a perfect game', () => {
+    expect(perfectMascots).toHaveLength(8);
+    expect(others.filter((unlock) => unlock === 'perfect')).toHaveLength(3);
   });
 });
 
@@ -71,10 +77,15 @@ describe('unlock voices', () => {
     join(__dirname, '../../assets/audio/dialogues.fr.txt'),
     'utf8',
   );
-  const spoken = (unlock: Unlock) => {
+  const PERFECT_VOICES: Record<string, string> = {
+    mascotte: '',
+    décor: '-decor',
+    musique: '-track',
+  };
+  const spoken = (unlock: Unlock, word: string) => {
     const name =
       unlock === 'perfect'
-        ? 'unlock-perfect'
+        ? `unlock-perfect${PERFECT_VOICES[word]}`
         : `unlock-${unlock.game}${unlock.successes === 2 ? '-twice' : ''}`;
     return dialogues.match(new RegExp(`^${name}\\.mp3 \\| (.+)$`, 'm'))?.[1];
   };
@@ -85,7 +96,7 @@ describe('unlock voices', () => {
     ['musique', Object.values(TRACK_UNLOCKS)],
   ])('name the %s they unlock', (word, unlocks) => {
     for (const unlock of unlocks) {
-      expect(spoken(unlock)).toContain(word);
+      expect(spoken(unlock, word)).toContain(word);
     }
   });
 });
@@ -136,8 +147,25 @@ describe('rewardFor', () => {
     });
   });
 
-  it('falls back to the reward of the game once both perfect-game mascots are won', () => {
-    const owned = owning({mascots: ['rabbit', 'cow']});
+  it('gives the perfect-game decor, then a track, once every perfect-game mascot is won', () => {
+    const owned = owning({mascots: perfectMascots});
+
+    expect(rewardFor('color', 10, owned)).toEqual({
+      kind: 'decor',
+      key: 'ocean',
+    });
+    expect(rewardFor('color', 10, {...owned, decors: ['ocean']})).toEqual({
+      kind: 'track',
+      key: 'jazzy',
+    });
+  });
+
+  it('falls back to the reward of the game once every perfect-game reward is won', () => {
+    const owned = owning({
+      mascots: perfectMascots,
+      decors: ['ocean'],
+      tracks: ['jazzy', 'nature'],
+    });
 
     expect(rewardFor('color', 10, owned)).toEqual({
       kind: 'mascot',
@@ -152,7 +180,7 @@ describe('rewardFor', () => {
       track: [] as string[],
     };
     let games = 0;
-    for (const game of [...allGames, ...allGames, ...allGames]) {
+    for (const game of Array.from({length: 5}, () => allGames).flat()) {
       const reward = rewardFor(game, 10, {
         mascots: owned.mascot,
         decors: owned.decor,
@@ -163,9 +191,19 @@ describe('rewardFor', () => {
       owned[reward.kind].push(reward.key);
     }
 
-    expect(owned.mascot).toHaveLength(7);
-    expect(owned.decor.sort()).toEqual(['automne', 'banquise', 'etoiles']);
-    expect(owned.track.sort()).toEqual(['aventure', 'festive']);
-    expect(games).toBe(12);
+    expect(owned.mascot).toHaveLength(13);
+    expect(owned.decor.sort()).toEqual([
+      'automne',
+      'banquise',
+      'etoiles',
+      'ocean',
+    ]);
+    expect(owned.track.sort()).toEqual([
+      'aventure',
+      'festive',
+      'jazzy',
+      'nature',
+    ]);
+    expect(games).toBe(21);
   });
 });

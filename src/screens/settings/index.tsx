@@ -21,7 +21,7 @@ import {
 } from '../../store/settings';
 import {NOL, shade} from '../../utils/color';
 import FONT from '../../utils/font';
-import {Unlock, lockOf, unlockHint} from '../../utils/rewards';
+import {Reward, Unlock, lockOf, unlockHint} from '../../utils/rewards';
 import {useScale} from '../../utils/scale';
 import {TRACK_CHOICES} from '../../utils/tracks';
 import {NavigationProp} from '../types';
@@ -36,6 +36,7 @@ const DECORS: DecorKey[] = [
   'banquise',
   'automne',
   'etoiles',
+  'ocean',
 ];
 
 const LOCKED_GREY = '#9FB4C2';
@@ -43,7 +44,12 @@ const LOCKED_GREY = '#9FB4C2';
 const DESIGN_WIDTH = 412;
 const DESIGN_HEIGHT = 1035;
 
-type LockedInfo = {title: string; unlock: Unlock; picture: React.ReactNode};
+type LockedInfo = {
+  title: string;
+  unlock: Unlock;
+  kind: Reward['kind'];
+  picture: React.ReactNode;
+};
 
 function useScaledStyles() {
   const scale = useScale(DESIGN_HEIGHT);
@@ -173,6 +179,7 @@ export default function SettingsScreen({navigation}: Props) {
                       setLocked({
                         title: m.label,
                         unlock,
+                        kind: 'mascot',
                         picture: (
                           <Mascot size={110 * scale} who={m.key} anim="none" />
                         ),
@@ -189,10 +196,10 @@ export default function SettingsScreen({navigation}: Props) {
                         },
                       ]}>
                       <View style={unlock && styles.locked}>
-                        <Mascot size={54 * scale} who={m.key} anim="none" />
+                        <Mascot size={48 * scale} who={m.key} anim="none" />
                       </View>
-                      {sel && <CheckBadge />}
-                      {unlock && <LockBadges />}
+                      {sel && <CheckBadge small />}
+                      {unlock && <LockBadges small />}
                     </View>
                     <Text
                       style={[
@@ -206,7 +213,7 @@ export default function SettingsScreen({navigation}: Props) {
                 );
               })}
               {/* Cases vides : une dernière rangée incomplète garde des cases de la même largeur */}
-              {Array.from({length: (3 - (MASCOTS.length % 3)) % 3}, (_, i) => (
+              {Array.from({length: (4 - (MASCOTS.length % 4)) % 4}, (_, i) => (
                 <View key={i} style={styles.mascotCell} />
               ))}
             </View>
@@ -230,6 +237,7 @@ export default function SettingsScreen({navigation}: Props) {
                       setLocked({
                         title: label,
                         unlock,
+                        kind: 'decor',
                         picture: (
                           <View style={styles.popupDecor}>
                             <DecorThumb
@@ -241,7 +249,7 @@ export default function SettingsScreen({navigation}: Props) {
                         ),
                       });
                     }}
-                    style={styles.decorGridCell}>
+                    style={styles.choiceCell}>
                     <View
                       style={[
                         styles.decorFrame,
@@ -250,7 +258,7 @@ export default function SettingsScreen({navigation}: Props) {
                       <View style={[styles.decorFill, unlock && styles.locked]}>
                         <DecorThumb
                           scene={key}
-                          unit={scale * 0.72}
+                          unit={scale * 0.83}
                           radius={13 * scale}
                         />
                       </View>
@@ -268,15 +276,15 @@ export default function SettingsScreen({navigation}: Props) {
                   </Pressable>
                 );
               })}
-              {Array.from({length: (4 - (DECORS.length % 4)) % 4}, (_, i) => (
-                <View key={i} style={styles.decorGridCell} />
+              {Array.from({length: (3 - (DECORS.length % 3)) % 3}, (_, i) => (
+                <View key={i} style={styles.choiceCell} />
               ))}
             </View>
           </SettingsCard>
 
           {/* MUSIQUE */}
           <SettingsCard title="La musique">
-            <View style={styles.decorRow}>
+            <View style={styles.decorGrid}>
               {TRACK_CHOICES.map((tr) => {
                 const {key} = tr;
                 const sel = settings.musicTrack === key;
@@ -292,6 +300,7 @@ export default function SettingsScreen({navigation}: Props) {
                       setLocked({
                         title: tr.label,
                         unlock,
+                        kind: 'track',
                         picture: (
                           <MaterialCommunityIcons
                             name={tr.icon}
@@ -301,7 +310,7 @@ export default function SettingsScreen({navigation}: Props) {
                         ),
                       });
                     }}
-                    style={styles.decorCell}>
+                    style={styles.choiceCell}>
                     <View
                       style={[
                         styles.trackFrame,
@@ -333,6 +342,12 @@ export default function SettingsScreen({navigation}: Props) {
                   </Pressable>
                 );
               })}
+              {Array.from(
+                {length: (3 - (TRACK_CHOICES.length % 3)) % 3},
+                (_, i) => (
+                  <View key={i} style={styles.choiceCell} />
+                ),
+              )}
             </View>
           </SettingsCard>
         </ScrollView>
@@ -341,7 +356,7 @@ export default function SettingsScreen({navigation}: Props) {
         <UnlockPopup
           title={locked.title}
           hint={unlockHint(locked.unlock)}
-          sound={unlockSound(locked.unlock)}
+          sound={unlockSound(locked.unlock, locked.kind)}
           picture={locked.picture}
           onClose={() => {
             setLocked(null);
@@ -403,7 +418,7 @@ function makeStyles(scale: number) {
       gap: 12 * scale,
     },
     mascotCell: {
-      width: '30%',
+      width: '21%',
       flexGrow: 1,
       alignItems: 'center',
       gap: 5 * scale,
@@ -459,8 +474,9 @@ function makeStyles(scale: number) {
       flexWrap: 'wrap',
       gap: 12 * scale,
     },
-    decorGridCell: {
-      width: '21%',
+    // Trois choix par rangée, décors et musiques.
+    choiceCell: {
+      width: '30%',
       flexGrow: 1,
       alignItems: 'center',
       gap: 6 * scale,
@@ -472,7 +488,7 @@ function makeStyles(scale: number) {
     },
     decorFrame: {
       width: '100%',
-      height: 56 * scale,
+      height: 62 * scale,
       borderRadius: 16 * scale,
       borderWidth: 2,
       borderColor: '#E4EFF5',
