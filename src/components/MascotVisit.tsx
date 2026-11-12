@@ -3,6 +3,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {Animated, Easing, Pressable, useWindowDimensions} from 'react-native';
 
 import Mascot from './Mascot';
+import {MascotKey, useSettingsStore} from '../store/settings';
 import {NOL} from '../utils/color';
 import {useScale} from '../utils/scale';
 
@@ -20,6 +21,8 @@ const FIRST_WAIT: Range = [10000, 20000];
 const WAIT: Range = [30000, 60000];
 const DURATION = {walk: 10000, peek: 5000};
 const BOTTOM = 36;
+// Les mascottes sont dessinées tournées vers la droite, sauf celles-ci.
+const DRAWN_LEFTWARD: MascotKey[] = ['sheep'];
 
 const between = ([min, max]: Range) => min + Math.random() * (max - min);
 
@@ -125,6 +128,9 @@ export default function MascotVisit({active}: Props) {
   const {width} = useWindowDimensions();
   const scale = useScale();
   const size = 70 * scale;
+  const drawnLeftward = useSettingsStore((s) =>
+    DRAWN_LEFTWARD.includes(s.mascot),
+  );
   const progress = useRef(new Animated.Value(0)).current;
   // duration > 0 : une visite est en cours, `played` en est la part déjà jouée.
   const [pending] = useState(() => ({
@@ -194,8 +200,7 @@ export default function MascotVisit({active}: Props) {
               ),
             }),
           },
-          // Les mascottes sont dessinées tournées vers la droite.
-          {scaleX: visit.leftward ? -1 : 1},
+          {scaleX: visit.leftward === drawnLeftward ? 1 : -1},
         ]
       : [
           {translateX: visit.at * (width - size)},
