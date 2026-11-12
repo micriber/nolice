@@ -3,7 +3,7 @@ import {COLORS_MAP} from './color-picture';
 import {LETTERS} from './letter-picture';
 import {FindGameKey, QUESTION_CONFIGS} from './question-config';
 import {SHAPES} from './shape-picture';
-import {SOUNDS_QUESTION} from '../../store/audio';
+import {SOUNDS_QUESTION, SOUNDS_SEQUENCE_ANSWER} from '../../store/audio';
 
 jest.mock('expo-audio', () => ({}));
 jest.mock('@sentry/react-native', () => ({}));
@@ -43,5 +43,16 @@ describe.each(gameTypes)('%s questions', (gameType) => {
     keys.forEach((key) => {
       expect(PICTURES[gameType][key]).toBeDefined();
     });
+  });
+});
+
+// Le jeu des suites dit sa propre réponse pour chaque animal et chaque forme.
+describe('sequence answers', () => {
+  const keys = [...QUESTION_CONFIGS.animal, ...QUESTION_CONFIGS.shape].map(
+    (item) => item.key,
+  );
+
+  it('has an answer sound for every animal and shape, and no other', () => {
+    expect(Object.keys(SOUNDS_SEQUENCE_ANSWER).sort()).toEqual(keys.sort());
   });
 });

@@ -148,7 +148,11 @@ const UNLOCK_SHAPE_TWICE_SOUND_PATH =
 const UNLOCK_LETTER_SOUND_PATH = '../../assets/audio/unlock-letter.mp3';
 const UNLOCK_LETTER_TWICE_SOUND_PATH =
   '../../assets/audio/unlock-letter-twice.mp3';
+const UNLOCK_SEQUENCE_SOUND_PATH = '../../assets/audio/unlock-sequence.mp3';
+const UNLOCK_SEQUENCE_TWICE_SOUND_PATH =
+  '../../assets/audio/unlock-sequence-twice.mp3';
 const UNLOCK_PERFECT_SOUND_PATH = '../../assets/audio/unlock-perfect.mp3';
+const SEQUENCE_SOUND_PATH = '../../assets/audio/sequence.mp3';
 const UNLOCK_PERFECT_TRACK_SOUND_PATH =
   '../../assets/audio/unlock-perfect-track.mp3';
 const UNLOCK_PERFECT_DECOR_SOUND_PATH =
@@ -178,6 +182,7 @@ type SoundsType = {
   CONGRATULATION: AudioSource;
   ALMOST: AudioSource;
   PERFECT: AudioSource;
+  SEQUENCE: AudioSource;
 };
 
 export const SOUNDS: SoundsType = {
@@ -187,6 +192,7 @@ export const SOUNDS: SoundsType = {
   CONGRATULATION: require(CONGRATULATION_SOUND_PATH),
   ALMOST: require(ALMOST_SOUND_PATH),
   PERFECT: require(PERFECT_SOUND_PATH),
+  SEQUENCE: require(SEQUENCE_SOUND_PATH),
 };
 
 export const MUSIC_TRACKS: Record<MusicTrackKey, AudioSource> = {
@@ -218,6 +224,10 @@ const SOUNDS_UNLOCK: Record<GameKey, Record<1 | 2, AudioSource>> = {
   letter: {
     1: require(UNLOCK_LETTER_SOUND_PATH),
     2: require(UNLOCK_LETTER_TWICE_SOUND_PATH),
+  },
+  sequence: {
+    1: require(UNLOCK_SEQUENCE_SOUND_PATH),
+    2: require(UNLOCK_SEQUENCE_TWICE_SOUND_PATH),
   },
 };
 // Au sans-faute, la phrase nomme la sorte de récompense.
@@ -527,6 +537,34 @@ export const SOUNDS_QUESTION: SoundsTypeQuestion = {
   },
 };
 
+// La réponse dite dans le jeu des suites, « C'est le chat. » : une par animal et par forme.
+export const SOUNDS_SEQUENCE_ANSWER: Record<string, AudioSource> = {
+  bird: require('../../assets/audio/sequence-bird.mp3'),
+  cat: require('../../assets/audio/sequence-cat.mp3'),
+  cow: require('../../assets/audio/sequence-cow.mp3'),
+  dog: require('../../assets/audio/sequence-dog.mp3'),
+  duck: require('../../assets/audio/sequence-duck.mp3'),
+  pig: require('../../assets/audio/sequence-pig.mp3'),
+  rabbit: require('../../assets/audio/sequence-rabbit.mp3'),
+  sheep: require('../../assets/audio/sequence-sheep.mp3'),
+  owl: require('../../assets/audio/sequence-owl.mp3'),
+  frog: require('../../assets/audio/sequence-frog.mp3'),
+  butterfly: require('../../assets/audio/sequence-butterfly.mp3'),
+  turtle: require('../../assets/audio/sequence-turtle.mp3'),
+  ladybug: require('../../assets/audio/sequence-ladybug.mp3'),
+  crab: require('../../assets/audio/sequence-crab.mp3'),
+  whale: require('../../assets/audio/sequence-whale.mp3'),
+  circle: require('../../assets/audio/sequence-circle.mp3'),
+  cross: require('../../assets/audio/sequence-cross.mp3'),
+  heart: require('../../assets/audio/sequence-heart.mp3'),
+  losange: require('../../assets/audio/sequence-losange.mp3'),
+  oval: require('../../assets/audio/sequence-oval.mp3'),
+  rectangle: require('../../assets/audio/sequence-rectangle.mp3'),
+  square: require('../../assets/audio/sequence-square.mp3'),
+  star: require('../../assets/audio/sequence-star.mp3'),
+  triangle: require('../../assets/audio/sequence-triangle.mp3'),
+};
+
 function errorSafe(callback: () => void, message: string) {
   try {
     callback();
@@ -622,6 +660,8 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
       SOUNDS.ALMOST,
       SOUNDS.PERFECT,
       SOUNDS.RETRY,
+      SOUNDS.SEQUENCE,
+      ...Object.values(SOUNDS_SEQUENCE_ANSWER),
       ...Object.values(SOUNDS_COUNT_QUESTION),
       ...Object.values(SOUNDS_UNLOCK_PERFECT),
       ...Object.values(SOUNDS_WELCOME),

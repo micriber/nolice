@@ -1,8 +1,9 @@
 # Nolice
 
-Mobile app (Android-first) — educational game for young French-speaking kids. Five mini-games:
+Mobile app (Android-first) — educational game for young French-speaking kids. Six mini-games:
 - **NumberGame** ("Les nombres") — count N animals shown, pick the right number 1–9
 - **FindGame** in 4 flavors via `gameType` param — `animal`, `color`, `shape`, `letter`. User hears "Trouve X" and taps the matching picture among 4 choices.
+- **SequenceGame** ("Les suites") — a row of five pictures mixing animals and shapes along a pattern; pick the picture that comes next among 4 choices.
 
 Each game runs 10 randomized questions, then shows a Score screen with replay button.
 
@@ -17,7 +18,7 @@ UI language: French only. UI text and audio are entirely in French.
 - **Analytics**: `@react-native-firebase/analytics` (modular API only — `logEvent`, not legacy namespaced API)
 - **Crash reporting**: Sentry (`@sentry/react-native`)
 - **Fonts**: Fredoka (display/titles) + Nunito (UI text) via `@expo-google-fonts` — see `src/utils/font.ts`
-- **Theme**: « Banquise » design (2026 redesign from a Claude Design handoff) — tokens in `src/utils/color.ts` (`NOL` palette, `shade()` helper, per-game `GAMES` config: amber=number, coral=animal, violet=color, teal=shape, mint=letter)
+- **Theme**: « Banquise » design (2026 redesign from a Claude Design handoff) — tokens in `src/utils/color.ts` (`NOL` palette, `shade()` helper, per-game `GAMES` config: amber=number, coral=animal, violet=color, teal=shape, mint=letter, pink=sequence)
 - **Sizing**: dp values taken from the 412dp-wide phone design, multiplied by `useScale()` (`src/utils/scale.ts`) so tablets get the phone layout enlarged
 
 ## Repo layout
@@ -35,6 +36,7 @@ src/
     settings/unlock-popup.tsx  Popup explaining how to win a locked reward, in writing and aloud
     game/
       NumberGame.tsx     "Combien de X ?" — count card + 4 number tiles
+      SequenceGame.tsx   "Qu'est-ce qui vient après ?" — sequence card whose last slot waits for the answer + a row of 4 picture tiles
       FindGame.tsx       "Trouve X" — generic for animal/color/shape/letter, 2×2 tiles; shapes and letters share one colour per question, drawn at random among lists that leave out the game's own colour
       GameHeader.tsx     Top bar (home, progress dots, music) + prompt row with SpeakerOrb
       Tile.tsx           White answer tile: idle/right/wrong/dim states, badge, shake/pop
@@ -57,14 +59,14 @@ src/
     Progress.tsx         10 question dots (green/red/current/upcoming)
     Confetti.tsx         One-shot falling confetti (correct answer, happy score)
     SpeakerOrb.tsx       account-voice icon in white orb + ring wave → replays question audio
-    GameGlyphs.tsx       Home card pictograms: Numerals "123", painter palette, shape cluster, Letters "ABC"
+    GameGlyphs.tsx       Home card pictograms: Numerals "123", painter palette, shape cluster, Letters "ABC", SequenceGlyph (frog, circle, frog and the game's dashed "?" slot)
   store/
     audio.ts             useSoundStore — single foreground player + looping background player
-    game.ts              useGameScoreStore — questions[], currentIndex, init/next/hasMore/getResults
+    game.ts              useGameScoreStore — questions[], currentIndex, init/start/next/hasMore/getResults
     settings.ts          useSettingsStore — mascot/decor/musicTrack and `welcomed` (welcome tour done), persisted to a JSON file (expo-file-system)
     rewards.ts           useRewardsStore — mascots, decors and tracks won so far, persisted to a JSON file; `claim(gameId, game, score)` grants the reward of a finished game
-  utils/                 array.shuffle, random helpers, color (NOL palette + GAMES) / font constants, scale (tablet enlargement), rewards (what unlocks each locked mascot, decor and track), tracks (label and pictogram of each music track)
-assets/audio/            ~175 mp3 files (questions, answers, feedback and score messages, unlock sentences, music tracks) and `dialogues.fr.txt`, the spoken text of each voice file
+  utils/                 array.shuffle, random helpers, color (NOL palette + GAMES) / font constants, scale (tablet enlargement), rewards (what unlocks each locked mascot, decor and track), tracks (label and pictogram of each music track), sequence (the sequences of a game: patterns, kinds and choices)
+assets/audio/            ~202 mp3 files (questions, answers, feedback and score messages, unlock sentences, music tracks) and `dialogues.fr.txt`, the spoken text of each voice file
 assets/animals/          PNG animals (game pictures and mascots)
 assets/branding/         nolice.png (default mascot « Nolice ») and the adaptive icon foreground
 assets/svg/              SVG color splashes and shapes
@@ -72,7 +74,7 @@ assets/svg/              SVG color splashes and shapes
 
 ## Navigation flow
 
-`Home` (landing = game selection) → (`NumberGame` | `FindGame`) → `Score` → back to `Home`. On the very first launch the stack starts on `Welcome` instead, which `replace`s itself with `Home` once the tour is finished and sets `welcomed`; `App.tsx` reads that flag once to choose the first route. The game screen `replace`s itself with `Score`, so Android back from Score lands on Home. `Settings` is reachable from Home's brush button and from the mascot next to it. There is no separate "JOUER" menu anymore — it was merged into Home during the redesign.
+`Home` (landing = game selection) → (`NumberGame` | `FindGame` | `SequenceGame`) → `Score` → back to `Home`. On the very first launch the stack starts on `Welcome` instead, which `replace`s itself with `Home` once the tour is finished and sets `welcomed`; `App.tsx` reads that flag once to choose the first route. The game screen `replace`s itself with `Score`, so Android back from Score lands on Home. `Settings` is reachable from Home's brush button and from the mascot next to it. There is no separate "JOUER" menu anymore — it was merged into Home during the redesign.
 
 `FindGame` is parameterized at navigation time with `{questionConfig, gameType}` — the same screen handles animal/color/shape/letter, just a different list from `QUESTION_CONFIGS` (`src/screens/game/question-config.ts`). `Score` receives `{gameId, gameType}` (gameType colors the score number).
 
@@ -94,7 +96,7 @@ Key contract:
 - `play()` exposes `audioLoading: boolean` which is `true` between the call and the moment the player reports `status.playing === true` (with a 2s safety timeout). UIs use this to gate user input (e.g., `Tile` `disabled` prop) and avoid the bug where cancelling a still-loading sound corrupts the audio engine state.
 
 Audio file mapping (`src/store/audio.ts`):
-- `SOUNDS` — global one-offs: `BRAVO`, `DOMMAGE`, `CONGRATULATION`, `RETRY`
+- `SOUNDS` — global one-offs: `BRAVO`, `DOMMAGE`, the score sentences (`RETRY`, `CONGRATULATION`, `ALMOST`, `PERFECT`) and `SEQUENCE`, the question of the sequences game
 - `MUSIC_TRACKS` — background tracks keyed by the `musicTrack` setting (`joyeuse`, `calme`, `aventure`, `festive`, `jazzy`, `nature`); `App.tsx` calls `playBackground(MUSIC_TRACKS[musicTrack])` each time the setting changes
 - `SOUNDS_COUNT_QUESTION` — count questions per animal + spoken numbers 1–9
 - `SOUNDS_REWARD` — the sentence announcing the reward just won, per kind, chained after the score sentence on Score
@@ -137,8 +139,9 @@ To run on a connected phone: enable USB debugging, `adb devices` should list it,
 
 Jest with the `jest-expo` preset, test files next to the code they cover (`*.test.ts`):
 - `src/store/game.test.ts`, `src/utils/random.test.ts` — question generation rules, checked over a few hundred random games each.
-- `src/screens/game/question-config.test.ts` — every FindGame item has its sounds and its picture.
-- `src/utils/rewards.test.ts` — the reward plan adds up (twenty-one rewards, one mascot then one decor or track per game, eight mascots, one decor and two tracks for a perfect game), the popup sentences, that each spoken unlock sentence names the kind of reward its rule unlocks, and which reward a finished game wins.
+- `src/screens/game/question-config.test.ts` — every FindGame item has its sounds and its picture, and every animal and shape its answer of the sequences game.
+- `src/utils/rewards.test.ts` — the reward plan adds up (twenty-one rewards, one mascot then one decor or track per game, seven mascots, one decor and one track for a perfect game), the popup sentences, that each spoken unlock sentence names the kind of reward its rule unlocks, and which reward a finished game wins.
+- `src/utils/sequence.test.ts` — every sequence follows a known pattern, mixes animals and shapes, offers four different choices including the images shown, and a game uses every pattern.
 - `src/store/rewards.test.ts` — rewards are saved and reloaded, a game is claimed once, and saved settings drop a mascot, decor or track that was not won. Runs against an in-memory `expo-file-system`.
 - `src/store/audio.test.ts` — the audio contract above, against a fake `expo-audio` player whose seek and status events the test drives. It proves the store's logic, not the real player: audio changes still need a device check.
 
@@ -149,17 +152,17 @@ Jest with the `jest-expo` preset, test files next to the code they cover (`*.tes
 - **Don't create a fresh player for each component re-render** — always go through `useSoundStore.play()`.
 - **Background music volume is 0.2, 0.06 under a foreground sound** (`MUSIC_VOLUME`, `DUCKED_MUSIC_VOLUME` in `src/store/audio.ts`) — don't change without checking the mix with question audio. The music comes back on `didJustFinish` or `stop()`, and stays low when the finish callback chains another sound.
 - **Question order** — `init()` deals answers in shuffled rounds, so every answer comes up before one repeats, and it reverses a round that would open on the answer closing the previous one, so two consecutive questions never share an answer. Keep both rules if editing the generator.
-- **Adding/renaming a FindGame item** touches three places: its list in `QUESTION_CONFIGS`, the audio entry in `SOUNDS_QUESTION[gameType.toUpperCase()]` and the picture map in its `*-picture.tsx`. `question-config.test.ts` fails while one is missing.
+- **Adding/renaming a FindGame item** touches three places: its list in `QUESTION_CONFIGS`, the audio entry in `SOUNDS_QUESTION[gameType.toUpperCase()]` and the picture map in its `*-picture.tsx`. An animal or a shape also needs its answer of the sequences game in `SOUNDS_SEQUENCE_ANSWER`, and an animal its count question in the numbers game. `question-config.test.ts` fails while a sound or a picture is missing.
 - **Settings persistence** goes through `useSettingsStore` (JSON file via the sync `expo-file-system` v55 `File` API) — no AsyncStorage in this project.
 - **Adding a music track**: add the key to `MusicTrackKey` (`src/store/settings.ts`), the mp3 to `MUSIC_TRACKS` (`src/store/audio.ts`) and its label and pictogram to `TRACK_CHOICES` (`src/utils/tracks.ts`), a pictogram a child can tell apart without reading; a track to win also gets an entry in `TRACK_UNLOCKS`. Picking a track in Settings turns the music on, and dancing bars mark the one being heard.
 - **Tablet sizing**: every size a child sees goes through `useScale()` — 1 on a phone, up to 2 on a tablet, held back by the window height so a page never overflows. A page taller than 700dp in the design passes its own design height (`useScale(860)` in Settings). A raw dp value stays phone-sized on a tablet.
 - **Stretched SVGs go through `<FillSvg>`**: it measures its container and passes numeric sizes. A `width="100%"` Svg keeps its old drawing when the window is resized (a foldable being opened), and comes out too narrow inside a padded parent.
 - **Portrait lock on tablets**: Android may ignore it on screens ≥ 600dp and show the app in a portrait band inside a landscape screen (a narrow, short window — hence the height limit in `useScale()`). On Android 16 the lock is dropped entirely for apps targeting API 36; `plugins/withPortraitOnLargeScreens.js` declares the temporary opt-out, which stops working once the app targets API 37 — a landscape layout is needed before that bump.
-- **Rewards** (plan in `readme.md`, « Les récompenses à débloquer »): `src/utils/rewards.ts` holds the rules — what each locked mascot, decor or track needs (`MASCOT_UNLOCKS`, `DECOR_UNLOCKS`, `TRACK_UNLOCKS`) and `rewardFor(game, score, owned)`, which gives at most one reward per game: a perfect-game reward on 10/10 while one is left (mascots first, then the decor, then the tracks), otherwise from 9/10 the next reward of the game. Score claims it once per `gameId` through `useRewardsStore`, announces it aloud and shows it on a card the child taps to select it; Settings greys what `lockOf()` still reports as locked, and `useSettingsStore` falls back to the default mascot, decor or track when the saved one was not won. Unlocking a new mascot, decor or track = one entry in its `*_UNLOCKS` map; the spoken sentence of that rule names the kind of reward (« cette mascotte », « ce décor », « cette musique »), so a rule moved to another kind needs its voice regenerated (`assets/audio/dialogues.fr.txt`, `npm run audio:samples -- --unlocks`).
-- **Waiting for the sixth game**: the frog is a perfect-game mascot for now (`MASCOT_UNLOCKS`) and becomes the mascot of the sixth game once it exists; that game's second reward, a decor or a track, is still to be found.
+- **Rewards** (plan in `readme.md`, « Les récompenses à débloquer »): `src/utils/rewards.ts` holds the rules — what each locked mascot, decor or track needs (`MASCOT_UNLOCKS`, `DECOR_UNLOCKS`, `TRACK_UNLOCKS`) and `rewardFor(game, score, owned)`, which gives at most one reward per game: a perfect-game reward on 10/10 while one is left (mascots first, then the decor, then the track), otherwise from 9/10 the next reward of the game. Score claims it once per `gameId` through `useRewardsStore`, announces it aloud and shows it on a card the child taps to select it; Settings greys what `lockOf()` still reports as locked, and `useSettingsStore` falls back to the default mascot, decor or track when the saved one was not won. Unlocking a new mascot, decor or track = one entry in its `*_UNLOCKS` map; the spoken sentence of that rule names the kind of reward (« cette mascotte », « ce décor », « cette musique »), so a rule moved to another kind needs its voice regenerated (`assets/audio/dialogues.fr.txt`, `npm run audio:samples -- --unlocks`).
 - **Mascot keys**: `owl` is Nolice the fox, a key saved in players' settings since 2.0; the owl won in the letters game is the mascot `hibou`, drawn by the animal picture `owl` (also an item of the animals game).
 - **Letter prompt**: the letters game writes « Trouve la bonne lettre » — only the voice names the letter, writing it would give the answer away. The result sheet does show it (« La réponse : la lettre N »).
 - **Letter shapes**: letters are drawn in Nunito (`FONT.UI_HEAVY`), not Fredoka, whose B has a single counter — a child must see the school shape.
+- **Sequences game**: `makeSequences()` (`src/utils/sequence.ts`) draws, per question, a pattern from `PATTERNS` and four pictures mixing animals and shapes (the first two are one of each kind, so every sequence shows both); the pattern plays on the first ones and all four are the choices. The screen hands the questions to the store with `start()` instead of `init()`, and says its own answer, « C'est le chat. » (`SOUNDS_SEQUENCE_ANSWER`, one `sequence-<key>.mp3` per animal and shape), because « Voici… » does not answer « Qu'est-ce qui vient après ? ». Each shape of a question gets its own colour.
 - **Adding a game**: append to `GAMES` in `src/utils/color.ts` — the Home grid wraps to rows of 2, a lone last card taking the full width. A FindGame flavor also needs its list in `QUESTION_CONFIGS`, its sounds in `SOUNDS_QUESTION`, a picture component and its case in `Tile`, a Home pictogram, and, to keep the reward plan, a mascot, a decor or track and the two `unlock-<game>` voices.
 
 ## Things that are NOT in the codebase

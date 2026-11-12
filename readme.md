@@ -2,23 +2,24 @@
 
 ## Idées d’évolution — Nolice – Maternelle
 
-L’objectif à terme est de proposer six jeux sous le nom **Nolice – Maternelle**. Cinq existent : les nombres, les animaux, les couleurs, les formes et les lettres (« Trouve la lettre A », avec quatre choix comme A, S, L et F, en majuscules pour commencer).
-
-Les deux pistes suivantes sont à explorer pour le sixième jeu ; le choix reste ouvert.
+**Nolice – Maternelle** compte six jeux : les nombres, les animaux, les couleurs, les formes, les lettres (« Trouve la lettre A », avec quatre choix comme A, S, L et F, en majuscules pour commencer) et les suites.
 
 ### Les suites
 
-L’enfant observe une suite d’animaux ou de formes et choisit l’image qui vient après parmi quatre propositions. Consigne orale : « Qu’est-ce qui vient après ? »
+L’enfant observe une suite qui mêle animaux et formes, et choisit l’image qui vient après parmi quatre propositions. Consigne, écrite et dite : « Qu’est-ce qui vient après ? »
 
-Exemple : chat, chien, chat, chien, **?** → chat.
+Exemple : chat, rond, chat, rond, chat, **?** → rond.
 
-Progression possible :
+Une partie mélange quatre sortes de suites, de cinq images chacune :
 
-- Deux éléments en alternance : chat, chien, chat, chien…
-- Trois éléments : rond, carré, triangle, rond, carré…
-- Un motif avec répétition : chat, chat, chien, chat, chat…
+- Deux images en alternance : chat, rond, chat, rond, chat…
+- La première image doublée : chat, chat, rond, chat, chat…
+- La deuxième image doublée : chat, rond, rond, chat, rond…
+- Trois images : chat, rond, chien, chat, rond…
 
-Afficher suffisamment de répétitions pour rendre le motif identifiable. Le jeu doit pouvoir se jouer sans savoir lire et pourrait réutiliser les illustrations existantes.
+Chaque suite contient au moins un animal et une forme, et chaque forme a sa propre couleur. Les quatre propositions contiennent toujours les images de la suite. Le jeu se joue sans savoir lire et réutilise les illustrations des animaux et des formes. Sa réponse a sa propre voix, « C’est le chat. », qui répond à la question posée.
+
+La piste suivante reste ouverte pour un prochain jeu.
 
 ### Les tailles
 
@@ -49,12 +50,13 @@ Chaque jeu est lié à une mascotte, puis à un décor ou une musique :
 | Les couleurs | L’oiseau | La musique festive |
 | Les formes | Le cochon | La banquise |
 | Les lettres | Le hibou | Les étoiles |
+| Les suites | La grenouille | La musique nature |
 
-Une réussite est une partie terminée avec au moins 9 sur 10. Le lapin, la vache, le papillon, la tortue, la coccinelle, le crabe et la baleine sont les mascottes du sans-faute. Le décor de l’océan, puis les musiques jazzy et nature, se gagnent eux aussi au sans-faute, une fois ces mascottes obtenues. La grenouille est pour l’instant une mascotte du sans-faute : elle deviendra la mascotte du sixième jeu quand il existera. La deuxième récompense de ce jeu, un décor ou une musique, reste à trouver.
+Une réussite est une partie terminée avec au moins 9 sur 10. Le lapin, la vache, le papillon, la tortue, la coccinelle, le crabe et la baleine sont les mascottes du sans-faute. Le décor de l’océan, puis la musique jazzy, se gagnent eux aussi au sans-faute, une fois ces mascottes obtenues.
 
 Une partie ne donne jamais plus d’une récompense :
 
-- Un sans-faute (10 sur 10), dans n’importe quel jeu, donne une récompense du sans-faute tant qu’il en reste : les mascottes d’abord, puis le décor, puis les musiques.
+- Un sans-faute (10 sur 10), dans n’importe quel jeu, donne une récompense du sans-faute tant qu’il en reste : les mascottes d’abord, puis le décor, puis la musique.
 - Sinon, une réussite donne la récompense suivante du jeu : sa mascotte, puis son décor ou sa musique.
 
 Les vingt et une récompenses demandent donc au moins vingt et une parties réussies.

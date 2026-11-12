@@ -1,6 +1,6 @@
 import {GameKey} from '../../utils/color';
 
-export type FindGameKey = Exclude<GameKey, 'number'>;
+export type FindGameKey = Exclude<GameKey, 'number' | 'sequence'>;
 
 export type QuestionConfig = {
   key: string;

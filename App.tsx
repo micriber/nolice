@@ -16,7 +16,7 @@ import {StatusBar} from 'expo-status-bar';
 import React, {useCallback, useEffect, useState} from 'react';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
-import {NumberGame, FindGame} from './src/screens/game';
+import {NumberGame, FindGame, SequenceGame} from './src/screens/game';
 import {Home} from './src/screens/home';
 import ScoreScreen from './src/screens/score';
 import SettingsScreen from './src/screens/settings';
@@ -135,6 +135,11 @@ function App() {
           <Stack.Screen
             name="FindGame"
             component={FindGame}
+            options={{animation: 'fade'}}
+          />
+          <Stack.Screen
+            name="SequenceGame"
+            component={SequenceGame}
             options={{animation: 'fade'}}
           />
           <Stack.Screen

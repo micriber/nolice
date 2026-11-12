@@ -4,7 +4,7 @@ import {Text, View} from 'react-native';
 import {AnimalImage} from '../screens/game/animal-picture';
 import {ColorImage} from '../screens/game/color-picture';
 import {ShapeImage} from '../screens/game/shape-picture';
-import {NOL} from '../utils/color';
+import {NOL, shade} from '../utils/color';
 import FONT from '../utils/font';
 
 // Pictogrammes des cartes de jeu — gros et lisibles sans savoir lire
@@ -78,6 +78,56 @@ export function PaletteGlyph({size}: {size: number}) {
       </View>
       <View style={{position: 'absolute', left: size * 0.19, bottom: 0}}>
         <ColorImage type="blue" size={size * 0.62} />
+      </View>
+    </View>
+  );
+}
+
+// Grenouille, rond, grenouille, « ? » : une suite qui mêle animal et forme et dont il manque la fin.
+// La case « ? » est celle du jeu : c'est elle qui distingue ce pictogramme de ceux des animaux et des formes.
+export function SequenceGlyph({size}: {size: number}) {
+  const cell = size / 2;
+  const slot = cell * 0.86;
+  return (
+    <View
+      style={{
+        width: size,
+        height: size,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+      }}>
+      <AnimalImage type="frog" size={cell} />
+      <ShapeImage type="circle" size={cell} color={NOL.amber} />
+      <AnimalImage type="frog" size={cell} />
+      <View
+        style={{
+          width: cell,
+          height: cell,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <View
+          style={{
+            width: slot,
+            height: slot,
+            borderRadius: slot / 2,
+            borderWidth: 2,
+            borderStyle: 'dashed',
+            borderColor: NOL.pinkDeep,
+            backgroundColor: shade(NOL.pink, 0.8),
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <Text
+            style={{
+              fontFamily: FONT.DISPLAY_BOLD,
+              fontSize: slot * 0.62,
+              lineHeight: slot * 0.8,
+              color: NOL.pinkDeep,
+            }}>
+            ?
+          </Text>
+        </View>
       </View>
     </View>
   );

@@ -18,6 +18,7 @@ import {
   Letters,
   Numerals,
   PaletteGlyph,
+  SequenceGlyph,
   ShapeCluster,
 } from '../../components/GameGlyphs';
 import Mascot from '../../components/Mascot';
@@ -45,6 +46,8 @@ function CardGlyph({game, size}: {game: GameConfig; size: number}) {
       return <PaletteGlyph size={size} />;
     case 'letter':
       return <Letters size={size} />;
+    case 'sequence':
+      return <SequenceGlyph size={size} />;
     default:
       return <ShapeCluster size={size} />;
   }
@@ -191,6 +194,11 @@ export function Home({navigation}: Props) {
     if (game.key === 'number') {
       void logEvent(getAnalytics(), 'NumberGame');
       navigation.navigate('NumberGame');
+      return;
+    }
+    if (game.key === 'sequence') {
+      void logEvent(getAnalytics(), 'SequenceGame');
+      navigation.navigate('SequenceGame');
       return;
     }
     const events: {[key: string]: string} = {

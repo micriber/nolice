@@ -20,6 +20,7 @@ const {values: options} = parseArgs({
     welcome: {type: 'boolean'},
     rewards: {type: 'boolean'},
     letters: {type: 'boolean'},
+    sequences: {type: 'boolean'},
     file: {type: 'string'},
     generate: {type: 'boolean'},
   },
@@ -34,11 +35,12 @@ if (
     options.welcome,
     options.rewards,
     options.letters,
+    options.sequences,
     options.file !== undefined,
   ].filter(Boolean).length > 1
 ) {
   throw new Error(
-    'Choisir un seul filtre : --all, --colors, --feedback, --responses, --unlocks, --welcome, --rewards, --letters ou --file.',
+    'Choisir un seul filtre : --all, --colors, --feedback, --responses, --unlocks, --welcome, --rewards, --letters, --sequences ou --file.',
   );
 }
 if (options.file !== undefined && !/^[a-z-]+(?:\.mp3)?$/.test(options.file)) {
@@ -91,15 +93,17 @@ const selected = options.file
                   )
                 : options.letters
                   ? dialogues.filter(({section}) => section === '[LETTRES]')
-                  : dialogues.filter(({name}) =>
-                      [
-                        'bird',
-                        'count-rabbit',
-                        'shape-rectangle',
-                        'bravo',
-                        'response-black',
-                      ].includes(name),
-                    );
+                  : options.sequences
+                    ? dialogues.filter(({section}) => section === '[SUITES]')
+                    : dialogues.filter(({name}) =>
+                        [
+                          'bird',
+                          'count-rabbit',
+                          'shape-rectangle',
+                          'bravo',
+                          'response-black',
+                        ].includes(name),
+                      );
 if (!selected.length) throw new Error('Aucun dialogue sélectionné.');
 const samples = selected.map(({name, text}) => [name, text]);
 const characters = samples.reduce((total, [, text]) => total + text.length, 0);

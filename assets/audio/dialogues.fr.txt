@@ -12,20 +12,23 @@ Transmettre uniquement la phrase validée, sans balise de douceur, de chuchoteme
 Conserver une phrase continue : ne pas ajouter de pause ou de ponctuation après « Voici ».
 Une génération peut varier en intonation malgré des réglages identiques : écouter avant intégration.
 Si une prise ne convient pas, régénérer uniquement ce fichier et comparer avec la version précédente.
+« C’est la vache. » est lu comme l’exclamation « la vache ! », à chaque prise : la phrase validée est « C’est une vache. ».
 Le script conserve les nouvelles prises et leurs réglages dans output/audio, sans remplacer les assets.
 Aperçu sans génération : npm run audio:samples -- --file response-losange.mp3
 Nouvelle prise : npm run audio:samples -- --file response-losange.mp3 --generate
 Les 34 réponses animaux, formes et couleurs : npm run audio:samples -- --responses --generate
-Les 13 phrases des récompenses à débloquer : npm run audio:samples -- --unlocks --generate
+Les 15 phrases des récompenses à débloquer : npm run audio:samples -- --unlocks --generate
 Les 3 phrases du parcours de bienvenue : npm run audio:samples -- --welcome --generate
 Les 3 phrases des récompenses gagnées : npm run audio:samples -- --rewards --generate
 Les 52 phrases des lettres : npm run audio:samples -- --letters --generate
+Les 25 phrases des suites : npm run audio:samples -- --sequences --generate
 
 AFFICHAGE ET AUDIO
 Les consignes restent courtes à l’écran, plus complètes à l’oral.
 Couleurs : « Trouve le noir » affiché / « Trouve la couleur noire. » prononcé.
 Comptage : « Combien de lapins ? » affiché / « Combien comptes-tu de lapins ? » prononcé.
 Lettres : « Trouve la bonne lettre » affiché, sans la lettre, qui serait la réponse / « Trouve la lettre N. » prononcé.
+Suites : « Qu’est-ce qui vient après ? » affiché et prononcé ; la réponse a sa propre voix, « C’est le chat. », qui répond à la question.
 Les résultats affichent « La réponse : … », même si la voix dit « Voici… ».
 « Dommage ! » est affiché et prononcé après une mauvaise réponse.
 Récompense verrouillée : la fenêtre affiche la règle exacte (« au moins 9 bonnes réponses sur 10 ») / « Pour avoir cette mascotte, gagne le jeu… » prononcé.
@@ -162,6 +165,8 @@ unlock-shape.mp3 | Pour avoir cette mascotte, gagne le jeu des formes.
 unlock-shape-twice.mp3 | Pour avoir ce décor, gagne deux fois le jeu des formes.
 unlock-letter.mp3 | Pour avoir cette mascotte, gagne le jeu des lettres.
 unlock-letter-twice.mp3 | Pour avoir ce décor, gagne deux fois le jeu des lettres.
+unlock-sequence.mp3 | Pour avoir cette mascotte, gagne le jeu des suites.
+unlock-sequence-twice.mp3 | Pour avoir cette musique, gagne deux fois le jeu des suites.
 unlock-perfect.mp3 | Pour avoir cette mascotte, trouve toutes les bonnes réponses dans un jeu.
 unlock-perfect-decor.mp3 | Pour avoir ce décor, trouve toutes les bonnes réponses dans un jeu.
 unlock-perfect-track.mp3 | Pour avoir cette musique, trouve toutes les bonnes réponses dans un jeu.
@@ -229,3 +234,30 @@ letter-y.mp3 | Trouve la lettre Y.
 response-letter-y.mp3 | Voici la lettre Y.
 letter-z.mp3 | Trouve la lettre Z.
 response-letter-z.mp3 | Voici la lettre Z.
+
+[SUITES]
+sequence.mp3 | Qu’est-ce qui vient après ?
+sequence-bird.mp3 | C’est l’oiseau.
+sequence-cat.mp3 | C’est le chat.
+sequence-cow.mp3 | C’est une vache.
+sequence-dog.mp3 | C’est le chien.
+sequence-duck.mp3 | C’est le canard.
+sequence-pig.mp3 | C’est le cochon.
+sequence-rabbit.mp3 | C’est le lapin.
+sequence-sheep.mp3 | C’est le mouton.
+sequence-owl.mp3 | C’est le hibou.
+sequence-frog.mp3 | C’est la grenouille.
+sequence-butterfly.mp3 | C’est le papillon.
+sequence-turtle.mp3 | C’est la tortue.
+sequence-ladybug.mp3 | C’est la coccinelle.
+sequence-crab.mp3 | C’est le crabe.
+sequence-whale.mp3 | C’est la baleine.
+sequence-circle.mp3 | C’est le cercle.
+sequence-cross.mp3 | C’est la croix.
+sequence-heart.mp3 | C’est le cœur.
+sequence-losange.mp3 | C’est le losange.
+sequence-oval.mp3 | C’est l’ovale.
+sequence-rectangle.mp3 | C’est le rectangle.
+sequence-square.mp3 | C’est le carré.
+sequence-star.mp3 | C’est l’étoile.
+sequence-triangle.mp3 | C’est le triangle.

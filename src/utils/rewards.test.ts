@@ -34,7 +34,7 @@ const perfectMascots = (Object.keys(MASCOT_UNLOCKS) as MascotKey[]).filter(
   (key) => MASCOT_UNLOCKS[key] === 'perfect',
 );
 
-// Le plan des récompenses : vingt et une en tout, une mascotte puis un décor ou une musique par jeu, huit mascottes, un décor et deux musiques au sans-faute.
+// Le plan des récompenses : vingt et une en tout, une mascotte puis un décor ou une musique par jeu, sept mascottes, un décor et une musique au sans-faute.
 describe('reward plan', () => {
   it('holds twenty-one rewards', () => {
     expect(mascots).toHaveLength(13);
@@ -49,9 +49,9 @@ describe('reward plan', () => {
     expect(gamesAt(others, 2)).toEqual(allGames);
   });
 
-  it('keeps eight mascots, one decor and two tracks for a perfect game', () => {
-    expect(perfectMascots).toHaveLength(8);
-    expect(others.filter((unlock) => unlock === 'perfect')).toHaveLength(3);
+  it('keeps seven mascots, one decor and one track for a perfect game', () => {
+    expect(perfectMascots).toHaveLength(7);
+    expect(others.filter((unlock) => unlock === 'perfect')).toHaveLength(2);
   });
 });
 
@@ -164,7 +164,7 @@ describe('rewardFor', () => {
     const owned = owning({
       mascots: perfectMascots,
       decors: ['ocean'],
-      tracks: ['jazzy', 'nature'],
+      tracks: ['jazzy'],
     });
 
     expect(rewardFor('color', 10, owned)).toEqual({

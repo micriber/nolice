@@ -18,6 +18,8 @@ export const NOL = {
   tealDeep: '#0FA1A3',
   mint: '#37C98B',
   mintDeep: '#1FA86F',
+  pink: '#EE6FB3',
+  pinkDeep: '#D4479A',
   star: '#FFC93C',
   starDeep: '#F0A91C',
 };
@@ -38,7 +40,13 @@ export function shade(hex: string, amt: number): string {
   return '#' + c(r) + c(g) + c(b);
 }
 
-export type GameKey = 'number' | 'animal' | 'color' | 'shape' | 'letter';
+export type GameKey =
+  | 'number'
+  | 'animal'
+  | 'color'
+  | 'shape'
+  | 'letter'
+  | 'sequence';
 
 export type GameConfig = {
   key: GameKey;
@@ -59,6 +67,7 @@ export const GAMES: GameConfig[] = [
   },
   {key: 'shape', label: 'Les formes', color: NOL.teal, deep: NOL.tealDeep},
   {key: 'letter', label: 'Les lettres', color: NOL.mint, deep: NOL.mintDeep},
+  {key: 'sequence', label: 'Les suites', color: NOL.pink, deep: NOL.pinkDeep},
 ];
 
 export function gameConfig(key: GameKey): GameConfig {

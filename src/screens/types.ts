@@ -15,6 +15,7 @@ export type StackNavigatorParamList = {
   Settings: undefined;
   NumberGame: undefined;
   FindGame: FindGameParams;
+  SequenceGame: undefined;
   Score: ScoreScreenParams;
 };
 

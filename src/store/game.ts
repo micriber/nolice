@@ -53,6 +53,8 @@ interface GameScoreState {
     minAnswer: number,
     closeChoices: boolean,
   ) => void;
+  // Partie dont les questions sont préparées par l'écran (jeu des suites).
+  start: (questions: Question[]) => void;
   answer: (isGood: boolean) => void;
   nextQuestion: () => void;
   hasMoreQuestion: () => boolean;
@@ -81,6 +83,9 @@ export const useGameScoreStore = create<GameScoreState>((set, get) => ({
       questions.push(newQuestion(answer, minAnswer, maxAnswer, closeChoices));
     }
 
+    set(() => ({questions, currentIndex: 0}));
+  },
+  start: (questions) => {
     set(() => ({questions, currentIndex: 0}));
   },
   answer: (isGood) => {
