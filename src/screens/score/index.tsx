@@ -202,10 +202,12 @@ export default function ScoreScreen() {
         : 'Bien essayé !';
   const message =
     mood === 'happy'
-      ? 'Incroyable, tu es un vrai champion !'
+      ? isPerfect
+        ? 'Tu as eu toutes les bonnes réponses !'
+        : 'Tu as eu presque toutes les bonnes réponses !'
       : mood === 'content'
-        ? 'Super travail, tu progresses vite !'
-        : 'Pas grave, on apprend en essayant. On retente ?';
+        ? 'Tu as eu plein de bonnes réponses !'
+        : 'On recommence ?';
 
   // Avant le premier affichage : la récompense prend la place du message sans qu'il clignote.
   useLayoutEffect(() => {
@@ -219,7 +221,15 @@ export default function ScoreScreen() {
       isGood,
       isPerfect,
     });
-    void playSound(mood === 'sad' ? SOUNDS.RETRY : SOUNDS.CONGRATULATION);
+    void playSound(
+      isPerfect
+        ? SOUNDS.PERFECT
+        : mood === 'happy'
+          ? SOUNDS.ALMOST
+          : mood === 'content'
+            ? SOUNDS.CONGRATULATION
+            : SOUNDS.RETRY,
+    );
     return () => {
       stopSound();
     };

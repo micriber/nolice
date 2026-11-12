@@ -122,7 +122,7 @@ export function ResultSheet(props: Props) {
               styles.headline,
               {color: accentDeep, fontSize: 26 * scale, lineHeight: 30 * scale},
             ]}>
-            {props.success ? 'Bravo !' : 'Presque !'}
+            {props.success ? 'Bravo !' : 'Dommage !'}
           </Text>
           <View style={[styles.answerRow, {marginTop: 5 * scale}]}>
             <Text style={[styles.answerLabel, {fontSize: 15 * scale}]}>

@@ -92,6 +92,8 @@ const ORANGE_ANSWER_SOUND_PATH = '../../assets/audio/response-orange.mp3';
 const GREY_QUESTION_SOUND_PATH = '../../assets/audio/grey.mp3';
 const GREY_ANSWER_SOUND_PATH = '../../assets/audio/response-grey.mp3';
 const CONGRATULATION_SOUND_PATH = '../../assets/audio/congratulation.mp3';
+const ALMOST_SOUND_PATH = '../../assets/audio/score-almost.mp3';
+const PERFECT_SOUND_PATH = '../../assets/audio/score-perfect.mp3';
 const RETRY_SOUND_PATH = '../../assets/audio/retry.mp3';
 const JOYEUSE_MUSIC_PATH = '../../assets/audio/joyeux.mp3';
 const CALME_MUSIC_PATH = '../../assets/audio/calme.mp3';
@@ -123,6 +125,8 @@ type SoundsType = {
   RETRY: AudioSource;
   BRAVO: AudioSource;
   CONGRATULATION: AudioSource;
+  ALMOST: AudioSource;
+  PERFECT: AudioSource;
 };
 
 export const SOUNDS: SoundsType = {
@@ -130,6 +134,8 @@ export const SOUNDS: SoundsType = {
   RETRY: require(RETRY_SOUND_PATH),
   BRAVO: require(BRAVO_SOUND_PATH),
   CONGRATULATION: require(CONGRATULATION_SOUND_PATH),
+  ALMOST: require(ALMOST_SOUND_PATH),
+  PERFECT: require(PERFECT_SOUND_PATH),
 };
 
 export const MUSIC_TRACKS: Record<MusicTrackKey, AudioSource> = {
@@ -371,6 +377,8 @@ export const useSoundStore = create<AudioStoreState>((set, get) => ({
       SOUNDS.BRAVO,
       SOUNDS.DOMMAGE,
       SOUNDS.CONGRATULATION,
+      SOUNDS.ALMOST,
+      SOUNDS.PERFECT,
       SOUNDS.RETRY,
       ...Object.values(SOUNDS_COUNT_QUESTION),
     ];

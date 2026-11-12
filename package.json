@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
+    "audio:samples": "node --env-file=.env.local scripts/voice-samples.mjs",
     "start": "expo start",
     "android": "expo run:android -d",
     "prebuild": " expo prebuild -p android",
@@ -44,6 +45,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@elevenlabs/elevenlabs-js": "^2.77.0",
     "@types/jest": "29.5.14",
     "@types/react": "~19.2.10",
     "@typescript-eslint/eslint-plugin": "^8.59.4",
